@@ -380,3 +380,8 @@ html, body {
   transition:all .2s;line-height:1;
 }
 .mute-btn:hover { background:rgba(255,150,0,.15); }
+
+/* City wrapper fix */
+.city-wrapper { display:flex;flex-direction:column;height:100%; }
+#city-map-scroll { flex:1;display:flex;flex-direction:column;min-height:0; }
+.city-viewport { flex:1;min-height:260px;max-height:calc(100vh - 320px); }
