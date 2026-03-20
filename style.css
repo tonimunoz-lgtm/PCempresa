@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<meta name="theme-color" content="#ff6b00"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="PizzaClicker"/>
+<meta name="description" content="El juego clicker más delicioso de la galaxia. ¡Conquista el multiverso a golpe de pizza!"/>
+<title>PizzaClicker 🍕 — El Imperio de la Pizza</title>
+<!-- PWA Manifest -->
+<link rel="manifest" href="manifest.json"/>
+<!-- Favicon -->
+<link rel="icon" type="image/x-icon" href="favicon.ico"/>
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png"/>
+<link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png"/>
+<!-- Apple Touch Icons -->
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png"/>
+<link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152x152.png"/>
+<link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144x144.png"/>
+<link rel="apple-touch-icon" sizes="128x128" href="icons/icon-128x128.png"/>
+<!-- Open Graph -->
+<meta property="og:title" content="PizzaClicker — El Imperio de la Pizza"/>
+<meta property="og:description" content="El juego clicker multijugador más delicioso de la galaxia"/>
+<meta property="og:image" content="icons/icon-512x512.png"/>
+<meta property="og:type" content="website"/>
+<link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+<!-- Background -->
+<div class="bg-glow bg1"></div>
+<div class="bg-glow bg2"></div>
+<div class="bg-pattern"></div>
+
+<!-- ===================== AUTH SCREEN ===================== -->
+<div id="auth-screen">
+  <div class="auth-particles" id="auth-particles"></div>
+  <div class="flame-bg fb1"></div>
+  <div class="flame-bg fb2"></div>
+  <div class="flame-bg fb3"></div>
+  <div class="auth-card">
+    <div class="auth-logo">
+      <span class="auth-logo-emoji">🍕</span>
+      <h1>PIZZA<span>CLICKER</span></h1>
+      <p>El Imperio de la Pizza</p>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login')">Entrar</button>
+      <button class="auth-tab" onclick="switchAuthTab('register')">Registro</button>
+      <button class="auth-tab" onclick="switchAuthTab('reset')">Recuperar</button>
+    </div>
+    <div id="field-username" class="form-group" style="display:none">
+      <label>Nombre de Pizzero</label>
+      <input type="text" id="inp-username" class="form-input" placeholder="Tu apodo legendario..."/>
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="inp-email" class="form-input" placeholder="tu@pizzeria.com" onkeydown="if(event.key==='Enter')authSubmit()"/>
+    </div>
+    <div id="field-password" class="form-group">
+      <label>Contraseña</label>
+      <input type="password" id="inp-password" class="form-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')authSubmit()"/>
+    </div>
+    <div id="auth-msg"></div>
+    <button class="auth-btn" id="auth-btn" onclick="authSubmit()">🔥 ¡Entrar al Horno!</button>
+    <p class="auth-footer">Guarda tu progreso en PizzaCity 🌍</p>
+  </div>
+</div>
+
+<!-- ===================== GAME SCREEN ===================== -->
+<div id="game-screen">
+
+  <!-- Top nav -->
+  <nav class="top-nav">
+    <div class="nav-brand">
+      <span class="nav-brand-emoji">🍕</span>
+      <span class="nav-brand-name">PIZZA<em>CLICKER</em></span>
+    </div>
+    <div class="nav-center" id="nav-center">
+      <div class="nav-stat" id="nav-pizzas"><span class="ns-icon">🍕</span><span class="ns-val">0 🍕</span></div>
+      <div class="nav-stat pps" id="nav-pps" style="display:none"><span class="ns-icon">⚡</span><span class="ns-val">0/s</span></div>
+    </div>
+    <button class="profile-btn" onclick="openProfile()">
+      <span>🍕</span>
+      <span id="nav-username">-</span>
+      <span class="plv" id="nav-level">Nv.1</span>
+    </button>
+  </nav>
+
+  <!-- XP bar -->
+  <div class="xp-bar-wrap">
+    <span class="xp-info" id="xp-info">Nv.1 · Aprendiz de Pizzero</span>
+    <div class="xp-track"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+    <span class="xp-info" id="xp-num">0 XP</span>
+  </div>
+
+  <!-- Main area -->
+  <div class="main-area" id="main-area">
+
+    <!-- CLICKER TAB -->
+    <div class="tab-panel active" id="tab-clicker">
+      <div class="clicker-panel">
+        <!-- Stats row -->
+        <div class="stats-row">
+          <div class="stat-box"><div class="sv" id="s-pizzas">0</div><div class="sl">Pizzas</div></div>
+          <div class="stat-box"><div class="sv" id="s-ppc">1</div><div class="sl">Por click</div></div>
+          <div class="stat-box"><div class="sv" id="s-pps">0</div><div class="sl">Por seg</div></div>
+          <div class="stat-box"><div class="sv" id="s-total">0</div><div class="sl">Total</div></div>
+        </div>
+
+        <!-- Level info -->
+        <div class="level-section">
+          <div class="level-info">
+            <span class="level-badge" id="level-badge">Nv.1</span>
+            <span class="level-title" id="level-title-text">Aprendiz de Pizzero</span>
+            <span class="combo-badge" id="combo-badge">🔥 COMBO x1.0</span>
+          </div>
+          <div class="xp-bar-small">
+            <div class="xp-bar-small-fill" id="xp-bar-small-fill" style="width:0%"></div>
+            <span class="xp-text" id="xp-text-small">0 XP</span>
+          </div>
+        </div>
+
+        <!-- THE OVEN -->
+        <div class="oven-container">
+          <div class="oven-glow" id="oven-glow"></div>
+          <div class="oven-wrapper" id="oven-wrapper" onclick="handleOvenClick(event)">
+            <div class="oven-body">
+              <!-- Main arch -->
+              <div class="oven-arch"></div>
+              <!-- Mouth -->
+              <div class="oven-mouth">
+                <div class="oven-interior"></div>
+                <div class="oven-fire" id="oven-fire"></div>
+              </div>
+              <!-- Base -->
+              <div class="oven-base"></div>
+              <!-- Chimney -->
+              <div class="oven-chimney">
+                <div class="oven-chimney-top"></div>
+                <div class="smoke-puff sp1"></div>
+                <div class="smoke-puff sp2"></div>
+              </div>
+              <!-- Floor stones -->
+              <div class="oven-stones" id="oven-stones"></div>
+              <!-- Label -->
+              <div class="oven-label">FORNO NAPOLETANO</div>
+            </div>
+            <!-- Pizza paddle -->
+            <div class="pizza-paddle" id="pizza-paddle">
+              <div class="paddle-handle"></div>
+              <div class="pizza-on-paddle">🍕</div>
+            </div>
+            <!-- Floaters -->
+            <div class="floaters-wrap" id="floaters-wrap"></div>
+          </div>
+          <div class="click-hint" id="click-hint">¡Haz click en el horno para hacer pizzas!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHOP TAB -->
+    <div class="tab-panel" id="tab-shop">
+      <div class="shop-wrapper">
+        <div class="shop-header">
+          <h2 class="shop-title">🏪 Tienda de Mejoras</h2>
+          <div class="shop-budget" id="shop-budget">0 🍕</div>
+        </div>
+        <div class="cat-bar" id="cat-bar"></div>
+        <div class="upgrades-list" id="upgrades-list"></div>
+      </div>
+    </div>
+
+    <!-- CITY TAB -->
+    <div class="tab-panel" id="tab-city">
+      <div class="city-wrapper">
+        <div class="city-hdr">
+          <h2>🌆 PizzaCity</h2>
+          <p>El corazón del imperio pizzero mundial</p>
+        </div>
+        <div class="city-map-scroll">
+          <div class="city-grid" id="city-grid"></div>
+        </div>
+        <div class="city-legend">
+          <div class="leg"><div class="leg-dot" style="background:#aaa"></div>Principiante</div>
+          <div class="leg"><div class="leg-dot" style="background:#00ff88"></div>Nv.4+</div>
+          <div class="leg"><div class="leg-dot" style="background:#ffcc00"></div>Nv.7+</div>
+          <div class="leg"><div class="leg-dot" style="background:#ff6b00"></div>Nv.10+</div>
+          <div class="leg"><div class="leg-dot" style="background:#ff00ff"></div>Élite</div>
+        </div>
+        <div class="ranking-section">
+          <h3>🏆 Ranking PizzaCity</h3>
+          <div id="ranking-list"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main-area -->
+
+  <!-- Bottom nav -->
+  <nav class="bottom-nav">
+    <button class="bnav-btn active" onclick="switchTab('clicker',this)"><span class="bi">🔥</span><span class="bl">Horno</span></button>
+    <button class="bnav-btn" onclick="switchTab('shop',this)"><span class="bi">🏪</span><span class="bl">Tienda</span></button>
+    <button class="bnav-btn" onclick="switchTab('city',this)"><span class="bi">🌆</span><span class="bl">PizzaCity</span></button>
+  </nav>
+</div>
+
+<!-- ===================== PROFILE MODAL ===================== -->
+<div class="modal-overlay" id="profile-modal" style="display:none" onclick="if(event.target===this)closeProfile()">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-avatar">🍕</div>
+      <div>
+        <div class="modal-uname" id="mod-uname">-</div>
+        <div class="modal-email" id="mod-email">-</div>
+        <div class="modal-title-lv" id="mod-title-lv">-</div>
+      </div>
+      <button class="modal-close" onclick="closeProfile()">✕</button>
+    </div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" onclick="switchModalTab('stats',this)">📊 Stats</button>
+      <button class="modal-tab" onclick="switchModalTab('security',this)">🔒 Seguridad</button>
+    </div>
+    <div id="modal-stats">
+      <div class="stat-grid-m" id="mod-stat-grid"></div>
+      <div class="next-unlock-box" id="mod-next-unlock"></div>
+      <div class="modal-msg" id="mod-msg" style="display:none"></div>
+      <button class="modal-btn" onclick="saveGameUI()">☁️ Guardar partida en la nube</button>
+    </div>
+    <div id="modal-security" style="display:none">
+      <p style="color:rgba(255,200,100,.75);font-size:13px;margin-bottom:14px;font-weight:700">Cambiar contraseña</p>
+      <input type="password" class="sec-input" id="new-pass" placeholder="Nueva contraseña (mín. 6 caracteres)"/>
+      <input type="password" class="sec-input" id="confirm-pass" placeholder="Confirmar nueva contraseña"/>
+      <div class="modal-msg" id="sec-msg" style="display:none"></div>
+      <button class="modal-btn" onclick="changePasswordUI()">🔑 Cambiar contraseña</button>
+    </div>
+    <button class="logout-btn" onclick="logoutUser()">🚪 Cerrar sesión</button>
+  </div>
+</div>
+
+<!-- Events container -->
+<div id="events-container"></div>
+
+<!-- Level up overlay -->
+<div id="levelup-overlay" onclick="if(event.target===this)closeLevelUp()">
+  <div class="lu-card">
+    <div class="lu-stars">✨✨✨</div>
+    <div class="lu-badge" id="lu-badge">NIVEL 2</div>
+    <div class="lu-title" id="lu-title">Pizzero Novato</div>
+    <div class="lu-unlock-box">
+      <div class="lu-ul-lbl">🔓 Desbloqueado:</div>
+      <div class="lu-ul-val" id="lu-unlock-val">-</div>
+    </div>
+    <button class="lu-btn" onclick="closeLevelUp()">¡Genial! 🍕</button>
+  </div>
+</div>
+
+<!-- ===================== SCRIPTS ===================== -->
+<script src="js/data.js"></script>
+<script src="js/game.js"></script>
+<script src="js/ui.js"></script>
+
+<!-- Firebase SDK (module) -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, updatePassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const app = initializeApp({
+  apiKey: "AIzaSyCkhLFKvgo-iPlHmHau-nxIysdnqp5ZdmI",
+  authDomain: "clicker-ea94f.firebaseapp.com",
+  projectId: "clicker-ea94f",
+  storageBucket: "clicker-ea94f.firebasestorage.app",
+  messagingSenderId: "873459350629",
+  appId: "1:873459350629:web:813bb901d6e928c8e8da8c"
+});
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+// Expose Firestore helpers to non-module scripts
+window._db            = db;
+window._db_collection = collection;
+window._db_getDocs    = getDocs;
+
+// Auth state
+let authMode = 'login';
+window._currentUserId   = null;
+window._currentUsername = '';
+window._currentEmail    = '';
+
+// ---- Auth tab switch ----
+window.switchAuthTab = function(mode) {
+  authMode = mode;
+  document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active', ['login','register','reset'][i]===mode));
+  document.getElementById('field-username').style.display = mode==='register'?'block':'none';
+  document.getElementById('field-password').style.display = mode==='reset'?'none':'block';
+  const btn = document.getElementById('auth-btn');
+  btn.textContent = mode==='login'?'🔥 ¡Entrar al Horno!': mode==='register'?'🍕 ¡Crear mi Pizzería!':'📧 Enviar Email de Recuperación';
+  document.getElementById('auth-msg').innerHTML='';
+};
+
+// ---- Auth submit ----
+window.authSubmit = async function() {
+  const email    = document.getElementById('inp-email').value.trim();
+  const password = document.getElementById('inp-password').value;
+  const username = document.getElementById('inp-username').value.trim();
+  const btn      = document.getElementById('auth-btn');
+  const msgEl    = document.getElementById('auth-msg');
+  msgEl.innerHTML = ''; btn.disabled=true; btn.textContent='⏳ Cargando...';
+  try {
+    if (authMode === 'login') {
+      await signInWithEmailAndPassword(auth, email, password);
+    } else if (authMode === 'register') {
+      if (!username) throw new Error('El nombre de pizzero es obligatorio');
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      const cx = Math.floor(Math.random()*14)+1, cy = Math.floor(Math.random()*10)+1;
+      await setDoc(doc(db,'users',cred.user.uid), {username, email, createdAt:Date.now(), gameState:null, cityPos:{x:cx,y:cy}});
+      await setDoc(doc(db,'city',cred.user.uid),  {userId:cred.user.uid, username, x:cx, y:cy, level:1, reputation:0, pizzasSold:0, upgrades:[], lastActive:Date.now()});
+    } else {
+      await sendPasswordResetEmail(auth, email);
+      msgEl.innerHTML='<div class="auth-success">✅ Email enviado. Revisa tu bandeja de entrada.</div>';
+    }
+  } catch(e) {
+    let m = e.message||'Error desconocido';
+    if (m.includes('user-not-found'))          m='Usuario no encontrado';
+    else if (m.includes('invalid-credential') || m.includes('wrong-password')) m='Email o contraseña incorrectos';
+    else if (m.includes('email-already-in-use')) m='Este email ya está registrado';
+    else if (m.includes('weak-password'))        m='Contraseña muy débil (mínimo 6 caracteres)';
+    msgEl.innerHTML=`<div class="auth-error">⚠️ ${m}</div>`;
+  }
+  btn.disabled=false; switchAuthTab(authMode);
+};
+
+// ---- Firebase game save ----
+window.saveGameToFirebase = async function() {
+  if (!window._currentUserId) return;
+  const save = {pizzas:G.pizzas, total:G.total, level:G.level, xp:G.xp, upgrades:G.upgrades, rep:G.rep};
+  await updateDoc(doc(db,'users',window._currentUserId), {gameState:save});
+  await updateDoc(doc(db,'city', window._currentUserId), {
+    level:G.level, reputation:G.rep, pizzasSold:G.total,
+    upgrades:Object.keys(G.upgrades).filter(k=>G.upgrades[k]>0),
+    lastActive:Date.now()
+  });
+};
+
+// ---- Change password ----
+window._changePassword = async function(newPass) {
+  await updatePassword(auth.currentUser, newPass);
+};
+
+// ---- Logout ----
+window.logoutUser = async function() {
+  await window.saveGameToFirebase().catch(()=>{});
+  await signOut(auth);
+  // Reset state
+  Object.assign(G, {pizzas:0,total:0,ppc:1,pps:0,rep:0,level:1,xp:0,upgrades:{},combo:0,lastClick:0,multiplier:1,secLevel:0,policeCorr:0,detectiveLv:0});
+  window._currentUserId=''; window._currentUsername=''; window._currentEmail='';
+  closeProfile();
+  document.getElementById('game-screen').style.display='none';
+  document.getElementById('auth-screen').style.display='flex';
+};
+
+// ---- Auth state listener ----
+onAuthStateChanged(auth, async user => {
+  if (user) {
+    window._currentUserId = user.uid;
+    window._currentEmail  = user.email;
+    try {
+      const snap = await getDoc(doc(db,'users',user.uid));
+      if (snap.exists()) {
+        const data = snap.data();
+        window._currentUsername = data.username || user.email;
+        if (data.gameState) loadGameState(data.gameState);
+      }
+    } catch(e) { console.log('Offline, using local state'); }
+    startGame();
+  } else {
+    document.getElementById('auth-screen').style.display='flex';
+    document.getElementById('game-screen').style.display='none';
+  }
+});
+
+// ---- Start game ----
+function startGame() {
+  document.getElementById('auth-screen').style.display='none';
+  document.getElementById('game-screen').style.display='flex';
+  document.getElementById('nav-username').textContent = window._currentUsername;
+  buildOvenFlames();
+  buildOvenStones();
+  buildAuthParticles();
+  renderShop();
+  updateUI();
+  startPassiveLoop();
+  startEventLoop();
+  startAutoSave();
+}
+
+function buildOvenFlames() {
+  const fire = document.getElementById('oven-fire');
+  fire.innerHTML='';
+  for(let i=0;i<8;i++){
+    const f=document.createElement('div');
+    f.className='fire-tongue';
+    f.style.cssText=`left:${i*12.5}%;height:${28+Math.random()*30}px;animation-delay:${Math.random()*0.5}s;animation-duration:${0.28+Math.random()*0.35}s`;
+    fire.appendChild(f);
+  }
+}
+
+function buildOvenStones() {
+  const stones = document.getElementById('oven-stones');
+  stones.innerHTML='';
+  [38,42,36,40,34].forEach(w => {
+    const s=document.createElement('div');
+    s.className='stone';
+    s.style.width=w+'px';
+    stones.appendChild(s);
+  });
+}
+
+function buildAuthParticles() {
+  const c = document.getElementById('auth-particles');
+  c.innerHTML='';
+  for(let i=0;i<18;i++){
+    const d=document.createElement('div');
+    d.className='auth-particle';
+    d.textContent='🍕';
+    d.style.cssText=`left:${Math.random()*100}%;font-size:${12+Math.random()*18}px;animation-delay:${Math.random()*5}s;animation-duration:${3+Math.random()*4}s`;
+    c.appendChild(d);
+  }
+}
+</script>
+</body>
+</html>
