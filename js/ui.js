@@ -336,10 +336,13 @@ async function renderCity() {
 
   // Load real players
   try {
-    const snap = await window._db_getDocs(window._db_collection(window._db, 'city'));
-    cityPlayers = [];
-    snap.forEach(d => cityPlayers.push(d.data()));
+    if (window._db && window._db_getDocs && window._db_collection) {
+      const snap = await window._db_getDocs(window._db_collection(window._db, 'city'));
+      cityPlayers = [];
+      snap.forEach(d => cityPlayers.push(d.data()));
+    }
   } catch(e) {
+    console.log('City load error:', e.message);
     cityPlayers = [];
   }
 
