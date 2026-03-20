@@ -258,20 +258,7 @@ for (let y = 0; y < CITY_H; y++) {
 }
 
 // Demo players to populate the city
-const DEMO_PLAYERS = [
-  {userId:'d1',username:'PizzaKing',x:0,y:0,level:12,reputation:1200,pizzasSold:500000,upgrades:['oven_4','staff_5','delivery_3','decor_4','tech_4'],lastActive:Date.now()-120000},
-  {userId:'d2',username:'ItalyBoss',x:3,y:0,level:9,reputation:800,pizzasSold:200000,upgrades:['oven_3','staff_3','delivery_2','decor_3'],lastActive:Date.now()-600000},
-  {userId:'d3',username:'MozzaMaster',x:6,y:0,level:7,reputation:400,pizzasSold:80000,upgrades:['oven_2','staff_2','decor_2'],lastActive:Date.now()-3600000},
-  {userId:'d4',username:'NapoliPro',x:9,y:0,level:5,reputation:200,pizzasSold:20000,upgrades:['oven_2','staff_1'],lastActive:Date.now()-7200000},
-  {userId:'d5',username:'VesuBurns',x:12,y:0,level:10,reputation:950,pizzasSold:300000,upgrades:['oven_3','staff_4','delivery_3','sec_2'],lastActive:Date.now()-300000},
-  {userId:'d6',username:'FornoRex',x:0,y:3,level:6,reputation:300,pizzasSold:50000,upgrades:['oven_2','staff_2'],lastActive:Date.now()-14400000},
-  {userId:'d7',username:'PizzaLoca',x:3,y:3,level:4,reputation:120,pizzasSold:10000,upgrades:['oven_1','staff_1'],lastActive:Date.now()-86400000},
-  {userId:'d8',username:'GalacticPie',x:6,y:3,level:14,reputation:2000,pizzasSold:5000000,upgrades:['oven_5','staff_6','space_2','tech_4'],lastActive:Date.now()-60000},
-  {userId:'d9',username:'TomatoGod',x:9,y:3,level:8,reputation:500,pizzasSold:150000,upgrades:['oven_3','staff_3','delivery_2'],lastActive:Date.now()-1800000},
-  {userId:'d10',username:'CheeseLord',x:12,y:3,level:3,reputation:60,pizzasSold:5000,upgrades:['oven_1'],lastActive:Date.now()-172800000},
-  {userId:'d11',username:'MarcoPollo',x:15,y:0,level:11,reputation:1100,pizzasSold:400000,upgrades:['oven_4','staff_5','delivery_3','tech_3'],lastActive:Date.now()-900000},
-  {userId:'d12',username:'SalsaDiva',x:18,y:0,level:2,reputation:20,pizzasSold:500,upgrades:[],lastActive:Date.now()-259200000},
-];
+const DEMO_PLAYERS = []; // Add real players via Firebase
 
 // Get visual appearance of pizzeria based on upgrades
 function getPizzeriaVisual(player) {
@@ -432,6 +419,8 @@ async function renderCity() {
   }
 
   world.appendChild(grid);
+  // Add life to the city after a short delay
+  setTimeout(() => addCityLife(world, CITY_W, CITY_H, CELL), 300);
 
   // Center on my player on load
   const myPlayer = allPlayers.find(p => p.userId === window._currentUserId);
@@ -442,6 +431,247 @@ async function renderCity() {
   applyTransform();
   setupCityEvents(viewport, world);
   renderRanking(allPlayers);
+}
+
+function addCityLife(world, W, H, CELL) {
+  const STEP = CELL + 2; // cell + gap
+
+  // --- CARS on horizontal roads (y % 3 === 2) ---
+  const carEmojis = ['🚗','🚕','🚙','🏎️','🚓','🚑','🚌','🛵'];
+  const hRoadRows = [];
+  const vRoadCols = [];
+  for (let y = 0; y < H; y++) { if (y % 3 === 2) hRoadRows.push(y); }
+  for (let x = 0; x < W; x++) { if (x % 3 === 2) vRoadCols.push(x); }
+
+  // Horizontal cars
+  hRoadRows.forEach((row, ri) => {
+    const numCars = 2 + Math.floor(Math.random() * 3);
+    for (let i = 0; i < numCars; i++) {
+      const car = document.createElement('div');
+      car.className = 'city-car ' + (Math.random() > 0.5 ? 'going-right' : 'going-left');
+      const yPos = row * STEP + STEP * 0.25 + (Math.random() * STEP * 0.35);
+      const duration = 6 + Math.random() * 8;
+      const delay = -Math.random() * duration;
+      car.style.cssText = `top:${yPos}px;animation-duration:${duration}s;animation-delay:${delay}s`;
+      car.textContent = carEmojis[Math.floor(Math.random() * carEmojis.length)];
+      world.appendChild(car);
+    }
+  });
+
+  // Vertical cars
+  vRoadCols.forEach((col, ci) => {
+    const numCars = 1 + Math.floor(Math.random() * 2);
+    for (let i = 0; i < numCars; i++) {
+      const car = document.createElement('div');
+      const goingDown = Math.random() > 0.5;
+      car.className = 'city-car ' + (goingDown ? 'going-down' : 'going-up');
+      const xPos = col * STEP + STEP * 0.2 + (Math.random() * STEP * 0.4);
+      const duration = 7 + Math.random() * 9;
+      const delay = -Math.random() * duration;
+      car.style.cssText = `left:${xPos}px;animation-duration:${duration}s;animation-delay:${delay}s`;
+      car.textContent = goingDown ? '🚗' : '🚙';
+      world.appendChild(car);
+    }
+  });
+
+  // --- DELIVERY BIKES on some h-roads ---
+  hRoadRows.slice(0, 3).forEach(row => {
+    if (Math.random() > 0.4) {
+      const del = document.createElement('div');
+      del.className = 'city-delivery';
+      const yPos = row * STEP + STEP * 0.6;
+      const duration = 4 + Math.random() * 4;
+      del.style.cssText = `top:${yPos}px;animation-duration:${duration}s;animation-delay:${-Math.random()*duration}s`;
+      del.textContent = '🛵';
+      world.appendChild(del);
+    }
+  });
+
+  // --- PEOPLE near buildings and pizzerias ---
+  const personEmojis = ['🧑','👩','👨','🧒','👴','👵','🧑‍🍳'];
+  // Scatter ~40 people around building cells
+  let personCount = 0;
+  for (let y = 0; y < H && personCount < 40; y++) {
+    for (let x = 0; x < W && personCount < 40; x++) {
+      if (BIG_LAYOUT[y] && BIG_LAYOUT[y][x] === 1 && Math.random() > 0.75) {
+        const numPeople = 1 + Math.floor(Math.random() * 2);
+        for (let p = 0; p < numPeople; p++) {
+          const person = document.createElement('div');
+          const isEntering = Math.random() > 0.7;
+          person.className = 'city-person' + (isEntering ? ' entering' : '');
+          const xPos = x * STEP + 4 + Math.random() * (STEP - 10);
+          const yPos = y * STEP + 4 + Math.random() * (STEP - 10);
+          const duration = 3 + Math.random() * 5;
+          const delay = -Math.random() * duration;
+          person.style.cssText = `left:${xPos}px;top:${yPos}px;animation-duration:${duration}s;animation-delay:${delay}s`;
+          person.textContent = personEmojis[Math.floor(Math.random() * personEmojis.length)];
+          world.appendChild(person);
+          personCount++;
+        }
+      }
+    }
+  }
+
+  // --- SMOKE from pizzeria cells (cells with players) ---
+  // Find player cells and add smoke puffs
+  world.querySelectorAll('.c-cell.has-player').forEach(cell => {
+    const numPuffs = 2 + Math.floor(Math.random() * 2);
+    for (let s = 0; s < numPuffs; s++) {
+      const smoke = document.createElement('div');
+      smoke.className = 'pizzeria-smoke';
+      smoke.style.animationDelay = (s * 0.7) + 's';
+      smoke.style.right = (2 + s * 5) + 'px';
+      cell.appendChild(smoke);
+    }
+  });
+}
+
+// ===================== CITY LIFE =====================
+function spawnCityLife(world, W, H, CELL) {
+  const STEP = CELL + 2; // cell size + gap
+
+  // Collect road cells by direction
+  const hRoads = []; // horizontal road rows (y % 3 === 2)
+  const vRoads = []; // vertical road cols (x % 3 === 2)
+
+  for (let y = 0; y < H; y++) {
+    if (y % 3 === 2) hRoads.push(y);
+  }
+  for (let x = 0; x < W; x++) {
+    if (x % 3 === 2) vRoads.push(x);
+  }
+
+  const CARS_H = ['🚗','🚕','🚙','🛻','🚓'];
+  const CARS_V = ['🚗','🚕','🚙','🚑','🚒'];
+  const PEOPLE = ['🧑','👩','👨','🧒','👴','👵','🧍','🚶'];
+
+  // Horizontal cars — move left→right or right→left along each hRoad row
+  hRoads.forEach((ry, i) => {
+    const count = 2 + Math.floor(Math.random() * 2);
+    for (let c = 0; c < count; c++) {
+      const goRight = Math.random() > 0.5;
+      const car = document.createElement('div');
+      car.className = 'city-car city-car-h';
+      car.textContent = CARS_H[Math.floor(Math.random() * CARS_H.length)];
+      const startX = goRight ? -STEP : W * STEP;
+      const endX   = goRight ? W * STEP + STEP : -STEP * 2;
+      const topY   = ry * STEP + STEP * 0.2;
+      const dur    = 8 + Math.random() * 12; // seconds
+      const delay  = -(Math.random() * dur);  // negative = already mid-journey
+      car.style.cssText = `
+        position:absolute;
+        left:${startX}px;
+        top:${topY}px;
+        font-size:${Math.floor(CELL * 0.38)}px;
+        line-height:1;
+        z-index:15;
+        pointer-events:none;
+        transform:scaleX(${goRight ? 1 : -1});
+        animation: carMoveH_${i}_${c} ${dur}s ${delay}s linear infinite;
+      `;
+      // Inject keyframe
+      const kf = document.createElement('style');
+      kf.textContent = `
+        @keyframes carMoveH_${i}_${c} {
+          from { transform: scaleX(${goRight?1:-1}) translateX(${goRight ? 0 : endX - startX}px); }
+          to   { transform: scaleX(${goRight?1:-1}) translateX(${goRight ? endX - startX : 0}px); }
+        }
+      `;
+      document.head.appendChild(kf);
+      world.appendChild(car);
+    }
+  });
+
+  // Vertical cars — move top→bottom or bottom→top along each vRoad col
+  vRoads.forEach((vx, i) => {
+    const count = 1 + Math.floor(Math.random() * 2);
+    for (let c = 0; c < count; c++) {
+      const goDown = Math.random() > 0.5;
+      const car = document.createElement('div');
+      car.className = 'city-car city-car-v';
+      car.textContent = CARS_V[Math.floor(Math.random() * CARS_V.length)];
+      const leftX  = vx * STEP + STEP * 0.15;
+      const startY = goDown ? -STEP : H * STEP;
+      const endY   = goDown ? H * STEP + STEP : -STEP * 2;
+      const dur    = 10 + Math.random() * 14;
+      const delay  = -(Math.random() * dur);
+      car.style.cssText = `
+        position:absolute;
+        left:${leftX}px;
+        top:${startY}px;
+        font-size:${Math.floor(CELL * 0.35)}px;
+        line-height:1;
+        z-index:15;
+        pointer-events:none;
+        animation: carMoveV_${i}_${c} ${dur}s ${delay}s linear infinite;
+      `;
+      const kf = document.createElement('style');
+      kf.textContent = `
+        @keyframes carMoveV_${i}_${c} {
+          from { top: ${startY}px; }
+          to   { top: ${endY}px; }
+        }
+      `;
+      document.head.appendChild(kf);
+      world.appendChild(car);
+    }
+  });
+
+  // People — wander near pizzerias on building tiles
+  const buildingCells = [];
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      if (BIG_LAYOUT[y][x] === 1) buildingCells.push({x, y});
+    }
+  }
+  // Pick random building cells for people
+  const peopleCount = 18 + Math.floor(Math.random() * 12);
+  for (let p = 0; p < peopleCount; p++) {
+    const bc = buildingCells[Math.floor(Math.random() * buildingCells.length)];
+    const person = document.createElement('div');
+    person.className = 'city-person';
+    person.textContent = PEOPLE[Math.floor(Math.random() * PEOPLE.length)];
+
+    // Pick a nearby road cell to walk toward
+    const targetX = bc.x + (Math.random() > 0.5 ? 2 : -1);
+    const targetY = bc.y + (Math.random() > 0.5 ? 2 : -1);
+    const clampX  = Math.max(0, Math.min(W-1, targetX));
+    const clampY  = Math.max(0, Math.min(H-1, targetY));
+
+    const startPx = bc.x * STEP + STEP * 0.3;
+    const startPy = bc.y * STEP + STEP * 0.3;
+    const endPx   = clampX * STEP + STEP * 0.3;
+    const endPy   = clampY * STEP + STEP * 0.3;
+
+    const dur   = 4 + Math.random() * 8;
+    const delay = -(Math.random() * dur);
+    const faceR = endPx > startPx ? 1 : -1;
+
+    person.style.cssText = `
+      position:absolute;
+      left:${startPx}px;
+      top:${startPy}px;
+      font-size:${Math.floor(CELL * 0.28)}px;
+      line-height:1;
+      z-index:12;
+      pointer-events:none;
+      transform:scaleX(${faceR});
+      animation: personWalk_${p} ${dur}s ${delay}s ease-in-out infinite alternate;
+    `;
+    const kf = document.createElement('style');
+    kf.textContent = `
+      @keyframes personWalk_${p} {
+        0%   { left:${startPx}px; top:${startPy}px; opacity:0.9; }
+        45%  { left:${endPx}px;   top:${endPy}px;   opacity:0.9; }
+        50%  { opacity:0; }
+        55%  { left:${startPx + (Math.random()*20-10)}px; top:${startPy + (Math.random()*20-10)}px; opacity:0; }
+        60%  { opacity:0.85; }
+        100% { left:${startPx}px; top:${startPy}px; opacity:0.9; }
+      }
+    `;
+    document.head.appendChild(kf);
+    world.appendChild(person);
+  }
 }
 
 function getTileBg(tile) {
@@ -662,6 +892,123 @@ function timeAgoCity(ts) {
 }
 
 // ===================== RANKING =====================
+
+// ===================== CITY LIFE =====================
+
+const CAR_EMOJIS     = ['🚗','🚕','🚙','🚌','🚎','🏎️','🚐','🚑','🚒'];
+const PERSON_EMOJIS  = ['🚶','🚶‍♀️','🧍','🕴️','👨','👩','🧑','👴','👵','🧒'];
+const DELIVERY_EMOJI = ['🛵','🚲','🛺'];
+
+function spawnCityLife(gridEl, gridW, gridH, cellSize, gap) {
+  const totalCell = cellSize + gap;
+
+  // Horizontal road rows (y % 3 === 2)
+  for (let y = 2; y < gridH; y += 3) {
+    const roadY = y * totalCell + totalCell / 2 - 6;
+    const roadLen = gridW * totalCell;
+
+    // 2-3 cars per horizontal road
+    const numCars = 2 + Math.floor(Math.random() * 2);
+    for (let i = 0; i < numCars; i++) {
+      const car = document.createElement('div');
+      const rev = Math.random() > 0.5;
+      car.className = 'city-car ' + (rev ? 'h-car-rev' : 'h-car');
+      car.textContent = CAR_EMOJIS[Math.floor(Math.random() * CAR_EMOJIS.length)];
+      const duration = 6 + Math.random() * 8;
+      const delay    = -(Math.random() * duration);
+      const laneOffset = rev ? 6 : -4;
+      car.style.cssText = `
+        left:0; top:${roadY + laneOffset}px;
+        --road-len:${roadLen}px;
+        animation-duration:${duration}s;
+        animation-delay:${delay}s;
+      `;
+      gridEl.appendChild(car);
+    }
+
+    // Delivery scooter occasionally
+    if (Math.random() > 0.5) {
+      const del = document.createElement('div');
+      del.className = 'city-delivery';
+      del.textContent = DELIVERY_EMOJI[Math.floor(Math.random() * DELIVERY_EMOJI.length)];
+      const duration = 3 + Math.random() * 3;
+      del.style.cssText = `
+        left:0; top:${roadY - 6}px;
+        --road-len:${roadLen}px;
+        animation-duration:${duration}s;
+        animation-delay:${-(Math.random() * duration)}s;
+      `;
+      gridEl.appendChild(del);
+    }
+
+    // People walking along the sidewalk (just above the road)
+    const numPeople = 3 + Math.floor(Math.random() * 3);
+    for (let i = 0; i < numPeople; i++) {
+      const person = document.createElement('div');
+      const rev = Math.random() > 0.5;
+      person.className = 'city-person' + (rev ? ' rev' : '');
+      person.textContent = PERSON_EMOJIS[Math.floor(Math.random() * PERSON_EMOJIS.length)];
+      const duration = 12 + Math.random() * 16;
+      const walkLen  = (2 + Math.floor(Math.random() * (gridW / 3))) * totalCell;
+      const startX   = Math.floor(Math.random() * gridW) * totalCell;
+      const sideY    = roadY - totalCell * 0.6 + (Math.random() > 0.5 ? totalCell * 1.1 : 0);
+      person.style.cssText = `
+        left:${startX}px; top:${sideY}px;
+        --walk-len:${walkLen}px;
+        animation-duration:${duration}s;
+        animation-delay:${-(Math.random() * duration)}s;
+      `;
+      gridEl.appendChild(person);
+    }
+  }
+
+  // Vertical road columns (x % 3 === 2)
+  for (let x = 2; x < gridW; x += 3) {
+    const roadX = x * totalCell + totalCell / 2 - 6;
+    const roadLen = gridH * totalCell;
+
+    const numCars = 1 + Math.floor(Math.random() * 2);
+    for (let i = 0; i < numCars; i++) {
+      const car = document.createElement('div');
+      const rev = Math.random() > 0.5;
+      car.className = 'city-car ' + (rev ? 'v-car-rev' : 'v-car');
+      car.textContent = CAR_EMOJIS[Math.floor(Math.random() * CAR_EMOJIS.length)];
+      const duration = 7 + Math.random() * 9;
+      car.style.cssText = `
+        left:${roadX}px; top:0;
+        --road-len:${roadLen}px;
+        animation-duration:${duration}s;
+        animation-delay:${-(Math.random() * duration)}s;
+      `;
+      gridEl.appendChild(car);
+    }
+  }
+
+  // Smoke from pizzerias — find player cells and add smoke
+  const playerCells = gridEl.querySelectorAll('.c-cell.has-player');
+  playerCells.forEach(cell => {
+    for (let s = 0; s < 3; s++) {
+      const smoke = document.createElement('div');
+      smoke.className = 'pizzeria-smoke' + (s > 0 ? ' s'+(s+1) : '');
+      cell.appendChild(smoke);
+    }
+    // Occasionally add a person entering
+    if (Math.random() > 0.4) {
+      const person = document.createElement('div');
+      person.className = 'city-person enter-pizzeria';
+      person.textContent = PERSON_EMOJIS[Math.floor(Math.random() * PERSON_EMOJIS.length)];
+      const duration = 4 + Math.random() * 6;
+      person.style.cssText = `
+        bottom:2px; left:${4 + Math.random()*10}px; top:auto;
+        animation-duration:${duration}s;
+        animation-delay:${-(Math.random() * duration)}s;
+        --walk-len:0px;
+      `;
+      cell.appendChild(person);
+    }
+  });
+}
+
 function renderRanking(allPlayers) {
   const list = document.getElementById('ranking-list');
   if (!list) return;
