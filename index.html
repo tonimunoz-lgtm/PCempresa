@@ -47,9 +47,9 @@
       <p>El Imperio de la Pizza</p>
     </div>
     <div class="auth-tabs">
-      <button class="auth-tab active" onclick="switchAuthTab('login')">Entrar</button>
-      <button class="auth-tab" onclick="switchAuthTab('register')">Registro</button>
-      <button class="auth-tab" onclick="switchAuthTab('reset')">Recuperar</button>
+      <button class="auth-tab active" id="tab-login">Entrar</button>
+      <button class="auth-tab" id="tab-register">Registro</button>
+      <button class="auth-tab" id="tab-reset">Recuperar</button>
     </div>
     <div id="field-username" class="form-group" style="display:none">
       <label>Nombre de Pizzero</label>
@@ -64,7 +64,7 @@
       <input type="password" id="inp-password" class="form-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')authSubmit()"/>
     </div>
     <div id="auth-msg"></div>
-    <button class="auth-btn" id="auth-btn" onclick="authSubmit()">🔥 ¡Entrar al Horno!</button>
+    <button class="auth-btn" id="auth-btn">🔥 ¡Entrar al Horno!</button>
     <p class="auth-footer">Guarda tu progreso en PizzaCity 🌍</p>
   </div>
 </div>
@@ -82,7 +82,7 @@
       <div class="nav-stat" id="nav-pizzas"><span class="ns-icon">🍕</span><span class="ns-val">0 🍕</span></div>
       <div class="nav-stat pps" id="nav-pps" style="display:none"><span class="ns-icon">⚡</span><span class="ns-val">0/s</span></div>
     </div>
-    <button class="profile-btn" onclick="openProfile()">
+    <button class="profile-btn" >
       <span>🍕</span>
       <span id="nav-username">-</span>
       <span class="plv" id="nav-level">Nv.1</span>
@@ -126,7 +126,7 @@
         <!-- THE OVEN -->
         <div class="oven-container">
           <div class="oven-glow" id="oven-glow"></div>
-          <div class="oven-wrapper" id="oven-wrapper" onclick="handleOvenClick(event)">
+          <div class="oven-wrapper" id="oven-wrapper" >
             <div class="oven-body">
               <!-- Main arch -->
               <div class="oven-arch"></div>
@@ -201,14 +201,14 @@
 
   <!-- Bottom nav -->
   <nav class="bottom-nav">
-    <button class="bnav-btn active" onclick="switchTab('clicker',this)"><span class="bi">🔥</span><span class="bl">Horno</span></button>
-    <button class="bnav-btn" onclick="switchTab('shop',this)"><span class="bi">🏪</span><span class="bl">Tienda</span></button>
-    <button class="bnav-btn" onclick="switchTab('city',this)"><span class="bi">🌆</span><span class="bl">PizzaCity</span></button>
+    <button class="bnav-btn active" ><span class="bi">🔥</span><span class="bl">Horno</span></button>
+    <button class="bnav-btn" ><span class="bi">🏪</span><span class="bl">Tienda</span></button>
+    <button class="bnav-btn" ><span class="bi">🌆</span><span class="bl">PizzaCity</span></button>
   </nav>
 </div>
 
 <!-- ===================== PROFILE MODAL ===================== -->
-<div class="modal-overlay" id="profile-modal" style="display:none" onclick="if(event.target===this)closeProfile()">
+<div class="modal-overlay" id="profile-modal" style="display:none" >
   <div class="modal-card">
     <div class="modal-header">
       <div class="modal-avatar">🍕</div>
@@ -217,26 +217,26 @@
         <div class="modal-email" id="mod-email">-</div>
         <div class="modal-title-lv" id="mod-title-lv">-</div>
       </div>
-      <button class="modal-close" onclick="closeProfile()">✕</button>
+      <button class="modal-close" >✕</button>
     </div>
     <div class="modal-tabs">
-      <button class="modal-tab active" onclick="switchModalTab('stats',this)">📊 Stats</button>
-      <button class="modal-tab" onclick="switchModalTab('security',this)">🔒 Seguridad</button>
+      <button class="modal-tab active" >📊 Stats</button>
+      <button class="modal-tab" >🔒 Seguridad</button>
     </div>
     <div id="modal-stats">
       <div class="stat-grid-m" id="mod-stat-grid"></div>
       <div class="next-unlock-box" id="mod-next-unlock"></div>
       <div class="modal-msg" id="mod-msg" style="display:none"></div>
-      <button class="modal-btn" onclick="saveGameUI()">☁️ Guardar partida en la nube</button>
+      <button class="modal-btn" >☁️ Guardar partida en la nube</button>
     </div>
     <div id="modal-security" style="display:none">
       <p style="color:rgba(255,200,100,.75);font-size:13px;margin-bottom:14px;font-weight:700">Cambiar contraseña</p>
       <input type="password" class="sec-input" id="new-pass" placeholder="Nueva contraseña (mín. 6 caracteres)"/>
       <input type="password" class="sec-input" id="confirm-pass" placeholder="Confirmar nueva contraseña"/>
       <div class="modal-msg" id="sec-msg" style="display:none"></div>
-      <button class="modal-btn" onclick="changePasswordUI()">🔑 Cambiar contraseña</button>
+      <button class="modal-btn" >🔑 Cambiar contraseña</button>
     </div>
-    <button class="logout-btn" onclick="logoutUser()">🚪 Cerrar sesión</button>
+    <button class="logout-btn" >🚪 Cerrar sesión</button>
   </div>
 </div>
 
@@ -244,7 +244,7 @@
 <div id="events-container"></div>
 
 <!-- Level up overlay -->
-<div id="levelup-overlay" onclick="if(event.target===this)closeLevelUp()">
+<div id="levelup-overlay" >
   <div class="lu-card">
     <div class="lu-stars">✨✨✨</div>
     <div class="lu-badge" id="lu-badge">NIVEL 2</div>
@@ -253,7 +253,7 @@
       <div class="lu-ul-lbl">🔓 Desbloqueado:</div>
       <div class="lu-ul-val" id="lu-unlock-val">-</div>
     </div>
-    <button class="lu-btn" onclick="closeLevelUp()">¡Genial! 🍕</button>
+    <button class="lu-btn" id="lu-btn">¡Genial! 🍕</button>
   </div>
 </div>
 
@@ -362,8 +362,40 @@ window.logoutUser = async function() {
   document.getElementById('auth-screen').style.display='flex';
 };
 
-// ---- Auth state listener ----
-onAuthStateChanged(auth, async user => {
+// ---- Wire up ALL event listeners inside module ----
+document.addEventListener('DOMContentLoaded', () => {});
+
+// Auth tabs
+document.getElementById('tab-login').addEventListener('click',    () => switchAuthTab('login'));
+document.getElementById('tab-register').addEventListener('click', () => switchAuthTab('register'));
+document.getElementById('tab-reset').addEventListener('click',    () => switchAuthTab('reset'));
+document.getElementById('auth-btn').addEventListener('click',     authSubmit);
+document.getElementById('inp-email').addEventListener('keydown',    e => { if(e.key==='Enter') authSubmit(); });
+document.getElementById('inp-password').addEventListener('keydown', e => { if(e.key==='Enter') authSubmit(); });
+
+// Game buttons — profile, logout, save, change password, level up
+document.getElementById('profile-modal').addEventListener('click', e => { if(e.target===document.getElementById('profile-modal')) closeProfile(); });
+document.getElementById('levelup-overlay').addEventListener('click', e => { if(e.target===document.getElementById('levelup-overlay')) closeLevelUp(); });
+
+// Bottom nav
+document.querySelectorAll('.bnav-btn').forEach((btn, i) => {
+  const tabs = ['clicker','shop','city'];
+  btn.addEventListener('click', () => switchTab(tabs[i], btn));
+});
+
+// Oven click
+document.getElementById('oven-wrapper').addEventListener('click', handleOvenClick);
+
+// Profile button
+document.getElementById('profile-modal').querySelector('.modal-close').addEventListener('click', closeProfile);
+document.querySelectorAll('.modal-tab').forEach((btn, i) => {
+  btn.addEventListener('click', () => switchModalTab(i===0?'stats':'security', btn));
+});
+document.querySelector('.logout-btn').addEventListener('click', logoutUser);
+document.querySelector('#modal-stats .modal-btn').addEventListener('click', saveGameUI);
+document.querySelector('#modal-security .modal-btn').addEventListener('click', changePasswordUI);
+document.getElementById('lu-btn') && document.getElementById('lu-btn').addEventListener('click', closeLevelUp);
+document.querySelector('.profile-btn').addEventListener('click', openProfile);
   if (user) {
     window._currentUserId = user.uid;
     window._currentEmail  = user.email;
