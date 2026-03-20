@@ -317,13 +317,18 @@ html, body {
 
 /* ===================== DESKTOP ===================== */
 @media (min-width:768px) {
-  .main-area { display:grid;grid-template-columns:460px 1fr; }
-  .tab-panel { position:relative;opacity:1;pointer-events:all;transform:none;overflow-y:auto; }
-  .tab-panel:first-child { border-right:1px solid rgba(255,150,0,.08); }
-  #tab-shop,.tab-panel:nth-child(3) { display:none; }
-  .bottom-nav { display:none; }
-  .main-area.show-shop #tab-clicker { display:none; }
-  .main-area.show-shop #tab-shop { display:flex; }
-  .main-area.show-city #tab-clicker { display:none; }
-  .main-area.show-city #tab-city { display:flex; }
+  #game-screen { flex-direction:column; }
+  .bottom-nav {
+    display:flex;
+    order:-1;
+    border-top:none;
+    border-bottom:1px solid rgba(255,150,0,.15);
+    padding-bottom:0;
+    background:rgba(0,0,0,.4);
+  }
+  .bnav-btn { padding:12px 32px;flex-direction:row;gap:8px; }
+  .bnav-btn .bi { font-size:18px; }
+  .bnav-btn .bl { font-size:13px;letter-spacing:1px; }
+  .bnav-btn::after { top:auto;bottom:0;left:25%;right:25%;border-radius:4px 4px 0 0; }
+  .main-area { flex:1; }
 }
