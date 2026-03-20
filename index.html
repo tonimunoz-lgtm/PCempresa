@@ -177,7 +177,6 @@
     <!-- CITY TAB -->
     <div class="tab-panel" id="tab-city">
       <div class="city-wrapper">
-        <!-- Compact header with legend inline -->
         <div class="city-hdr">
           <div class="city-hdr-left">
             <h2>🌆 PizzaCity</h2>
@@ -191,17 +190,20 @@
             <div class="leg-sm"><div class="leg-dot-sm" style="background:#ff00ff"></div>Elite</div>
           </div>
         </div>
-        <!-- Map fills all space -->
+        <!-- Map fills all remaining space -->
         <div id="city-map-scroll"></div>
-      </div>
-      <!-- Ranking drawer anchored to bottom -->
-      <div class="ranking-drawer" id="ranking-drawer">
-        <div class="ranking-drawer-handle" id="ranking-handle">
-          <div class="ranking-drawer-title">🏆 Ranking PizzaCity <span id="ranking-count" style="color:rgba(255,255,255,.4);font-size:11px;font-weight:600"></span></div>
-          <div class="ranking-drawer-arrow" id="ranking-arrow">▲</div>
-        </div>
-        <div class="ranking-drawer-body">
-          <div id="ranking-list"></div>
+        <!-- Ranking drawer anchored to bottom of city-wrapper -->
+        <div class="ranking-drawer" id="ranking-drawer">
+          <div class="ranking-drawer-handle" id="ranking-handle">
+            <div class="ranking-drawer-title">
+              🏆 Ranking PizzaCity
+              <span id="ranking-count" style="color:rgba(255,255,255,.35);font-size:11px;font-weight:600"></span>
+            </div>
+            <div class="ranking-drawer-arrow">▲</div>
+          </div>
+          <div class="ranking-drawer-body">
+            <div id="ranking-list"></div>
+          </div>
         </div>
       </div>
     </div>
