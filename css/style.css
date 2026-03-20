@@ -451,19 +451,23 @@ html, body {
 
 /* ===================== CITY TILES ===================== */
 .c-cell { position:relative;border-radius:3px;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:filter .15s,transform .15s; }
-.c-cell.road   { background:#1c1c1c;border:1px solid #2a2a2a; }
+.c-cell.road   { 
+  background:linear-gradient(135deg,#4a4a4a 0%,#3a3a3a 100%);
+  border:1px solid #555;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.04);
+}
 .c-cell.block  { background:linear-gradient(160deg,#141a12,#0d1209);border:1px solid rgba(100,150,80,.1); }
 .c-cell.park   { background:linear-gradient(135deg,#0a1e0e,#061408);border:1px solid rgba(50,200,80,.15); }
 .c-cell.plaza  { background:linear-gradient(135deg,#1c1a0a,#141208);border:1px solid rgba(200,180,50,.12); }
 .c-cell.market { background:linear-gradient(135deg,#160d1e,#0e0814);border:1px solid rgba(180,80,255,.12); }
 /* Road lane markings */
 .c-cell.h-road::after,.c-cell.v-road::after {
-  content:'';position:absolute;background:rgba(255,220,50,.1);border-radius:1px;
+  content:'';position:absolute;background:rgba(255,230,80,.25);border-radius:2px;
 }
 .c-cell.h-road::after { width:55%;height:2px;top:50%;left:22%;transform:translateY(-50%); }
 .c-cell.v-road::after { width:2px;height:55%;left:50%;top:22%;transform:translateX(-50%); }
-.c-cell.x-road { background:#222; }
-.c-cell.x-road::after { content:'';position:absolute;width:8px;height:8px;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(255,220,50,.15); }
+.c-cell.x-road { background:#424242; }
+.c-cell.x-road::after { content:'';position:absolute;width:8px;height:8px;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(255,230,80,.3); }
 .c-cell.has-player { cursor:pointer; }
 .c-cell.has-player:hover { filter:brightness(1.5);transform:scale(1.1);z-index:10; }
 .c-cell.is-me { box-shadow:0 0 12px rgba(255,200,0,.6),inset 0 0 6px rgba(255,200,0,.1); }
