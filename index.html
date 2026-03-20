@@ -396,6 +396,9 @@ document.querySelector('#modal-stats .modal-btn').addEventListener('click', save
 document.querySelector('#modal-security .modal-btn').addEventListener('click', changePasswordUI);
 document.getElementById('lu-btn') && document.getElementById('lu-btn').addEventListener('click', closeLevelUp);
 document.querySelector('.profile-btn').addEventListener('click', openProfile);
+
+// ---- Auth state listener ----
+onAuthStateChanged(auth, async user => {
   if (user) {
     window._currentUserId = user.uid;
     window._currentEmail  = user.email;
