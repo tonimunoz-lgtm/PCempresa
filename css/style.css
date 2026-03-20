@@ -480,3 +480,246 @@ html, body {
   .city-hdr-left h2 { font-size:15px; }
   .city-ctrl-btn { padding:4px 9px;font-size:11px; }
 }
+
+/* ===================== CITY LIFE ANIMATIONS ===================== */
+
+/* Cars moving horizontally along h-roads */
+.city-car {
+  position:absolute;
+  font-size:11px;
+  z-index:5;
+  pointer-events:none;
+  will-change:transform;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));
+}
+.city-car.going-right {
+  animation: driveRight linear infinite;
+}
+.city-car.going-left {
+  animation: driveLeft linear infinite;
+  transform:scaleX(-1);
+}
+.city-car.going-down {
+  animation: driveDown linear infinite;
+}
+.city-car.going-up {
+  animation: driveUp linear infinite;
+}
+
+@keyframes driveRight {
+  0%   { left:-30px; }
+  100% { left:calc(100% + 30px); }
+}
+@keyframes driveLeft {
+  0%   { left:calc(100% + 30px); }
+  100% { left:-30px; }
+}
+@keyframes driveDown {
+  0%   { top:-30px; }
+  100% { top:calc(100% + 30px); }
+}
+@keyframes driveUp {
+  0%   { top:calc(100% + 30px); }
+  100% { top:-30px; }
+}
+
+/* Pedestrians wandering around buildings */
+.city-person {
+  position:absolute;
+  font-size:9px;
+  z-index:6;
+  pointer-events:none;
+  will-change:transform;
+  animation: wander ease-in-out infinite alternate;
+}
+@keyframes wander {
+  0%   { transform:translate(0px, 0px); }
+  25%  { transform:translate(6px, -4px); }
+  50%  { transform:translate(3px, 6px); }
+  75%  { transform:translate(-5px, 3px); }
+  100% { transform:translate(2px, -5px); }
+}
+
+/* Person entering pizzeria */
+.city-person.entering {
+  animation: enterPizzeria ease-in-out infinite;
+}
+@keyframes enterPizzeria {
+  0%   { transform:translate(0,0) scale(1); opacity:1; }
+  40%  { transform:translate(0,-8px) scale(0.7); opacity:0.6; }
+  50%  { transform:translate(0,-10px) scale(0); opacity:0; }
+  55%  { transform:translate(0,-10px) scale(0); opacity:0; }
+  60%  { transform:translate(0,5px) scale(0); opacity:0; }
+  80%  { transform:translate(0,5px) scale(0.8); opacity:0.7; }
+  100% { transform:translate(0,0) scale(1); opacity:1; }
+}
+
+/* Smoke from pizzeria chimneys */
+.pizzeria-smoke {
+  position:absolute;
+  top:-4px;
+  right:4px;
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:rgba(220,200,180,0.5);
+  pointer-events:none;
+  animation:pizzeriaSmoke 2.5s ease-out infinite;
+  z-index:7;
+}
+.pizzeria-smoke:nth-child(2) { animation-delay:0.8s; right:8px; }
+.pizzeria-smoke:nth-child(3) { animation-delay:1.6s; right:2px; }
+@keyframes pizzeriaSmoke {
+  0%   { transform:translate(0,0) scale(1); opacity:0.5; }
+  100% { transform:translate(-4px,-14px) scale(2.5); opacity:0; }
+}
+
+/* Pizza delivery animation */
+.city-delivery {
+  position:absolute;
+  font-size:10px;
+  z-index:8;
+  pointer-events:none;
+  animation:deliveryRun linear infinite;
+}
+@keyframes deliveryRun {
+  0%   { left:-20px; top:30%; opacity:1; }
+  45%  { opacity:1; }
+  50%  { left:calc(100% + 20px); opacity:0; top:50%; }
+  51%  { left:-20px; top:60%; opacity:0; }
+  55%  { opacity:1; }
+  100% { left:calc(100% + 20px); top:40%; opacity:1; }
+}
+
+/* ===================== CITY LIFE ===================== */
+.city-car, .city-person {
+  will-change: transform, left, top;
+  user-select: none;
+  -webkit-user-select: none;
+  text-shadow: 0 1px 3px rgba(0,0,0,.8);
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.6));
+}
+.city-car-h { transform-origin: center center; }
+
+/* ===================== CITY LIFE ANIMATIONS ===================== */
+
+/* Cars */
+.city-car {
+  position:absolute;
+  font-size:11px;
+  pointer-events:none;
+  z-index:5;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));
+  white-space:nowrap;
+}
+.city-car.h-car {
+  animation: carMoveH linear infinite;
+}
+.city-car.h-car-rev {
+  animation: carMoveHrev linear infinite;
+  transform:scaleX(-1);
+}
+.city-car.v-car {
+  animation: carMoveV linear infinite;
+}
+.city-car.v-car-rev {
+  animation: carMoveVrev linear infinite;
+}
+
+@keyframes carMoveH {
+  0%   { transform: translateX(-60px); opacity:0; }
+  5%   { opacity:1; }
+  95%  { opacity:1; }
+  100% { transform: translateX(calc(var(--road-len) + 60px)); opacity:0; }
+}
+@keyframes carMoveHrev {
+  0%   { transform: scaleX(-1) translateX(-60px); opacity:0; }
+  5%   { opacity:1; }
+  95%  { opacity:1; }
+  100% { transform: scaleX(-1) translateX(calc(var(--road-len) + 60px)); opacity:0; }
+}
+@keyframes carMoveV {
+  0%   { transform: translateY(-60px) rotate(90deg); opacity:0; }
+  5%   { opacity:1; }
+  95%  { opacity:1; }
+  100% { transform: translateY(calc(var(--road-len) + 60px)) rotate(90deg); opacity:0; }
+}
+@keyframes carMoveVrev {
+  0%   { transform: translateY(calc(var(--road-len) + 60px)) rotate(-90deg); opacity:0; }
+  5%   { opacity:1; }
+  95%  { opacity:1; }
+  100% { transform: translateY(-60px) rotate(-90deg); opacity:0; }
+}
+
+/* People */
+.city-person {
+  position:absolute;
+  font-size:10px;
+  pointer-events:none;
+  z-index:6;
+  animation: personWalk linear infinite;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,.6));
+}
+.city-person.rev {
+  animation: personWalkRev linear infinite;
+}
+@keyframes personWalk {
+  0%   { transform:translateX(-20px); opacity:0; }
+  8%   { opacity:1; }
+  92%  { opacity:1; }
+  100% { transform:translateX(calc(var(--walk-len) + 20px)); opacity:0; }
+}
+@keyframes personWalkRev {
+  0%   { transform:translateX(calc(var(--walk-len) + 20px)) scaleX(-1); opacity:0; }
+  8%   { opacity:1; }
+  92%  { opacity:1; }
+  100% { transform:translateX(-20px) scaleX(-1); opacity:0; }
+}
+
+/* Person entering pizzeria */
+.city-person.enter-pizzeria {
+  animation: enterPizzeria ease-in-out infinite;
+}
+@keyframes enterPizzeria {
+  0%,100% { transform:translateX(0) scale(1); opacity:1; }
+  45%     { transform:translateX(20px) scale(0.7); opacity:0.6; }
+  50%     { transform:translateX(20px) scale(0); opacity:0; }
+  55%     { transform:translateX(0) scale(0); opacity:0; }
+  60%     { transform:translateX(0) scale(0.7); opacity:0.6; }
+}
+
+/* Smoke from pizzerias */
+.pizzeria-smoke {
+  position:absolute;
+  top:-8px;
+  right:4px;
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:rgba(200,200,200,.3);
+  pointer-events:none;
+  z-index:4;
+  animation:pizzaSmoke 2.5s ease-out infinite;
+}
+.pizzeria-smoke.s2 { right:8px; animation-delay:.8s; animation-duration:3s; }
+.pizzeria-smoke.s3 { right:2px; animation-delay:1.6s; animation-duration:2s; }
+@keyframes pizzaSmoke {
+  0%   { transform:translateY(0) scale(1); opacity:.4; }
+  100% { transform:translateY(-18px) scale(2.5); opacity:0; }
+}
+
+/* Delivery scooter */
+.city-delivery {
+  position:absolute;
+  font-size:13px;
+  pointer-events:none;
+  z-index:7;
+  animation:deliveryZoom linear infinite;
+  filter:drop-shadow(0 2px 4px rgba(255,100,0,.4));
+}
+@keyframes deliveryZoom {
+  0%   { transform:translateX(-80px) scaleX(1); opacity:0; }
+  3%   { opacity:1; }
+  97%  { opacity:1; }
+  100% { transform:translateX(calc(var(--road-len) + 80px)) scaleX(1); opacity:0; }
+}
