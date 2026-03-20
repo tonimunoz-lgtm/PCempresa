@@ -324,16 +324,21 @@ async function renderCity() {
   // Setup drawer toggle
   setupRankingDrawer();
 
-  // Viewport
+  // Viewport — fills remaining space
   const viewport = document.createElement('div');
   viewport.className = 'city-viewport';
   viewport.id = 'city-viewport';
+  viewport.style.position = 'relative';
+  viewport.style.flex = '1';
   wrapper.appendChild(viewport);
 
-  // Canvas world
+  // Canvas world — positioned inside viewport
   const world = document.createElement('div');
   world.className = 'city-world';
   world.id = 'city-world';
+  world.style.position = 'absolute';
+  world.style.top = '0';
+  world.style.left = '0';
   viewport.appendChild(world);
 
   // Load real players
@@ -380,7 +385,16 @@ async function renderCity() {
       const isMe = player && window._currentUserId && player.userId === window._currentUserId;
 
       const cell = document.createElement('div');
-      cell.className = 'c-cell ' + ['road','block','park','plaza','market'][tile];
+      const tileNames = ['road','block','park','plaza','market'];
+      cell.className = 'c-cell ' + (tileNames[tile]||'block');
+      // Road direction classes for markings
+      if (tile === 0) {
+        const isHRoad = y % 3 === 2;
+        const isVRoad = x % 3 === 2;
+        if (isHRoad && isVRoad) cell.classList.add('x-road');
+        else if (isHRoad)       cell.classList.add('h-road');
+        else                    cell.classList.add('v-road');
+      }
       if (player) cell.classList.add('has-player');
       if (isMe)   cell.classList.add('is-me');
       cell.style.width  = CELL+'px';
