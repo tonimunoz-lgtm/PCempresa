@@ -316,11 +316,13 @@ async function renderCity() {
     <div class="city-ctrl-group">
       <button class="city-ctrl-btn" id="zoom-in"  onclick="cityZoomIn()">🔍+</button>
       <button class="city-ctrl-btn" id="zoom-out" onclick="cityZoomOut()">🔍-</button>
-      <button class="city-ctrl-btn" onclick="cityCenter()">📍 Mi pizzería</button>
+      <button class="city-ctrl-btn" onclick="cityCenter()">📍 Yo</button>
     </div>
-    <div style="color:rgba(255,255,255,.4);font-size:11px">Arrastra para moverte · Scroll para zoom</div>
+    <div style="color:rgba(255,255,255,.35);font-size:10px;white-space:nowrap">Arrastra · Scroll = zoom</div>
   `;
   wrapper.appendChild(controls);
+  // Setup drawer toggle
+  setupRankingDrawer();
 
   // Viewport
   const viewport = document.createElement('div');
@@ -649,25 +651,43 @@ function timeAgoCity(ts) {
 function renderRanking(allPlayers) {
   const list = document.getElementById('ranking-list');
   if (!list) return;
+  const players = [...(allPlayers||cityPlayers)].sort((a,b)=>(b.pizzasSold||0)-(a.pizzasSold||0));
   list.innerHTML = '';
-  [...(allPlayers||cityPlayers)]
-    .sort((a,b)=>(b.pizzasSold||0)-(a.pizzasSold||0))
-    .slice(0,20)
-    .forEach((p,i) => {
-      const isMe = window._currentUserId && p.userId===window._currentUserId;
-      const medals = ['🥇','🥈','🥉'];
-      const row = document.createElement('div');
-      row.className = 'rank-row'+(isMe?' me':'');
-      row.innerHTML = `
-        <span class="rank-num">${medals[i]||'#'+(i+1)}</span>
-        <span>${getPizzeriaVisual(p).size}</span>
-        <span class="rank-name">${p.username||'?'}</span>
-        <span class="rank-lv" style="color:${getLvColor(p.level||1)}">Nv.${p.level||1}</span>
-        <span class="rank-pz">${fmt(p.pizzasSold||0)} 🍕</span>
-      `;
-      row.onclick = () => openPlayerPopup(p, allPlayers||cityPlayers);
-      list.appendChild(row);
-    });
+  // Update count badge
+  const countEl = document.getElementById('ranking-count');
+  if (countEl) countEl.textContent = `(${players.length} jugadores)`;
+  players.slice(0,30).forEach((p,i) => {
+    const isMe = window._currentUserId && p.userId===window._currentUserId;
+    const medals = ['🥇','🥈','🥉'];
+    const row = document.createElement('div');
+    row.className = 'rank-row'+(isMe?' me':'');
+    row.innerHTML = `
+      <span class="rank-num">${medals[i]||'#'+(i+1)}</span>
+      <span>${getPizzeriaVisual(p).size}</span>
+      <span class="rank-name">${p.username||'?'}</span>
+      <span class="rank-lv" style="color:${getLvColor(p.level||1)}">Nv.${p.level||1}</span>
+      <span class="rank-pz">${fmt(p.pizzasSold||0)} 🍕</span>
+    `;
+    row.onclick = () => openPlayerPopup(p, allPlayers||cityPlayers);
+    list.appendChild(row);
+  });
+}
+
+function setupRankingDrawer() {
+  const drawer = document.getElementById('ranking-drawer');
+  const handle = document.getElementById('ranking-handle');
+  if (!drawer || !handle) return;
+  handle.onclick = () => {
+    drawer.classList.toggle('open');
+  };
+  // Swipe up to open, swipe down to close
+  let touchStartY = 0;
+  handle.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, {passive:true});
+  handle.addEventListener('touchend', e => {
+    const diff = touchStartY - e.changedTouches[0].clientY;
+    if (diff > 30) drawer.classList.add('open');
+    if (diff < -30) drawer.classList.remove('open');
+  }, {passive:true});
 }
 
 // ===================== PROFILE =====================
