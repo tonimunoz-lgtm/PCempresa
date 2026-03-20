@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>PizzaClicker 🍕</title>
+<link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#070408;color:#fff;font-family:'Nunito',sans-serif;overflow:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:rgba(255,150,0,.4);border-radius:2px}
+
+/* ========== AUTH ========== */
+#auth-screen{
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 50% 110%,#3d0000,#1a0010 40%,#070408);
+  z-index:100;overflow:hidden;
+}
+.auth-particles{position:absolute;inset:0;pointer-events:none}
+.auth-particle{position:absolute;top:-30px;font-size:20px;opacity:.25;animation:fallDown linear infinite}
+@keyframes fallDown{to{transform:translateY(110vh) rotate(360deg);opacity:0}}
+.flame-bg{position:absolute;bottom:0;width:250px;height:350px;border-radius:50% 50% 30% 30%;filter:blur(60px);opacity:.35;animation:flicker 2s ease-in-out infinite alternate}
+.fb1{left:5%;background:#ff6b00}
+.fb2{left:50%;transform:translateX(-50%);background:#ff3300;height:450px;animation-delay:.5s}
+.fb3{right:5%;background:#ff9500;animation-delay:1s}
+@keyframes flicker{to{transform:scaleX(1.15) scaleY(1.1);opacity:.5}}
+.auth-card{
+  position:relative;z-index:2;
+  background:rgba(15,5,10,.92);
+  border:2px solid rgba(255,100,0,.4);
+  border-radius:24px;padding:36px 32px;
+  width:100%;max-width:400px;margin:16px;
+  backdrop-filter:blur(20px);
+  box-shadow:0 0 60px rgba(255,80,0,.2),inset 0 0 40px rgba(255,50,0,.05);
+}
+.auth-logo{text-align:center;margin-bottom:28px}
+.auth-logo-emoji{font-size:60px;display:block;animation:bounce 2s ease-in-out infinite}
+@keyframes bounce{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-10px) rotate(5deg)}}
+.auth-logo h1{font-family:'Russo One',sans-serif;font-size:32px;color:#fff;letter-spacing:4px;margin:8px 0 0}
+.auth-logo h1 span{color:#ff6b00}
+.auth-logo p{color:rgba(255,150,50,.7);font-size:12px;letter-spacing:2px;margin-top:4px}
+.auth-tabs{display:flex;gap:4px;margin-bottom:20px;background:rgba(255,255,255,.05);border-radius:12px;padding:4px}
+.auth-tab{flex:1;padding:9px;border:none;border-radius:8px;background:transparent;color:rgba(255,255,255,.5);cursor:pointer;font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;transition:all .2s}
+.auth-tab.active{background:linear-gradient(135deg,#ff6b00,#cc2200);color:#fff;box-shadow:0 4px 12px rgba(255,80,0,.4)}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;color:rgba(255,200,100,.8);font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.form-input{width:100%;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,100,0,.3);border-radius:10px;padding:12px 14px;color:#fff;font-size:15px;font-family:'Nunito',sans-serif;outline:none;transition:border-color .2s}
+.form-input:focus{border-color:rgba(255,150,0,.8);box-shadow:0 0 20px rgba(255,100,0,.15)}
+.form-input::placeholder{color:rgba(255,255,255,.3)}
+.auth-error{background:rgba(255,50,50,.15);border:1px solid rgba(255,50,50,.4);border-radius:8px;padding:10px 14px;color:#ff8080;font-size:13px;margin-bottom:12px}
+.auth-success{background:rgba(50,255,100,.1);border:1px solid rgba(50,255,100,.3);border-radius:8px;padding:10px 14px;color:#80ff90;font-size:13px;margin-bottom:12px}
+.auth-btn{width:100%;background:linear-gradient(135deg,#ff6b00,#cc2200);border:none;border-radius:12px;padding:14px;color:#fff;font-size:16px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;letter-spacing:1px;transition:all .2s;box-shadow:0 6px 20px rgba(255,80,0,.4);margin-top:4px}
+.auth-btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(255,80,0,.5)}
+.auth-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.auth-footer{text-align:center;color:rgba(255,255,255,.3);font-size:11px;margin-top:16px}
+
+/* ========== GAME ========== */
+#game-screen{display:none;flex-direction:column;height:100vh;height:100dvh;position:relative}
+.top-nav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 16px;background:rgba(0,0,0,.6);
+  border-bottom:1px solid rgba(255,150,0,.15);
+  backdrop-filter:blur(20px);flex-shrink:0;gap:8px;z-index:10;position:relative;
+}
+.nav-brand{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.nav-brand span{font-size:20px}
+.nav-brand b{font-family:'Russo One',sans-serif;font-size:13px;color:rgba(255,200,100,.9);letter-spacing:2px}
+.nav-brand b em{color:#ff6b00;font-style:normal}
+.nav-stats{display:flex;align-items:center;gap:8px;flex:1;justify-content:center}
+.nav-stat{
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,150,0,.2);
+  border-radius:20px;padding:5px 12px;font-size:13px;font-weight:800;color:#ffcc00;
+}
+.nav-stat.pps{color:#88ddff;border-color:rgba(0,200,255,.2)}
+.profile-btn{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(255,150,0,.1);border:1.5px solid rgba(255,150,0,.3);
+  border-radius:20px;padding:6px 12px;color:#fff;cursor:pointer;transition:all .2s;flex-shrink:0;font-family:'Nunito',sans-serif;
+}
+.profile-btn:hover{background:rgba(255,150,0,.2)}
+.profile-btn .plv{font-size:10px;color:#ff6b00;font-weight:800;background:rgba(255,100,0,.2);padding:2px 6px;border-radius:10px}
+
+/* XP bar */
+.xp-bar-wrap{
+  background:rgba(0,0,0,.4);padding:4px 16px;flex-shrink:0;
+  display:flex;align-items:center;gap:10px;
+}
+.xp-info{font-size:11px;color:rgba(255,200,100,.7);white-space:nowrap;font-weight:700}
+.xp-track{flex:1;height:8px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden}
+.xp-fill{height:100%;background:linear-gradient(90deg,#ff6b00,#ffcc00);border-radius:4px;transition:width .4s ease}
+
+/* Tabs */
+.main-area{flex:1;overflow:hidden;position:relative}
+.tab-panel{position:absolute;inset:0;overflow-y:auto;opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+.tab-panel.active{opacity:1;pointer-events:all;transform:translateY(0)}
+.bottom-nav{
+  display:flex;background:rgba(0,0,0,.7);
+  border-top:1px solid rgba(255,150,0,.15);backdrop-filter:blur(20px);flex-shrink:0;
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.bnav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:10px 8px;border:none;background:transparent;color:rgba(255,255,255,.4);
+  cursor:pointer;transition:all .2s;position:relative;font-family:'Nunito',sans-serif;
+}
+.bnav-btn::after{content:'';position:absolute;top:0;left:25%;right:25%;height:2px;background:linear-gradient(90deg,#ff6b00,#ffcc00);border-radius:0 0 4px 4px;opacity:0;transition:opacity .2s}
+.bnav-btn.active{color:#fff}
+.bnav-btn.active::after{opacity:1}
+.bnav-btn .bi{font-size:22px}
+.bnav-btn .bl{font-size:10px;font-weight:700;letter-spacing:.5px}
+
+/* ========== CLICKER PANEL ========== */
+.clicker-panel{padding:16px;display:flex;flex-direction:column;align-items:center;gap:14px;max-width:480px;margin:0 auto}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%}
+.stat-box{background:rgba(255,255,255,.05);border:1px solid rgba(255,150,0,.2);border-radius:10px;padding:8px 6px;text-align:center}
+.stat-box .sv{font-size:13px;font-weight:900;color:#ffcc00;line-height:1}
+.stat-box .sl{font-size:9px;color:rgba(255,255,255,.4);margin-top:2px}
+.oven-area{position:relative;width:280px;display:flex;flex-direction:column;align-items:center}
+.oven-glow{position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(255,120,0,.5) 0%,transparent 70%);pointer-events:none;top:50%;left:50%;transform:translate(-50%,-50%);transition:opacity .1s;opacity:.3}
+.oven-click{cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;transition:transform .1s;position:relative}
+.oven-click:active{transform:scale(.94)}
+.oven-svg{width:260px;height:240px;filter:drop-shadow(0 10px 30px rgba(255,80,0,.3))}
+.pizza-spin{animation:pizzaSpin 6s linear infinite;transform-origin:center center}
+@keyframes pizzaSpin{to{transform:rotate(360deg)}}
+.floaters-container{position:absolute;inset:0;pointer-events:none;overflow:visible}
+.floater{position:absolute;font-weight:900;font-size:16px;pointer-events:none;animation:floatUp 1.1s ease-out forwards;text-shadow:0 2px 4px rgba(0,0,0,.6);white-space:nowrap}
+@keyframes floatUp{0%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(-70px) scale(.8);opacity:0}}
+.combo-badge{
+  background:linear-gradient(135deg,#ff9500,#ff3300);
+  color:#fff;font-weight:900;font-size:13px;
+  padding:5px 16px;border-radius:20px;
+  animation:pulse .5s ease-in-out infinite alternate;
+  box-shadow:0 0 20px rgba(255,100,0,.5);
+  display:none;
+}
+@keyframes pulse{to{transform:scale(1.06)}}
+.click-hint{color:rgba(255,200,100,.4);font-size:12px;margin-top:4px;text-align:center}
+
+/* ========== SHOP PANEL ========== */
+.shop-header{padding:14px 16px;border-bottom:1px solid rgba(255,150,0,.15);display:flex;justify-content:space-between;align-items:center}
+.shop-title{font-size:17px;font-weight:900;color:#ffcc00}
+.shop-budget{color:#ffcc00;font-weight:800;font-size:15px}
+.cat-bar{display:flex;gap:6px;padding:8px 12px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid rgba(255,150,0,.1)}
+.cat-bar::-webkit-scrollbar{display:none}
+.cat-btn{white-space:nowrap;padding:6px 12px;border:1.5px solid rgba(255,150,0,.25);border-radius:20px;background:transparent;color:rgba(255,255,255,.55);font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Nunito',sans-serif;flex-shrink:0}
+.cat-btn.active,.cat-btn:hover{background:linear-gradient(135deg,#ff6b00,#cc2200);border-color:transparent;color:#fff;box-shadow:0 3px 10px rgba(255,80,0,.3)}
+.upgrades-list{padding:10px 12px;display:flex;flex-direction:column;gap:7px}
+.upgrade-card{
+  display:flex;align-items:center;gap:10px;padding:11px;
+  background:rgba(255,255,255,.04);border:1.5px solid rgba(255,150,0,.1);
+  border-radius:12px;cursor:pointer;transition:all .2s;
+}
+.upgrade-card:hover:not(.maxed):not(.locked){border-color:rgba(255,200,0,.4);transform:translateX(3px);box-shadow:0 0 20px rgba(255,150,0,.12)}
+.upgrade-card.affordable{border-color:rgba(255,200,0,.25)}
+.upgrade-card.maxed{opacity:.55;cursor:default;border-color:rgba(100,255,100,.2)}
+.upgrade-card.locked{opacity:.35;cursor:not-allowed}
+.upgrade-card .ue{font-size:28px;flex-shrink:0}
+.upgrade-info{flex:1;min-width:0}
+.upgrade-info .un{font-weight:800;color:#fff;font-size:13px;margin-bottom:1px}
+.upgrade-info .ud{color:rgba(255,255,255,.4);font-size:10px;margin-bottom:2px}
+.upgrade-info .uf{color:rgba(255,200,100,.8);font-size:10px;font-weight:700}
+.upgrade-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.lvl-dots{display:flex;gap:2px;flex-wrap:wrap;max-width:55px;justify-content:flex-end}
+.lvl-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.15)}
+.lvl-dot.on{background:linear-gradient(135deg,#ff6b00,#ffcc00)}
+.ucost{font-size:12px;font-weight:800}
+.ucost.ok{color:#ffcc00}.ucost.no{color:rgba(255,255,255,.3)}
+.ucost.mx{color:#80ff90;font-size:11px}.ucost.lk{color:rgba(255,255,255,.3);font-size:11px}
+
+/* ========== CITY PANEL ========== */
+.city-header{padding:14px 16px 8px;border-bottom:1px solid rgba(255,150,0,.15)}
+.city-header h2{font-size:18px;font-weight:900;color:#ffcc00}
+.city-header p{color:rgba(255,255,255,.4);font-size:11px;margin-top:3px}
+.city-map{padding:12px;overflow-x:auto}
+.city-grid{display:grid;gap:2px;margin:0 auto}
+.cell{border-radius:3px;position:relative;display:flex;align-items:center;justify-content:center;cursor:default;transition:all .15s}
+.cell.road{background:#2a2510}
+.cell.block{background:#141e14}
+.cell.park{background:#0e2018}
+.cell.plaza{background:#1e1c0e}
+.cell.has-player{cursor:pointer}
+.cell.has-player:hover{filter:brightness(1.3)}
+.cell-inner{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%}
+.city-legend{display:flex;gap:10px;flex-wrap:wrap;padding:0 12px 4px;margin-top:4px}
+.leg{display:flex;align-items:center;gap:5px;font-size:10px;color:rgba(255,255,255,.45)}
+.leg-dot{width:8px;height:8px;border-radius:50%}
+.ranking{padding:0 12px 12px}
+.ranking h3{font-size:14px;font-weight:900;color:#ffcc00;margin-bottom:8px}
+.rank-row{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:9px;background:rgba(255,255,255,.03);border:1px solid rgba(255,150,0,.08);cursor:pointer;margin-bottom:5px;transition:all .2s;font-size:12px}
+.rank-row:hover{background:rgba(255,150,0,.08)}
+.rank-row.me{border-color:rgba(255,200,0,.25);background:rgba(255,200,0,.05)}
+.rank-num{color:rgba(255,255,255,.3);font-size:10px;width:20px}
+.rank-name{flex:1;font-weight:700;color:#fff}
+.rank-lv{font-weight:800;font-size:10px}
+.rank-pz{color:rgba(255,200,100,.8);font-weight:800;font-size:11px}
+
+/* ========== PROFILE MODAL ========== */
+.modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+.modal-card{background:#0d0810;border:2px solid rgba(255,150,0,.35);border-radius:22px;padding:26px;width:320px;max-width:94vw;max-height:88vh;overflow-y:auto;box-shadow:0 0 80px rgba(255,80,0,.25)}
+.modal-header{display:flex;align-items:center;gap:14px;margin-bottom:20px;position:relative}
+.modal-avatar{font-size:44px}
+.modal-uname{font-size:18px;font-weight:900;color:#fff}
+.modal-email{font-size:11px;color:rgba(255,255,255,.4);margin:2px 0}
+.modal-title-lv{font-size:11px;color:#ff6b00;font-weight:700}
+.modal-close{position:absolute;top:0;right:0;background:rgba(255,255,255,.1);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:13px}
+.modal-tabs{display:flex;gap:4px;margin-bottom:16px;background:rgba(255,255,255,.05);border-radius:9px;padding:3px}
+.modal-tab{flex:1;padding:7px;border:none;border-radius:7px;background:transparent;color:rgba(255,255,255,.5);cursor:pointer;font-size:12px;font-weight:700;font-family:'Nunito',sans-serif}
+.modal-tab.active{background:linear-gradient(135deg,#ff6b00,#cc2200);color:#fff}
+.stat-grid-m{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:14px}
+.sg-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,150,0,.12);border-radius:10px;padding:10px 6px;text-align:center}
+.sg-v{font-size:16px;font-weight:900;color:#ffcc00}
+.sg-l{font-size:9px;color:rgba(255,255,255,.4);margin-top:2px}
+.next-unlock-box{background:rgba(255,150,0,.07);border:1px solid rgba(255,150,0,.18);border-radius:10px;padding:10px;margin-bottom:14px;font-size:12px}
+.nu-lbl{color:rgba(255,200,100,.6);margin-bottom:3px;font-size:10px}
+.nu-val{color:#ffcc00;font-weight:700}
+.modal-msg{background:rgba(255,200,100,.1);border:1px solid rgba(255,200,100,.3);border-radius:8px;padding:9px 12px;color:rgba(255,200,100,.9);font-size:12px;margin-bottom:10px;text-align:center}
+.modal-btn{width:100%;padding:12px;background:linear-gradient(135deg,#ff6b00,#cc2200);border:none;border-radius:11px;color:#fff;font-weight:800;font-size:13px;cursor:pointer;transition:all .2s;font-family:'Nunito',sans-serif;margin-bottom:8px}
+.modal-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(255,80,0,.4)}
+.sec-input{width:100%;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,100,0,.3);border-radius:9px;padding:11px 14px;color:#fff;font-size:14px;font-family:'Nunito',sans-serif;outline:none;margin-bottom:10px}
+.sec-input:focus{border-color:rgba(255,150,0,.8)}
+.logout-btn{width:100%;padding:11px;background:rgba(255,50,50,.12);border:1.5px solid rgba(255,50,50,.3);border-radius:11px;color:#ff8080;font-weight:700;font-size:13px;cursor:pointer;margin-top:8px;font-family:'Nunito',sans-serif;transition:all .2s}
+.logout-btn:hover{background:rgba(255,50,50,.22)}
+
+/* ========== EVENTS ========== */
+#events-container{position:fixed;top:16px;right:16px;z-index:300;display:flex;flex-direction:column;gap:8px;max-width:300px;pointer-events:none}
+.event-toast{background:rgba(8,4,12,.95);border:1.5px solid;border-radius:14px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;pointer-events:all;cursor:pointer;animation:slideIn .35s cubic-bezier(.34,1.56,.64,1);backdrop-filter:blur(20px)}
+@keyframes slideIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+.et-emoji{font-size:26px;flex-shrink:0}
+.et-title{font-weight:800;font-size:12px;margin-bottom:2px}
+.et-desc{color:rgba(255,255,255,.5);font-size:10px;line-height:1.4}
+.et-impact{font-weight:900;font-size:13px;margin-top:4px}
+.et-impact.loss{color:#ff4444}.et-impact.gain{color:#44ff88}
+
+/* ========== LEVEL UP ========== */
+#levelup-overlay{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
+.lu-card{background:linear-gradient(135deg,#1a0808,#0d0515);border:3px solid #ff6b00;border-radius:26px;padding:36px 30px;text-align:center;max-width:320px;width:90%;box-shadow:0 0 80px rgba(255,100,0,.5);animation:popIn .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{from{transform:scale(.5) rotate(-5deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+.lu-stars{font-size:30px;animation:starAnim 1s ease-in-out infinite alternate;margin-bottom:10px}
+@keyframes starAnim{to{transform:scale(1.1) rotate(5deg)}}
+.lu-badge{display:inline-block;background:linear-gradient(135deg,#ff6b00,#ffcc00);color:#000;font-size:12px;font-weight:900;letter-spacing:3px;padding:5px 18px;border-radius:20px;margin-bottom:12px}
+.lu-title{font-size:24px;font-weight:900;color:#fff;margin-bottom:18px;text-shadow:0 0 20px rgba(255,150,50,.5)}
+.lu-unlock{background:rgba(255,150,0,.1);border:1px solid rgba(255,150,0,.3);border-radius:12px;padding:12px;margin-bottom:20px}
+.lu-ul-lbl{color:rgba(255,200,100,.6);font-size:11px;margin-bottom:4px}
+.lu-ul-val{color:#ffcc00;font-weight:700;font-size:14px}
+.lu-btn{background:linear-gradient(135deg,#ff6b00,#cc2200);border:none;border-radius:12px;padding:13px 28px;color:#fff;font-size:15px;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;box-shadow:0 6px 20px rgba(255,80,0,.4)}
+
+/* Background glows */
+.bg-glow{position:fixed;border-radius:50%;filter:blur(80px);opacity:.1;pointer-events:none;z-index:0}
+.bg1{width:500px;height:500px;background:#ff4400;top:-150px;left:-150px;animation:drift1 8s ease-in-out infinite alternate}
+.bg2{width:400px;height:400px;background:#ff0080;bottom:-100px;right:-100px;animation:drift2 10s ease-in-out infinite alternate}
+@keyframes drift1{to{transform:translate(60px,50px)}}
+@keyframes drift2{to{transform:translate(-50px,-60px)}}
+</style>
+</head>
+<body>
+
+<!-- Background glows -->
+<div class="bg-glow bg1"></div>
+<div class="bg-glow bg2"></div>
+
+<!-- ===== AUTH SCREEN ===== -->
+<div id="auth-screen">
+  <div class="auth-particles" id="auth-particles"></div>
+  <div class="flame-bg fb1"></div>
+  <div class="flame-bg fb2"></div>
+  <div class="flame-bg fb3"></div>
+  <div class="auth-card">
+    <div class="auth-logo">
+      <span class="auth-logo-emoji">🍕</span>
+      <h1>PIZZA<span>CLICKER</span></h1>
+      <p>El Imperio de la Pizza</p>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login')">Entrar</button>
+      <button class="auth-tab" onclick="switchAuthTab('register')">Registro</button>
+      <button class="auth-tab" onclick="switchAuthTab('reset')">Recuperar</button>
+    </div>
+    <div id="auth-form">
+      <div id="field-username" class="form-group" style="display:none">
+        <label>Nombre de Pizzero</label>
+        <input type="text" id="inp-username" class="form-input" placeholder="Tu apodo legendario..."/>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="inp-email" class="form-input" placeholder="tu@pizzeria.com"/>
+      </div>
+      <div id="field-password" class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="inp-password" class="form-input" placeholder="••••••••"/>
+      </div>
+      <div id="auth-msg"></div>
+      <button class="auth-btn" id="auth-submit-btn" onclick="authSubmit()">🔥 ¡Entrar al Horno!</button>
+    </div>
+    <p class="auth-footer">Inicia sesión para guardar tu progreso en PizzaCity 🌍</p>
+  </div>
+</div>
+
+<!-- ===== GAME SCREEN ===== -->
+<div id="game-screen">
+  <nav class="top-nav">
+    <div class="nav-brand"><span>🍕</span><b>PIZZA<em>CLICKER</em></b></div>
+    <div class="nav-stats">
+      <div class="nav-stat" id="nav-pizzas">0 🍕</div>
+      <div class="nav-stat pps" id="nav-pps" style="display:none">0/s ⚡</div>
+    </div>
+    <button class="profile-btn" onclick="openProfile()">
+      <span>🍕</span>
+      <span id="nav-username">-</span>
+      <span class="plv" id="nav-level">Nv.1</span>
+    </button>
+  </nav>
+
+  <div class="xp-bar-wrap">
+    <span class="xp-info" id="xp-info">Nv.1 · Aprendiz de Pizzero</span>
+    <div class="xp-track"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+    <span class="xp-info" id="xp-num">0 XP</span>
+  </div>
+
+  <div class="main-area">
+    <!-- CLICKER TAB -->
+    <div class="tab-panel active" id="tab-clicker">
+      <div class="clicker-panel">
+        <div class="stats-row">
+          <div class="stat-box"><div class="sv" id="s-pizzas">0</div><div class="sl">Pizzas</div></div>
+          <div class="stat-box"><div class="sv" id="s-ppc">1</div><div class="sl">Por click</div></div>
+          <div class="stat-box"><div class="sv" id="s-pps">0</div><div class="sl">Por seg</div></div>
+          <div class="stat-box"><div class="sv" id="s-total">0</div><div class="sl">Total</div></div>
+        </div>
+
+        <div class="oven-area">
+          <div class="oven-glow" id="oven-glow"></div>
+          <div class="oven-click" id="oven-click" onclick="handleClick(event)">
+            <!-- Italian wood-fired oven SVG -->
+            <svg class="oven-svg" viewBox="0 0 260 240" xmlns="http://www.w3.org/2000/svg">
+              <!-- Base -->
+              <rect x="10" y="160" width="240" height="70" rx="12" fill="#4a2008"/>
+              <rect x="10" y="160" width="240" height="10" rx="0" fill="#6B3410"/>
+              <!-- Arch body -->
+              <ellipse cx="130" cy="115" rx="115" ry="115" fill="#7a3a1a"/>
+              <rect x="15" y="115" width="230" height="60" fill="#7a3a1a"/>
+              <!-- Arch highlight -->
+              <ellipse cx="130" cy="115" rx="110" ry="110" fill="none" stroke="rgba(255,180,80,.15)" stroke-width="8"/>
+              <!-- Oven mouth -->
+              <ellipse cx="130" cy="130" rx="80" ry="65" fill="#1a0500"/>
+              <rect x="50" y="130" width="160" height="55" fill="#1a0500"/>
+              <!-- Fire inside -->
+              <ellipse cx="130" cy="175" rx="60" ry="18" fill="rgba(255,100,0,.4)"/>
+              <animateTransform attributeName="transform" type="scale" values="1;1.005;1" dur="0.8s" repeatCount="indefinite" additive="sum"/>
+              <!-- Flame 1 -->
+              <path d="M90,170 Q95,140 105,155 Q110,135 120,160 Q115,125 130,145 Q135,120 145,155 Q150,135 160,155 Q165,140 170,170 Z" fill="url(#fireGrad)" opacity="0.9">
+                <animate attributeName="d" dur="0.4s" repeatCount="indefinite"
+                  values="M90,170 Q95,140 105,155 Q110,135 120,160 Q115,125 130,145 Q135,120 145,155 Q150,135 160,155 Q165,140 170,170 Z;
+                          M90,170 Q97,135 107,152 Q112,130 122,158 Q117,122 130,142 Q133,118 143,153 Q148,132 158,152 Q163,138 170,170 Z;
+                          M90,170 Q95,140 105,155 Q110,135 120,160 Q115,125 130,145 Q135,120 145,155 Q150,135 160,155 Q165,140 170,170 Z"/>
+              </path>
+              <defs>
+                <linearGradient id="fireGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+                  <stop offset="0%" stop-color="#ff6b00"/>
+                  <stop offset="60%" stop-color="#ffcc00"/>
+                  <stop offset="100%" stop-color="rgba(255,255,200,0)"/>
+                </linearGradient>
+              </defs>
+              <!-- Stone floor -->
+              <rect x="55" y="175" width="40" height="12" rx="5" fill="#666"/>
+              <rect x="100" y="175" width="40" height="12" rx="5" fill="#555"/>
+              <rect x="145" y="175" width="40" height="12" rx="5" fill="#666"/>
+              <!-- Chimney -->
+              <rect x="180" y="20" width="28" height="75" rx="4" fill="#6B3410"/>
+              <rect x="176" y="16" width="36" height="12" rx="4" fill="#7a3a1a"/>
+              <!-- Smoke -->
+              <circle cx="194" cy="8" r="8" fill="rgba(200,200,200,0.15)">
+                <animate attributeName="cy" from="8" to="-30" dur="2s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" from="0.3" to="0" dur="2s" repeatCount="indefinite"/>
+                <animate attributeName="r" from="6" to="16" dur="2s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="190" cy="2" r="5" fill="rgba(200,200,200,0.1)">
+                <animate attributeName="cy" from="2" to="-35" dur="2.5s" begin="1s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" from="0.25" to="0" dur="2.5s" begin="1s" repeatCount="indefinite"/>
+                <animate attributeName="r" from="4" to="14" dur="2.5s" begin="1s" repeatCount="indefinite"/>
+              </circle>
+              <!-- Label -->
+              <text x="130" y="215" text-anchor="middle" fill="rgba(255,220,150,0.6)" font-size="9" font-family="Nunito,sans-serif" font-weight="800" letter-spacing="2">FORNO NAPOLETANO</text>
+              <!-- Pizza on paddle -->
+              <text x="30" y="155" font-size="36" class="pizza-spin" text-anchor="middle">🍕</text>
+              <rect x="30" y="155" width="55" height="7" rx="3" fill="#6B3410" transform="rotate(-15,30,155)"/>
+            </svg>
+            <div class="floaters-container" id="floaters"></div>
+          </div>
+          <div class="combo-badge" id="combo-badge">🔥 COMBO x1.0</div>
+          <div class="click-hint" id="click-hint">¡Haz click en el horno para hacer pizzas!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHOP TAB -->
+    <div class="tab-panel" id="tab-shop">
+      <div class="shop-header">
+        <div class="shop-title">🏪 Tienda de Mejoras</div>
+        <div class="shop-budget" id="shop-budget">0 🍕</div>
+      </div>
+      <div class="cat-bar" id="cat-bar"></div>
+      <div class="upgrades-list" id="upgrades-list"></div>
+    </div>
+
+    <!-- CITY TAB -->
+    <div class="tab-panel" id="tab-city">
+      <div class="city-header">
+        <h2>🌆 PizzaCity</h2>
+        <p>El corazón del imperio pizzero mundial</p>
+      </div>
+      <div class="city-map"><div class="city-grid" id="city-grid"></div></div>
+      <div class="city-legend">
+        <div class="leg"><div class="leg-dot" style="background:#aaa"></div>Principiante</div>
+        <div class="leg"><div class="leg-dot" style="background:#00ff88"></div>Nv.4+</div>
+        <div class="leg"><div class="leg-dot" style="background:#ffcc00"></div>Nv.7+</div>
+        <div class="leg"><div class="leg-dot" style="background:#ff6b00"></div>Nv.10+</div>
+        <div class="leg"><div class="leg-dot" style="background:#ff00ff"></div>Élite</div>
+      </div>
+      <div class="ranking"><h3>🏆 Ranking PizzaCity</h3><div id="ranking-list"></div></div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="bnav-btn active" onclick="switchTab('clicker',this)"><span class="bi">🔥</span><span class="bl">Horno</span></button>
+    <button class="bnav-btn" onclick="switchTab('shop',this)"><span class="bi">🏪</span><span class="bl">Tienda</span></button>
+    <button class="bnav-btn" onclick="switchTab('city',this)"><span class="bi">🌆</span><span class="bl">PizzaCity</span></button>
+  </nav>
+</div>
+
+<!-- ===== PROFILE MODAL ===== -->
+<div class="modal-overlay" id="profile-modal" style="display:none" onclick="closeProfile()">
+  <div class="modal-card" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-avatar">🍕</div>
+      <div>
+        <div class="modal-uname" id="mod-uname">-</div>
+        <div class="modal-email" id="mod-email">-</div>
+        <div class="modal-title-lv" id="mod-title">-</div>
+      </div>
+      <button class="modal-close" onclick="closeProfile()">✕</button>
+    </div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" onclick="switchModalTab('stats',this)">📊 Stats</button>
+      <button class="modal-tab" onclick="switchModalTab('security',this)">🔒 Seguridad</button>
+    </div>
+    <div id="modal-stats">
+      <div class="stat-grid-m" id="mod-stat-grid"></div>
+      <div class="next-unlock-box" id="mod-next-unlock"></div>
+      <div class="modal-msg" id="mod-msg" style="display:none"></div>
+      <button class="modal-btn" onclick="saveGame()">☁️ Guardar partida en la nube</button>
+    </div>
+    <div id="modal-security" style="display:none">
+      <p style="color:rgba(255,200,100,.7);font-size:12px;margin-bottom:12px;font-weight:700">Cambiar contraseña</p>
+      <input type="password" class="sec-input" id="new-pass" placeholder="Nueva contraseña (mín. 6 caracteres)"/>
+      <input type="password" class="sec-input" id="confirm-pass" placeholder="Confirmar contraseña"/>
+      <div class="modal-msg" id="sec-msg" style="display:none"></div>
+      <button class="modal-btn" onclick="changePassword()">🔑 Cambiar contraseña</button>
+    </div>
+    <button class="logout-btn" onclick="logout()">🚪 Cerrar sesión</button>
+  </div>
+</div>
+
+<!-- ===== EVENTS ===== -->
+<div id="events-container"></div>
+
+<!-- ===== LEVEL UP ===== -->
+<div id="levelup-overlay" onclick="closeLevelUp()">
+  <div class="lu-card" onclick="event.stopPropagation()">
+    <div class="lu-stars">✨✨✨</div>
+    <div class="lu-badge" id="lu-badge">NIVEL 2</div>
+    <div class="lu-title" id="lu-title">Pizzero Novato</div>
+    <div class="lu-unlock"><div class="lu-ul-lbl">🔓 Desbloqueado:</div><div class="lu-ul-val" id="lu-unlock-val">-</div></div>
+    <button class="lu-btn" onclick="closeLevelUp()">¡Genial! 🍕</button>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, updatePassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCkhLFKvgo-iPlHmHau-nxIysdnqp5ZdmI",
+  authDomain: "clicker-ea94f.firebaseapp.com",
+  projectId: "clicker-ea94f",
+  storageBucket: "clicker-ea94f.firebasestorage.app",
+  messagingSenderId: "873459350629",
+  appId: "1:873459350629:web:813bb901d6e928c8e8da8c"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ===== GAME DATA =====
+const UPGRADES = [
+  {id:"oven_1",name:"Horno de Leña Básico",desc:"Un horno artesanal",emoji:"🪵",cost:50,maxLv:10,effect:"+1 pizza/click",ppc:1,pps:0,rep:0,cat:"oven"},
+  {id:"oven_2",name:"Horno Napolitano",desc:"Importado de Nápoles",emoji:"🔥",cost:500,maxLv:10,effect:"+5 pizzas/click",ppc:5,pps:0,rep:0,cat:"oven"},
+  {id:"oven_3",name:"Horno Doble Cámara",desc:"Dos pizzas a la vez",emoji:"⚡",cost:5000,maxLv:10,effect:"+20 pizzas/click",ppc:20,pps:0,rep:0,cat:"oven"},
+  {id:"oven_4",name:"Horno Volcánico",desc:"Calor del Vesubio",emoji:"🌋",cost:50000,maxLv:8,effect:"+100 pizzas/click",ppc:100,pps:0,rep:0,cat:"oven"},
+  {id:"oven_5",name:"Horno Cuántico",desc:"Cocina en múltiples dimensiones",emoji:"⚛️",cost:1000000,maxLv:5,effect:"+1000 pizzas/click",ppc:1000,pps:0,rep:0,cat:"oven"},
+  {id:"staff_1",name:"Pizzero Aprendiz",desc:"Tu primer empleado",emoji:"👨‍🍳",cost:100,maxLv:15,effect:"+0.5 pizza/seg",ppc:0,pps:0.5,rep:0,cat:"staff"},
+  {id:"staff_2",name:"Chef Italiano",desc:"Formado en Florencia",emoji:"⭐",cost:1000,maxLv:15,effect:"+3 pizzas/seg",ppc:0,pps:3,rep:0,cat:"staff"},
+  {id:"staff_3",name:"Maestro Pizzaiolo",desc:"Certificado Verace",emoji:"👑",cost:10000,maxLv:10,effect:"+15 pizzas/seg",ppc:0,pps:15,rep:0,cat:"staff"},
+  {id:"staff_4",name:"Equipo de Camareros",desc:"Servicio impecable",emoji:"🤵",cost:8000,maxLv:10,effect:"+10 pizzas/seg",ppc:0,pps:10,rep:5,cat:"staff"},
+  {id:"staff_5",name:"Robot Pizzero",desc:"Nunca duerme",emoji:"🤖",cost:500000,maxLv:8,effect:"+200 pizzas/seg",ppc:0,pps:200,rep:0,cat:"staff"},
+  {id:"staff_6",name:"Ejército de Clones",desc:"Del mejor chef",emoji:"🧬",cost:10000000,maxLv:5,effect:"+5000 pizzas/seg",ppc:0,pps:5000,rep:0,cat:"staff"},
+  {id:"delivery_1",name:"Bicicleta de Reparto",desc:"El clásico repartidor",emoji:"🚲",cost:300,maxLv:10,effect:"+1 pizza/seg",ppc:0,pps:1,rep:0,cat:"delivery"},
+  {id:"delivery_2",name:"Flota de Motos",desc:"30 minutos garantizados",emoji:"🛵",cost:8000,maxLv:10,effect:"+8 pizzas/seg",ppc:0,pps:8,rep:0,cat:"delivery"},
+  {id:"delivery_3",name:"Drones de Reparto",desc:"Entrega aérea",emoji:"🚁",cost:250000,maxLv:8,effect:"+80 pizzas/seg",ppc:0,pps:80,rep:0,cat:"delivery"},
+  {id:"delivery_4",name:"Teletransportación",desc:"Física cuántica",emoji:"✨",cost:5000000,maxLv:5,effect:"+1000 pizzas/seg",ppc:0,pps:1000,rep:0,cat:"delivery"},
+  {id:"decor_1",name:"Decoración Rústica",desc:"Madera y ladrillo",emoji:"🏺",cost:200,maxLv:5,effect:"+reputación",ppc:0,pps:0,rep:10,cat:"decor"},
+  {id:"decor_2",name:"Terraza Exterior",desc:"Con vistas al centro",emoji:"🌿",cost:3000,maxLv:5,effect:"+reputación +clientes",ppc:0,pps:5,rep:25,cat:"decor"},
+  {id:"decor_3",name:"Iluminación Italiana",desc:"Guirnaldas y velas",emoji:"🕯️",cost:15000,maxLv:5,effect:"+reputación",ppc:0,pps:0,rep:50,cat:"decor"},
+  {id:"decor_4",name:"Fuente de Mármol",desc:"Enviada de Carrara",emoji:"⛲",cost:100000,maxLv:3,effect:"+reputación máxima",ppc:0,pps:0,rep:200,cat:"decor"},
+  {id:"tech_1",name:"Página Web",desc:"Pedidos online",emoji:"💻",cost:500,maxLv:1,effect:"+2 pizzas/seg",ppc:0,pps:2,rep:0,cat:"tech"},
+  {id:"tech_2",name:"App Móvil",desc:"Silicon Valley",emoji:"📱",cost:5000,maxLv:1,effect:"+20 pizzas/seg",ppc:0,pps:20,rep:0,cat:"tech"},
+  {id:"tech_3",name:"IA de Sabores",desc:"Recetas por IA",emoji:"🧠",cost:200000,maxLv:3,effect:"+100 pizzas/seg",ppc:0,pps:100,rep:0,cat:"tech"},
+  {id:"tech_4",name:"Publicidad Holográfica",desc:"Reclamos en 3D",emoji:"🌐",cost:1000000,maxLv:3,effect:"+reputación +ventas",ppc:0,pps:100,rep:300,cat:"tech"},
+  {id:"space_1",name:"Cohete de Reparto",desc:"Pizzas a la Luna",emoji:"🚀",cost:2000000,maxLv:5,effect:"+500 pizzas/seg",ppc:0,pps:500,rep:0,cat:"space"},
+  {id:"space_2",name:"Pizzería en Marte",desc:"Primera sucursal interplanetaria",emoji:"🔴",cost:10000000,maxLv:3,effect:"+2000 pizzas/seg",ppc:0,pps:2000,rep:0,cat:"space"},
+  {id:"space_3",name:"Cadena Galáctica",desc:"Por toda la Vía Láctea",emoji:"🌌",cost:100000000,maxLv:3,effect:"+20000 pizzas/seg",ppc:0,pps:20000,rep:0,cat:"space"},
+  {id:"space_4",name:"Imperio del Multiverso",desc:"Pizzerías en cada dimensión",emoji:"🌀",cost:999999999,maxLv:1,effect:"🏆 VICTORIA TOTAL",ppc:0,pps:999999,rep:0,cat:"space"},
+  {id:"sec_1",name:"Cámara de Seguridad",desc:"Vigila 24/7",emoji:"📷",cost:2000,maxLv:5,effect:"-daño robos",ppc:0,pps:0,rep:0,cat:"security"},
+  {id:"sec_2",name:"Guardia de Seguridad",desc:"Ex-marine",emoji:"💂",cost:20000,maxLv:5,effect:"-daño ataques",ppc:0,pps:0,rep:0,cat:"security"},
+  {id:"sec_3",name:"Soborno Policía",desc:"Miran para otro lado",emoji:"👮",cost:50000,maxLv:10,effect:"+corrupción policial",ppc:0,pps:0,rep:0,cat:"security"},
+  {id:"sec_4",name:"Detective Privado",desc:"Descubre saboteadores",emoji:"🔍",cost:100000,maxLv:5,effect:"+probabilidad pillar rivales",ppc:0,pps:0,rep:0,cat:"security"},
+];
+
+const LEVELS = [
+  {lv:1,xp:0,title:"Aprendiz de Pizzero",unlock:"Acceso básico"},
+  {lv:2,xp:100,title:"Pizzero Novato",unlock:"Tienda básica"},
+  {lv:3,xp:300,title:"Chef en Prácticas",unlock:"Mejoras de personal"},
+  {lv:4,xp:700,title:"Cocinero Local",unlock:"Decoración del local"},
+  {lv:5,xp:1500,title:"Maestro de la Masa",unlock:"Tecnología básica"},
+  {lv:6,xp:3000,title:"Empresario Pizzero",unlock:"Flota de reparto"},
+  {lv:7,xp:6000,title:"Magnate del Queso",unlock:"App móvil"},
+  {lv:8,xp:12000,title:"Barón de la Pizza",unlock:"Drones de reparto"},
+  {lv:9,xp:25000,title:"Rey de PizzaCity",unlock:"Publicidad holográfica"},
+  {lv:10,xp:50000,title:"Señor de las Pizzas",unlock:"🚨 INTERACCIONES PVP"},
+  {lv:11,xp:100000,title:"Conde de Mozzarella",unlock:"Cohetes de reparto"},
+  {lv:12,xp:200000,title:"Duque del Horno",unlock:"Pizzería en Marte"},
+  {lv:13,xp:400000,title:"Príncipe del Multiverso",unlock:"Cadena Galáctica"},
+  {lv:14,xp:800000,title:"Rey del Universo Pizza",unlock:"Imperio Multiverso"},
+  {lv:15,xp:2000000,title:"🍕 DIOS DE LA PIZZA 🍕",unlock:"¡Has conquistado el multiverso!"},
+];
+
+const CITY_LAYOUT = [
+  [1,1,0,1,1,1,0,1,1,0,1,1,1,0,1,1],
+  [1,1,0,1,1,1,0,1,1,0,1,1,1,0,1,1],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [1,1,0,1,1,0,2,2,0,1,1,0,1,1,1,1],
+  [1,1,0,1,1,0,2,2,0,1,1,0,1,1,1,1],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [1,1,0,1,1,0,3,3,0,1,1,0,2,2,0,1],
+  [1,1,0,1,1,0,3,3,0,1,1,0,2,2,0,1],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [1,1,0,1,1,1,0,1,1,0,1,1,0,1,1,1],
+  [1,1,0,1,1,1,0,1,1,0,1,1,0,1,1,1],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1],
+];
+
+// ===== GAME STATE =====
+let G = {
+  pizzas:0, total:0, ppc:1, pps:0, level:1, xp:0, rep:0,
+  upgrades:{}, // id -> level
+  combo:0, lastClick:0, multiplier:1,
+  secLevel:0, policeCorr:0,
+};
+let currentUser = null;
+let currentUsername = '';
+let floaterId = 0;
+let authMode = 'login';
+let currentCat = 'all';
+
+// ===== UTILS =====
+function fmt(n){
+  n = Math.floor(n);
+  if(n>=1e12)return(n/1e12).toFixed(2)+'T';
+  if(n>=1e9)return(n/1e9).toFixed(2)+'B';
+  if(n>=1e6)return(n/1e6).toFixed(2)+'M';
+  if(n>=1e3)return(n/1e3).toFixed(1)+'K';
+  return n.toString();
+}
+function upgLevel(id){ return G.upgrades[id]||0; }
+function upgCost(upg){ return Math.floor(upg.cost * Math.pow(1.5, upgLevel(upg.id))); }
+function getLvColor(lv){ if(lv>=12)return'#ff00ff';if(lv>=10)return'#ff6b00';if(lv>=7)return'#ffcc00';if(lv>=4)return'#00ff88';return'#aaaaaa'; }
+
+function recalcStats(){
+  let ppc=1,pps=0,rep=0;
+  UPGRADES.forEach(u=>{
+    const lv=upgLevel(u.id);
+    if(lv>0){ ppc+=u.ppc*lv; pps+=u.pps*lv; rep+=u.rep*lv; }
+  });
+  G.ppc=ppc; G.pps=pps; G.rep=rep;
+}
+
+// ===== AUTH =====
+window.switchAuthTab = function(mode){
+  authMode = mode;
+  document.querySelectorAll('.auth-tab').forEach((t,i)=>{
+    t.classList.toggle('active',['login','register','reset'][i]===mode);
+  });
+  document.getElementById('field-username').style.display = mode==='register'?'block':'none';
+  document.getElementById('field-password').style.display = mode==='reset'?'none':'block';
+  const btn = document.getElementById('auth-submit-btn');
+  btn.textContent = mode==='login'?'🔥 ¡Entrar al Horno!': mode==='register'?'🍕 ¡Crear mi Pizzería!':'📧 Enviar Email';
+  document.getElementById('auth-msg').innerHTML='';
+};
+
+window.authSubmit = async function(){
+  const email = document.getElementById('inp-email').value.trim();
+  const password = document.getElementById('inp-password').value;
+  const username = document.getElementById('inp-username').value.trim();
+  const btn = document.getElementById('auth-submit-btn');
+  const msgEl = document.getElementById('auth-msg');
+  msgEl.innerHTML=''; btn.disabled=true; btn.textContent='⏳ Cargando...';
+  try{
+    if(authMode==='login'){
+      await signInWithEmailAndPassword(auth, email, password);
+    } else if(authMode==='register'){
+      if(!username){ throw new Error('El nombre de pizzero es obligatorio'); }
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      const cx=Math.floor(Math.random()*14)+1, cy=Math.floor(Math.random()*10)+1;
+      await setDoc(doc(db,'users',cred.user.uid),{username,email,createdAt:Date.now(),gameState:null,cityPos:{x:cx,y:cy}});
+      await setDoc(doc(db,'city',cred.user.uid),{userId:cred.user.uid,username,x:cx,y:cy,level:1,reputation:0,pizzasSold:0,upgrades:[],lastActive:Date.now()});
+    } else {
+      await sendPasswordResetEmail(auth, email);
+      msgEl.innerHTML='<div class="auth-success">✅ Email de recuperación enviado. Revisa tu bandeja.</div>';
+    }
+  } catch(e){
+    let m=e.message||'Error desconocido';
+    if(m.includes('user-not-found'))m='Usuario no encontrado';
+    else if(m.includes('wrong-password')||m.includes('invalid-credential'))m='Email o contraseña incorrectos';
+    else if(m.includes('email-already-in-use'))m='Email ya registrado';
+    else if(m.includes('weak-password'))m='Contraseña muy débil (mín. 6 caracteres)';
+    msgEl.innerHTML=`<div class="auth-error">⚠️ ${m}</div>`;
+  }
+  btn.disabled=false;
+  switchAuthTab(authMode);
+};
+
+// ===== FIREBASE AUTH STATE =====
+onAuthStateChanged(auth, async(user)=>{
+  if(user){
+    currentUser=user;
+    try{
+      const snap=await getDoc(doc(db,'users',user.uid));
+      if(snap.exists()){
+        const data=snap.data();
+        currentUsername=data.username||user.email;
+        if(data.gameState){ loadGameState(data.gameState); }
+      }
+    } catch(e){ console.log('Offline mode'); }
+    startGame();
+  } else {
+    currentUser=null;
+    document.getElementById('auth-screen').style.display='flex';
+    document.getElementById('game-screen').style.display='none';
+  }
+});
+
+function loadGameState(s){
+  if(s.pizzas) G.pizzas=s.pizzas;
+  if(s.total) G.total=s.total;
+  if(s.level) G.level=s.level;
+  if(s.xp) G.xp=s.xp;
+  if(s.upgrades) G.upgrades=s.upgrades;
+  if(s.rep) G.rep=s.rep;
+  recalcStats();
+}
+
+// ===== GAME START =====
+function startGame(){
+  document.getElementById('auth-screen').style.display='none';
+  document.getElementById('game-screen').style.display='flex';
+  document.getElementById('nav-username').textContent=currentUsername;
+  renderUpgrades();
+  renderCity();
+  buildParticles();
+  updateUI();
+  // Passive income loop
+  setInterval(()=>{ G.pizzas+=G.pps/20; G.total+=G.pps/20; addXP(G.pps/200); updateUI(); }, 50);
+  // Auto-save
+  setInterval(saveGame, 60000);
+  // Random events
+  setInterval(randomEvent, 12000);
+}
+
+function buildParticles(){
+  const c=document.getElementById('auth-particles');
+  for(let i=0;i<15;i++){
+    const d=document.createElement('div');
+    d.className='auth-particle';
+    d.textContent='🍕';
+    d.style.cssText=`left:${Math.random()*100}%;animation-delay:${Math.random()*5}s;animation-duration:${3+Math.random()*4}s;font-size:${12+Math.random()*16}px`;
+    c.appendChild(d);
+  }
+}
+
+// ===== CLICK =====
+window.handleClick = function(e){
+  const now=Date.now();
+  if(now-G.lastClick<500){ G.combo=Math.min(G.combo+1,50); G.multiplier=1+G.combo*0.05; }
+  else { G.combo=0; G.multiplier=1; }
+  G.lastClick=now;
+  const gained=Math.floor(G.ppc*G.multiplier);
+  G.pizzas+=gained; G.total+=gained;
+  addXP(1);
+
+  // Glow effect
+  const glow=document.getElementById('oven-glow');
+  glow.style.opacity='0.8';
+  setTimeout(()=>glow.style.opacity='0.3',200);
+
+  // Floating text
+  const rect=document.getElementById('oven-click').getBoundingClientRect();
+  const x=e.clientX-rect.left, y=e.clientY-rect.top;
+  const id=++floaterId;
+  let txt=`+${fmt(gained)} 🍕`, color='#ffcc00';
+  if(G.multiplier>=2){txt=`🔥 COMBO! +${fmt(gained)} 🍕`;color='#ff6b00';}
+  else if(G.multiplier>=1.5){color='#ff9500';}
+  const fl=document.createElement('div');
+  fl.className='floater';
+  fl.style.cssText=`left:${x}px;top:${y}px;color:${color}`;
+  fl.textContent=txt;
+  document.getElementById('floaters').appendChild(fl);
+  setTimeout(()=>fl.remove(),1200);
+
+  // Combo badge
+  const cb=document.getElementById('combo-badge');
+  if(G.combo>5){ cb.style.display='inline-block'; cb.textContent=`🔥 COMBO x${G.multiplier.toFixed(1)}`; }
+  else { cb.style.display='none'; }
+
+  updateUI();
+};
+
+function addXP(amount){
+  G.xp+=amount;
+  const prevLv=G.level;
+  while(true){
+    const next=LEVELS.find(l=>l.lv===G.level+1);
+    if(next && G.xp>=next.xp){ G.level++; showLevelUp(G.level); }
+    else break;
+  }
+}
+
+// ===== UI UPDATE =====
+function updateUI(){
+  const pf=fmt(G.pizzas);
+  document.getElementById('nav-pizzas').textContent=pf+' 🍕';
+  document.getElementById('s-pizzas').textContent=pf;
+  document.getElementById('s-ppc').textContent=fmt(G.ppc);
+  document.getElementById('s-pps').textContent=fmt(G.pps);
+  document.getElementById('s-total').textContent=fmt(G.total);
+  document.getElementById('shop-budget').textContent=pf+' 🍕';
+  if(G.pps>0){ document.getElementById('nav-pps').style.display='flex'; document.getElementById('nav-pps').textContent=fmt(G.pps)+'/s ⚡'; }
+
+  const lvData=LEVELS.find(l=>l.lv===G.level)||LEVELS[0];
+  const nextLv=LEVELS.find(l=>l.lv===G.level+1);
+  const prog=nextLv?Math.min(100,((G.xp-lvData.xp)/(nextLv.xp-lvData.xp))*100):100;
+  document.getElementById('xp-fill').style.width=prog+'%';
+  document.getElementById('xp-info').textContent=`Nv.${G.level} · ${lvData.title}`;
+  document.getElementById('xp-num').textContent=fmt(G.xp)+' XP';
+  document.getElementById('nav-level').textContent='Nv.'+G.level;
+
+  // Refresh upgrades costs
+  document.querySelectorAll('[data-upg-id]').forEach(card=>{
+    const id=card.dataset.upgId;
+    const upg=UPGRADES.find(u=>u.id===id);
+    if(!upg) return;
+    const lv=upgLevel(id);
+    const cost=upgCost(upg);
+    const maxed=lv>=upg.maxLv;
+    const costEl=card.querySelector('.ucost');
+    if(costEl){
+      if(maxed){ costEl.className='ucost mx'; costEl.textContent='✅ MAX'; }
+      else if(G.pizzas>=cost){ costEl.className='ucost ok'; costEl.textContent=fmt(cost)+' 🍕'; card.classList.add('affordable'); }
+      else { costEl.className='ucost no'; costEl.textContent=fmt(cost)+' 🍕'; card.classList.remove('affordable'); }
+    }
+  });
+}
+
+// ===== SHOP =====
+const CATS=[{id:'all',label:'⭐ Todo'},{id:'oven',label:'🔥 Hornos'},{id:'staff',label:'👨‍🍳 Personal'},{id:'delivery',label:'🚲 Reparto'},{id:'decor',label:'✨ Decor'},{id:'tech',label:'💻 Tech'},{id:'space',label:'🚀 Espacio'},{id:'security',label:'🔒 Seguridad'}];
+
+function renderUpgrades(){
+  // Cat bar
+  const bar=document.getElementById('cat-bar');
+  bar.innerHTML='';
+  CATS.forEach(c=>{
+    const btn=document.createElement('button');
+    btn.className='cat-btn'+(c.id===currentCat?' active':'');
+    btn.textContent=c.label;
+    btn.onclick=()=>{ currentCat=c.id; renderUpgrades(); };
+    bar.appendChild(btn);
+  });
+
+  const list=document.getElementById('upgrades-list');
+  list.innerHTML='';
+  const filtered=UPGRADES.filter(u=>currentCat==='all'||u.cat===currentCat);
+  filtered.forEach(upg=>{
+    const lv=upgLevel(upg.id);
+    const cost=upgCost(upg);
+    const maxed=lv>=upg.maxLv;
+    const locked=(upg.cat==='space'&&G.level<8)||(upg.cat==='security'&&(upg.id==='sec_3'||upg.id==='sec_4')&&G.level<10);
+    const affordable=G.pizzas>=cost&&!maxed&&!locked;
+
+    const card=document.createElement('div');
+    card.className='upgrade-card'+(maxed?' maxed':locked?' locked':affordable?' affordable':'');
+    card.dataset.upgId=upg.id;
+    if(!maxed&&!locked) card.onclick=()=>buyUpgrade(upg.id);
+
+    const dots=Array.from({length:Math.min(upg.maxLv,10)},(_,i)=>`<div class="lvl-dot${i<lv?' on':''}"></div>`).join('');
+    let costHtml='';
+    if(maxed) costHtml='<span class="ucost mx">✅ MAX</span>';
+    else if(locked) costHtml=`<span class="ucost lk">🔒 Nv.${upg.cat==='space'?8:10}</span>`;
+    else costHtml=`<span class="ucost ${affordable?'ok':'no'}">${fmt(cost)} 🍕</span>`;
+
+    card.innerHTML=`<div class="ue">${upg.emoji}</div><div class="upgrade-info"><div class="un">${upg.name}</div><div class="ud">${upg.desc}</div><div class="uf">${upg.effect}</div></div><div class="upgrade-right"><div class="lvl-dots">${dots}</div>${costHtml}${lv>0?`<div style="color:rgba(255,150,0,.6);font-size:10px">Nv.${lv}/${upg.maxLv}</div>`:''}</div>`;
+    list.appendChild(card);
+  });
+}
+
+function buyUpgrade(id){
+  const upg=UPGRADES.find(u=>u.id===id);
+  if(!upg) return;
+  const lv=upgLevel(id);
+  if(lv>=upg.maxLv) return;
+  const cost=upgCost(upg);
+  if(G.pizzas<cost) return;
+  G.pizzas-=cost;
+  G.upgrades[id]=(lv+1);
+  addXP(Math.floor(cost/10));
+  recalcStats();
+  renderUpgrades();
+  updateUI();
+}
+
+// ===== TABS =====
+window.switchTab = function(name, btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='shop') renderUpgrades();
+  if(name==='city') renderCity();
+};
+
+// ===== CITY =====
+async function renderCity(){
+  const grid=document.getElementById('city-grid');
+  const W=16,H=12;
+  const cellSize=Math.min(Math.floor((Math.min(window.innerWidth,480)-32)/W),44);
+  grid.style.gridTemplateColumns=`repeat(${W},${cellSize}px)`;
+  grid.style.gridTemplateRows=`repeat(${H},${cellSize}px)`;
+
+  // Load players
+  let players=[];
+  try{
+    const snap=await getDocs(collection(db,'city'));
+    snap.forEach(d=>players.push(d.data()));
+  } catch(e){
+    players=[
+      {userId:'d1',username:'PizzaKing',x:3,y:1,level:8,reputation:500,pizzasSold:50000,lastActive:Date.now()},
+      {userId:'d2',username:'ItalyBoss',x:9,y:4,level:5,reputation:200,pizzasSold:20000,lastActive:Date.now()-3600000},
+      {userId:'d3',username:'MozzaMaster',x:13,y:7,level:3,reputation:80,pizzasSold:5000,lastActive:Date.now()-86400000},
+    ];
+  }
+
+  grid.innerHTML='';
+  CITY_LAYOUT.forEach((row,y)=>{
+    row.forEach((tile,x)=>{
+      const player=players.find(p=>p.x===x&&p.y===y);
+      const isMe=player&&currentUser&&player.userId===currentUser.uid;
+      const cell=document.createElement('div');
+      const tClass=['road','block','park','plaza'][tile]||'block';
+      cell.className='cell '+tClass+(player?' has-player':'');
+      cell.style.width=cellSize+'px';cell.style.height=cellSize+'px';
+      cell.style.border=isMe?`2px solid ${getLvColor(player.level)}`:'1px solid rgba(255,255,255,0.04)';
+      if(player){
+        cell.style.background=`radial-gradient(circle, ${getLvColor(player.level)}22, transparent)`;
+        cell.innerHTML=`<div class="cell-inner"><span style="font-size:${Math.max(cellSize*.35,12)}px">🍕</span><span style="font-size:${Math.max(cellSize*.16,7)}px;color:${getLvColor(player.level)};font-weight:900;text-shadow:0 1px 3px black;overflow:hidden;white-space:nowrap;max-width:100%">${player.username.substring(0,6)}</span>${isMe?`<span style="font-size:7px;color:#ffcc00">YO</span>`:''}</div>`;
+        cell.title=`${player.username} · Nv.${player.level}`;
+      } else if(tile===2){
+        cell.innerHTML=`<span style="font-size:${cellSize*.4}px">🌳</span>`;
+      } else if(tile===3){
+        cell.innerHTML=`<span style="font-size:${cellSize*.4}px">⛲</span>`;
+      }
+      grid.appendChild(cell);
+    });
+  });
+
+  // Ranking
+  const rl=document.getElementById('ranking-list');
+  rl.innerHTML='';
+  [...players].sort((a,b)=>b.pizzasSold-a.pizzasSold).forEach((p,i)=>{
+    const isMe=currentUser&&p.userId===currentUser.uid;
+    const row=document.createElement('div');
+    row.className='rank-row'+(isMe?' me':'');
+    row.innerHTML=`<span class="rank-num">#${i+1}</span><span>🍕</span><span class="rank-name">${p.username}</span><span class="rank-lv" style="color:${getLvColor(p.level)}">Nv.${p.level}</span><span class="rank-pz">${fmt(p.pizzasSold)}</span>`;
+    rl.appendChild(row);
+  });
+}
+
+// ===== EVENTS =====
+function randomEvent(){
+  const bad=Math.max(0.005,0.018-G.secLevel*0.001);
+  const r=Math.random();
+  if(r<bad){
+    const types=[
+      {type:'earthquake',emoji:'🌋',title:'¡Terremoto!',desc:'El Vesubio ha despertado. Daños en el horno.',loss:.08},
+      {type:'robbery',emoji:'🦹',title:'¡Robo!',desc:'Alguien vació la caja registradora.',loss:.1},
+      {type:'fire',emoji:'🔥',title:'¡Incendio!',desc:'El horno se sobrecalentó. Pizzas perdidas.',loss:.07},
+      {type:'strike',emoji:'✊',title:'¡Huelga!',desc:'Los empleados piden mejores condiciones.',loss:.05},
+      {type:'flood',emoji:'🌊',title:'¡Inundación!',desc:'Las cañerías han fallado.',loss:.06},
+    ];
+    const evt=types[Math.floor(Math.random()*types.length)];
+    const loss=Math.floor(G.pizzas*evt.loss);
+    G.pizzas=Math.max(0,G.pizzas-loss);
+    showEventToast(evt.emoji,evt.title,evt.desc,`-${fmt(loss)} 🍕`,false);
+  } else if(r<bad+0.012){
+    const good=[
+      {emoji:'📱',title:'¡Viral en TikTok!',desc:'Tu pizza es trending. ¡Pedidos disparados!',gain:.15},
+      {emoji:'👽',title:'¡Pedido alienígena!',desc:'Una nave ha pedido 500 pizzas.',gain:.2},
+    ];
+    const evt=good[Math.floor(Math.random()*good.length)];
+    const gain=Math.max(10,Math.floor(G.total*evt.gain*0.01));
+    G.pizzas+=gain; G.total+=gain;
+    showEventToast(evt.emoji,evt.title,evt.desc,`+${fmt(gain)} 🍕`,true);
+  }
+  updateUI();
+}
+
+function showEventToast(emoji,title,desc,impact,isGood){
+  const color=isGood?'rgba(0,200,100,.5)':'rgba(255,80,0,.5)';
+  const toast=document.createElement('div');
+  toast.className='event-toast';
+  toast.style.borderColor=color;
+  toast.style.boxShadow=`0 0 20px ${color}`;
+  toast.innerHTML=`<span class="et-emoji">${emoji}</span><div><div class="et-title" style="color:${isGood?'#44ff88':'#ff6b00'}">${title}</div><div class="et-desc">${desc}</div><div class="et-impact ${isGood?'gain':'loss'}">${impact}</div></div>`;
+  toast.onclick=()=>toast.remove();
+  document.getElementById('events-container').appendChild(toast);
+  setTimeout(()=>{ if(toast.parentNode) toast.remove(); },7000);
+}
+
+// ===== LEVEL UP =====
+function showLevelUp(lv){
+  const lvData=LEVELS.find(l=>l.lv===lv);
+  if(!lvData) return;
+  document.getElementById('lu-badge').textContent='NIVEL '+lv;
+  document.getElementById('lu-title').textContent=lvData.title;
+  document.getElementById('lu-unlock-val').textContent=lvData.unlock;
+  document.getElementById('levelup-overlay').style.display='flex';
+}
+window.closeLevelUp=function(){ document.getElementById('levelup-overlay').style.display='none'; };
+
+// ===== PROFILE =====
+window.openProfile=function(){
+  const lvData=LEVELS.find(l=>l.lv===G.level)||LEVELS[0];
+  const nextLv=LEVELS.find(l=>l.lv===G.level+1);
+  document.getElementById('mod-uname').textContent=currentUsername;
+  document.getElementById('mod-email').textContent=currentUser?.email||'';
+  document.getElementById('mod-title').textContent=lvData.title;
+  const sg=document.getElementById('mod-stat-grid');
+  sg.innerHTML=[
+    ['Nivel',G.level],['XP',fmt(G.xp)],['Total 🍕',fmt(G.total)],
+    ['Reputación',G.rep],['🍕/click',fmt(G.ppc)],['🍕/seg',fmt(G.pps)],
+  ].map(([l,v])=>`<div class="sg-box"><div class="sg-v">${v}</div><div class="sg-l">${l}</div></div>`).join('');
+  const nu=document.getElementById('mod-next-unlock');
+  if(nextLv) nu.innerHTML=`<div class="nu-lbl">Próximo desbloqueo (Nv.${nextLv.lv}):</div><div class="nu-val">${nextLv.unlock}</div>`;
+  document.getElementById('profile-modal').style.display='flex';
+};
+window.closeProfile=function(){ document.getElementById('profile-modal').style.display='none'; };
+
+window.switchModalTab=function(tab,btn){
+  document.querySelectorAll('.modal-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('modal-stats').style.display=tab==='stats'?'block':'none';
+  document.getElementById('modal-security').style.display=tab==='security'?'block':'none';
+};
+
+window.saveGame=async function(){
+  if(!currentUser) return;
+  const modMsg=document.getElementById('mod-msg');
+  try{
+    await updateDoc(doc(db,'users',currentUser.uid),{gameState:{pizzas:G.pizzas,total:G.total,level:G.level,xp:G.xp,upgrades:G.upgrades,rep:G.rep}});
+    await updateDoc(doc(db,'city',currentUser.uid),{level:G.level,reputation:G.rep,pizzasSold:G.total,upgrades:Object.keys(G.upgrades).filter(k=>G.upgrades[k]>0),lastActive:Date.now()});
+    if(modMsg){ modMsg.style.display='block'; modMsg.textContent='✅ Partida guardada en la nube'; setTimeout(()=>modMsg.style.display='none',3000); }
+  } catch(e){
+    if(modMsg){ modMsg.style.display='block'; modMsg.textContent='⚠️ Error al guardar (sin conexión)'; setTimeout(()=>modMsg.style.display='none',3000); }
+  }
+};
+
+window.changePassword=async function(){
+  const np=document.getElementById('new-pass').value;
+  const cp=document.getElementById('confirm-pass').value;
+  const msg=document.getElementById('sec-msg');
+  msg.style.display='block';
+  if(np.length<6){ msg.textContent='⚠️ Mínimo 6 caracteres'; return; }
+  if(np!==cp){ msg.textContent='⚠️ Las contraseñas no coinciden'; return; }
+  try{
+    await updatePassword(auth.currentUser, np);
+    msg.textContent='✅ Contraseña actualizada';
+    document.getElementById('new-pass').value='';
+    document.getElementById('confirm-pass').value='';
+  } catch(e){ msg.textContent='⚠️ Error. Re-inicia sesión primero.'; }
+  setTimeout(()=>msg.style.display='none',3000);
+};
+
+window.logout=async function(){
+  await saveGame();
+  await signOut(auth);
+  G={pizzas:0,total:0,ppc:1,pps:0,level:1,xp:0,rep:0,upgrades:{},combo:0,lastClick:0,multiplier:1,secLevel:0,policeCorr:0};
+  closeProfile();
+};
+</script>
+</body>
+</html>
