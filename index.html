@@ -2,670 +2,433 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>PizzaClicker Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet"/>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:#050308;color:#fff;font-family:'Nunito',sans-serif;overflow-x:hidden}
-::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:rgba(255,150,0,.4);border-radius:3px}
-
-/* BG */
-.bg1{position:fixed;width:500px;height:500px;border-radius:50%;background:#ff4400;top:-150px;left:-150px;filter:blur(100px);opacity:.07;pointer-events:none}
-.bg2{position:fixed;width:400px;height:400px;border-radius:50%;background:#8800ff;bottom:-100px;right:-100px;filter:blur(100px);opacity:.07;pointer-events:none}
-
-/* LOGIN */
-#admin-login{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:100;background:#050308}
-.login-card{background:rgba(15,5,20,.95);border:2px solid rgba(255,100,0,.4);border-radius:22px;padding:40px 36px;width:380px;max-width:95vw;box-shadow:0 0 60px rgba(255,80,0,.2)}
-.login-logo{text-align:center;margin-bottom:28px}
-.login-logo span{font-size:52px;display:block;margin-bottom:10px}
-.login-logo h1{font-family:'Russo One',sans-serif;font-size:24px;color:#fff;letter-spacing:3px}
-.login-logo h1 em{color:#ff6b00;font-style:normal}
-.login-logo p{color:rgba(255,150,50,.6);font-size:11px;letter-spacing:2px;margin-top:4px}
-.form-group{margin-bottom:14px}
-.form-group label{display:block;color:rgba(255,200,100,.75);font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
-.form-input{width:100%;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,100,0,.3);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;font-family:'Nunito',sans-serif;outline:none;transition:border-color .2s}
-.form-input:focus{border-color:rgba(255,150,0,.8)}
-.form-input::placeholder{color:rgba(255,255,255,.3)}
-.login-btn{width:100%;background:linear-gradient(135deg,#ff6b00,#cc2200);border:none;border-radius:11px;padding:13px;color:#fff;font-size:15px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;margin-top:6px;transition:all .2s;box-shadow:0 6px 20px rgba(255,80,0,.35)}
-.login-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(255,80,0,.45)}
-.login-err{background:rgba(255,50,50,.15);border:1px solid rgba(255,50,50,.4);border-radius:8px;padding:9px 13px;color:#ff8080;font-size:13px;margin-bottom:12px;display:none}
-
-/* MAIN ADMIN */
-#admin-main{display:none;min-height:100vh}
-
-/* Sidebar */
-.sidebar{position:fixed;top:0;left:0;width:220px;height:100vh;background:rgba(0,0,0,.6);border-right:1px solid rgba(255,150,0,.12);backdrop-filter:blur(20px);display:flex;flex-direction:column;z-index:50}
-.sidebar-brand{padding:24px 20px 18px;border-bottom:1px solid rgba(255,150,0,.1)}
-.sidebar-brand-title{font-family:'Russo One',sans-serif;font-size:14px;color:rgba(255,200,100,.9);letter-spacing:2px}
-.sidebar-brand-title em{color:#ff6b00;font-style:normal}
-.sidebar-brand-sub{font-size:10px;color:rgba(255,255,255,.3);letter-spacing:1px;margin-top:2px}
-.sidebar-nav{flex:1;padding:16px 10px;display:flex;flex-direction:column;gap:4px}
-.snav-btn{display:flex;align-items:center;gap:10px;padding:10px 12px;border:none;background:transparent;color:rgba(255,255,255,.5);cursor:pointer;border-radius:10px;font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;transition:all .2s;text-align:left;width:100%}
-.snav-btn:hover{background:rgba(255,150,0,.08);color:#fff}
-.snav-btn.active{background:rgba(255,100,0,.15);color:#ff6b00;border:1px solid rgba(255,100,0,.2)}
-.snav-btn .si{font-size:18px;width:22px;text-align:center}
-.sidebar-footer{padding:16px;border-top:1px solid rgba(255,150,0,.1)}
-.admin-badge{background:rgba(255,100,0,.15);border:1px solid rgba(255,100,0,.25);border-radius:10px;padding:10px 12px;font-size:11px}
-.admin-badge .ab-email{color:rgba(255,200,100,.8);font-weight:700;word-break:break-all}
-.admin-badge .ab-role{color:#ff6b00;font-size:10px;font-weight:800;letter-spacing:1px;margin-top:2px}
-.logout-admin{width:100%;padding:8px;background:rgba(255,50,50,.1);border:1px solid rgba(255,50,50,.25);border-radius:8px;color:#ff8080;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px;font-family:'Nunito',sans-serif}
-
-/* Content */
-.admin-content{margin-left:220px;padding:28px;min-height:100vh}
-.admin-page{display:none}
-.admin-page.active{display:block}
-
-/* Page header */
-.page-header{margin-bottom:24px}
-.page-title{font-family:'Russo One',sans-serif;font-size:26px;color:#fff;margin:0 0 4px}
-.page-sub{color:rgba(255,255,255,.4);font-size:13px}
-
-/* Stats cards */
-.stats-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:28px}
-.stats-card{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,150,0,.15);border-radius:16px;padding:20px;transition:border-color .2s}
-.stats-card:hover{border-color:rgba(255,150,0,.35)}
-.sc-icon{font-size:32px;margin-bottom:10px}
-.sc-value{font-size:30px;font-weight:900;color:#ffcc00;line-height:1}
-.sc-label{color:rgba(255,255,255,.45);font-size:12px;margin-top:4px}
-
-/* Table */
-.table-wrap{background:rgba(255,255,255,.03);border:1.5px solid rgba(255,150,0,.12);border-radius:16px;overflow:hidden}
-.table-header{padding:16px 20px;border-bottom:1px solid rgba(255,150,0,.1);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-.table-title{font-size:16px;font-weight:800;color:#ffcc00}
-.search-input{background:rgba(255,255,255,.06);border:1.5px solid rgba(255,150,0,.2);border-radius:10px;padding:8px 14px;color:#fff;font-size:13px;font-family:'Nunito',sans-serif;outline:none;width:220px}
-.search-input:focus{border-color:rgba(255,150,0,.6)}
-.search-input::placeholder{color:rgba(255,255,255,.3)}
-table{width:100%;border-collapse:collapse}
-thead tr{background:rgba(255,150,0,.06)}
-th{padding:12px 16px;text-align:left;font-size:11px;font-weight:800;color:rgba(255,200,100,.7);letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(255,150,0,.08)}
-td{padding:12px 16px;font-size:13px;color:rgba(255,255,255,.8);border-bottom:1px solid rgba(255,255,255,.04)}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:rgba(255,150,0,.04)}
-.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:800;letter-spacing:.5px}
-.badge-admin{background:rgba(255,100,0,.2);color:#ff6b00;border:1px solid rgba(255,100,0,.3)}
-.badge-user{background:rgba(100,100,255,.15);color:#8888ff;border:1px solid rgba(100,100,255,.2)}
-.badge-banned{background:rgba(255,50,50,.15);color:#ff6666;border:1px solid rgba(255,50,50,.25)}
-.lv-badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:900}
-
-/* Action buttons */
-.action-btns{display:flex;gap:6px;flex-wrap:wrap}
-.btn-sm{padding:5px 12px;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s}
-.btn-ban{background:rgba(255,50,50,.18);color:#ff8080;border:1px solid rgba(255,50,50,.3)}
-.btn-ban:hover{background:rgba(255,50,50,.3)}
-.btn-unban{background:rgba(50,200,100,.15);color:#80ff90;border:1px solid rgba(50,200,100,.25)}
-.btn-unban:hover{background:rgba(50,200,100,.25)}
-.btn-promote{background:rgba(255,150,0,.15);color:#ffcc00;border:1px solid rgba(255,150,0,.25)}
-.btn-promote:hover{background:rgba(255,150,0,.25)}
-.btn-reset{background:rgba(100,100,255,.15);color:#8888ff;border:1px solid rgba(100,100,255,.25)}
-.btn-reset:hover{background:rgba(100,100,255,.25)}
-.btn-delete{background:rgba(200,0,0,.15);color:#ff5555;border:1px solid rgba(200,0,0,.25)}
-.btn-delete:hover{background:rgba(200,0,0,.28)}
-.btn-primary{background:linear-gradient(135deg,#ff6b00,#cc2200);color:#fff;border:none;padding:9px 18px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(255,80,0,.35)}
-
-/* Pagination */
-.pagination{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid rgba(255,150,0,.08)}
-.page-btn{background:rgba(255,255,255,.06);border:1px solid rgba(255,150,0,.2);border-radius:7px;color:rgba(255,255,255,.6);padding:5px 12px;font-size:12px;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s}
-.page-btn:hover,.page-btn.active{background:rgba(255,100,0,.2);color:#ffcc00;border-color:rgba(255,100,0,.4)}
-.page-info{color:rgba(255,255,255,.3);font-size:12px}
-
-/* Logs */
-.log-entry{display:flex;align-items:flex-start;gap:12px;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.04)}
-.log-entry:last-child{border-bottom:none}
-.log-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
-.log-dot.info{background:#4488ff}
-.log-dot.warn{background:#ffaa00}
-.log-dot.error{background:#ff4444}
-.log-dot.success{background:#44ff88}
-.log-time{color:rgba(255,255,255,.3);font-size:11px;white-space:nowrap;margin-top:2px}
-.log-msg{color:rgba(255,255,255,.7);font-size:13px;flex:1}
-.log-user{color:rgba(255,200,100,.7);font-size:11px;margin-top:2px}
-
-/* Modal */
-.modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
-.modal-box{background:#0d0810;border:2px solid rgba(255,150,0,.35);border-radius:20px;padding:28px;width:400px;max-width:95vw;box-shadow:0 0 60px rgba(255,80,0,.25)}
-.modal-title{font-size:18px;font-weight:900;color:#ffcc00;margin-bottom:16px}
-.modal-text{color:rgba(255,255,255,.6);font-size:14px;line-height:1.6;margin-bottom:20px}
-.modal-actions{display:flex;gap:10px;justify-content:flex-end}
-.btn-cancel{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:9px;color:rgba(255,255,255,.6);padding:9px 18px;font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif}
-.btn-danger{background:linear-gradient(135deg,#cc0000,#880000);border:none;border-radius:9px;color:#fff;padding:9px 18px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif}
-
-/* Toast */
-#admin-toast{position:fixed;bottom:24px;right:24px;z-index:500;display:flex;flex-direction:column;gap:8px}
-.a-toast{background:rgba(10,5,15,.97);border:1.5px solid;border-radius:12px;padding:12px 16px;font-size:13px;font-weight:700;animation:slideUp .3s ease;pointer-events:none}
-@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
-.a-toast.success{border-color:rgba(50,200,100,.5);color:#80ff90}
-.a-toast.error{border-color:rgba(255,50,50,.5);color:#ff8080}
-.a-toast.info{border-color:rgba(80,150,255,.5);color:#88bbff}
-
-/* Responsive */
-@media(max-width:768px){
-  .sidebar{width:60px}
-  .snav-btn span:not(.si){display:none}
-  .sidebar-brand-title,.sidebar-brand-sub,.admin-badge,.sidebar-footer .logout-admin{display:none}
-  .admin-content{margin-left:60px;padding:16px}
-}
-</style>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<meta name="theme-color" content="#ff6b00"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="PizzaClicker"/>
+<meta name="description" content="El juego clicker más delicioso de la galaxia. ¡Conquista el multiverso a golpe de pizza!"/>
+<title>PizzaClicker 🍕 — El Imperio de la Pizza</title>
+<!-- PWA Manifest -->
+<link rel="manifest" href="manifest.json"/>
+<!-- Favicon -->
+<link rel="icon" type="image/x-icon" href="favicon.ico"/>
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png"/>
+<link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png"/>
+<!-- Apple Touch Icons -->
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png"/>
+<link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152x152.png"/>
+<link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144x144.png"/>
+<link rel="apple-touch-icon" sizes="128x128" href="icons/icon-128x128.png"/>
+<!-- Open Graph -->
+<meta property="og:title" content="PizzaClicker — El Imperio de la Pizza"/>
+<meta property="og:description" content="El juego clicker multijugador más delicioso de la galaxia"/>
+<meta property="og:image" content="icons/icon-512x512.png"/>
+<meta property="og:type" content="website"/>
+<link rel="stylesheet" href="css/style.css"/>
 </head>
 <body>
-<div class="bg1"></div>
-<div class="bg2"></div>
 
-<!-- ===== ADMIN LOGIN ===== -->
-<div id="admin-login">
-  <div class="login-card">
-    <div class="login-logo">
-      <span>🍕</span>
-      <h1>PIZZA<em>CLICKER</em></h1>
-      <p>PANEL DE ADMINISTRACIÓN</p>
+<!-- Background -->
+<div class="bg-glow bg1"></div>
+<div class="bg-glow bg2"></div>
+<div class="bg-pattern"></div>
+
+<!-- ===================== AUTH SCREEN ===================== -->
+<div id="auth-screen">
+  <div class="auth-particles" id="auth-particles"></div>
+  <div class="flame-bg fb1"></div>
+  <div class="flame-bg fb2"></div>
+  <div class="flame-bg fb3"></div>
+  <div class="auth-card">
+    <div class="auth-logo">
+      <span class="auth-logo-emoji">🍕</span>
+      <h1>PIZZA<span>CLICKER</span></h1>
+      <p>El Imperio de la Pizza</p>
     </div>
-    <div class="login-err" id="login-err"></div>
-    <div class="form-group">
-      <label>Email de administrador</label>
-      <input type="email" id="adm-email" class="form-input" placeholder="admin@pizzaclicker.com" onkeydown="if(event.key==='Enter')adminLogin()"/>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login')">Entrar</button>
+      <button class="auth-tab" onclick="switchAuthTab('register')">Registro</button>
+      <button class="auth-tab" onclick="switchAuthTab('reset')">Recuperar</button>
+    </div>
+    <div id="field-username" class="form-group" style="display:none">
+      <label>Nombre de Pizzero</label>
+      <input type="text" id="inp-username" class="form-input" placeholder="Tu apodo legendario..."/>
     </div>
     <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="inp-email" class="form-input" placeholder="tu@pizzeria.com" onkeydown="if(event.key==='Enter')authSubmit()"/>
+    </div>
+    <div id="field-password" class="form-group">
       <label>Contraseña</label>
-      <input type="password" id="adm-pass" class="form-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')adminLogin()"/>
+      <input type="password" id="inp-password" class="form-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')authSubmit()"/>
     </div>
-    <button class="login-btn" id="login-btn" onclick="adminLogin()">🔐 Acceder al Panel</button>
+    <div id="auth-msg"></div>
+    <button class="auth-btn" id="auth-btn" onclick="authSubmit()">🔥 ¡Entrar al Horno!</button>
+    <p class="auth-footer">Guarda tu progreso en PizzaCity 🌍</p>
   </div>
 </div>
 
-<!-- ===== ADMIN MAIN ===== -->
-<div id="admin-main">
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <div class="sidebar-brand">
-      <div class="sidebar-brand-title">PIZZA<em>CLICKER</em></div>
-      <div class="sidebar-brand-sub">ADMIN PANEL</div>
+<!-- ===================== GAME SCREEN ===================== -->
+<div id="game-screen">
+
+  <!-- Top nav -->
+  <nav class="top-nav">
+    <div class="nav-brand">
+      <span class="nav-brand-emoji">🍕</span>
+      <span class="nav-brand-name">PIZZA<em>CLICKER</em></span>
     </div>
-    <nav class="sidebar-nav">
-      <button class="snav-btn active" onclick="showPage('dashboard',this)"><span class="si">📊</span><span>Dashboard</span></button>
-      <button class="snav-btn" onclick="showPage('users',this)"><span class="si">👥</span><span>Usuarios</span></button>
-      <button class="snav-btn" onclick="showPage('city',this)"><span class="si">🌆</span><span>PizzaCity</span></button>
-      <button class="snav-btn" onclick="showPage('events',this)"><span class="si">⚡</span><span>Eventos</span></button>
-      <button class="snav-btn" onclick="showPage('logs',this)"><span class="si">📋</span><span>Logs</span></button>
-    </nav>
-    <div class="sidebar-footer">
-      <div class="admin-badge">
-        <div class="ab-email" id="sb-email">-</div>
-        <div class="ab-role">🍕 SUPER ADMIN</div>
-      </div>
-      <button class="logout-admin" onclick="adminLogout()">🚪 Cerrar sesión</button>
+    <div class="nav-center" id="nav-center">
+      <div class="nav-stat" id="nav-pizzas"><span class="ns-icon">🍕</span><span class="ns-val">0 🍕</span></div>
+      <div class="nav-stat pps" id="nav-pps" style="display:none"><span class="ns-icon">⚡</span><span class="ns-val">0/s</span></div>
     </div>
+    <button class="profile-btn" onclick="openProfile()">
+      <span>🍕</span>
+      <span id="nav-username">-</span>
+      <span class="plv" id="nav-level">Nv.1</span>
+    </button>
+  </nav>
+
+  <!-- XP bar -->
+  <div class="xp-bar-wrap">
+    <span class="xp-info" id="xp-info">Nv.1 · Aprendiz de Pizzero</span>
+    <div class="xp-track"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+    <span class="xp-info" id="xp-num">0 XP</span>
   </div>
 
-  <!-- Content -->
-  <div class="admin-content">
+  <!-- Main area -->
+  <div class="main-area" id="main-area">
 
-    <!-- DASHBOARD -->
-    <div class="admin-page active" id="page-dashboard">
-      <div class="page-header">
-        <h1 class="page-title">📊 Dashboard</h1>
-        <p class="page-sub">Visión general de PizzaClicker</p>
-      </div>
-      <div class="stats-cards" id="dash-stats"></div>
-      <div class="table-wrap">
-        <div class="table-header">
-          <div class="table-title">🏆 Top jugadores hoy</div>
-          <button class="btn-primary" onclick="loadDashboard()">🔄 Actualizar</button>
+    <!-- CLICKER TAB -->
+    <div class="tab-panel active" id="tab-clicker">
+      <div class="clicker-panel">
+        <!-- Stats row -->
+        <div class="stats-row">
+          <div class="stat-box"><div class="sv" id="s-pizzas">0</div><div class="sl">Pizzas</div></div>
+          <div class="stat-box"><div class="sv" id="s-ppc">1</div><div class="sl">Por click</div></div>
+          <div class="stat-box"><div class="sv" id="s-pps">0</div><div class="sl">Por seg</div></div>
+          <div class="stat-box"><div class="sv" id="s-total">0</div><div class="sl">Total</div></div>
         </div>
-        <table><thead><tr><th>#</th><th>Usuario</th><th>Nivel</th><th>🍕 Total</th><th>Reputación</th><th>Última conexión</th></tr></thead>
-        <tbody id="top-players-table"></tbody></table>
-      </div>
-    </div>
 
-    <!-- USERS -->
-    <div class="admin-page" id="page-users">
-      <div class="page-header">
-        <h1 class="page-title">👥 Gestión de Usuarios</h1>
-        <p class="page-sub">Administra todos los jugadores registrados</p>
-      </div>
-      <div class="table-wrap">
-        <div class="table-header">
-          <div class="table-title">Todos los usuarios</div>
-          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-            <input type="text" class="search-input" id="user-search" placeholder="🔍 Buscar usuario..." oninput="filterUsers()"/>
-            <button class="btn-primary" onclick="loadUsers()">🔄 Actualizar</button>
+        <!-- Level info -->
+        <div class="level-section">
+          <div class="level-info">
+            <span class="level-badge" id="level-badge">Nv.1</span>
+            <span class="level-title" id="level-title-text">Aprendiz de Pizzero</span>
+            <span class="combo-badge" id="combo-badge">🔥 COMBO x1.0</span>
+          </div>
+          <div class="xp-bar-small">
+            <div class="xp-bar-small-fill" id="xp-bar-small-fill" style="width:0%"></div>
+            <span class="xp-text" id="xp-text-small">0 XP</span>
           </div>
         </div>
-        <table>
-          <thead><tr><th>Usuario</th><th>Email</th><th>Nivel</th><th>🍕 Total</th><th>Estado</th><th>Registro</th><th>Acciones</th></tr></thead>
-          <tbody id="users-table"></tbody>
-        </table>
-        <div class="pagination" id="users-pagination"></div>
-      </div>
-    </div>
 
-    <!-- CITY -->
-    <div class="admin-page" id="page-city">
-      <div class="page-header">
-        <h1 class="page-title">🌆 PizzaCity Admin</h1>
-        <p class="page-sub">Gestiona las pizzerías y posiciones en la ciudad</p>
-      </div>
-      <div class="table-wrap">
-        <div class="table-header">
-          <div class="table-title">Pizzerías en la ciudad</div>
-          <button class="btn-primary" onclick="loadCity()">🔄 Actualizar</button>
+        <!-- THE OVEN -->
+        <div class="oven-container">
+          <div class="oven-glow" id="oven-glow"></div>
+          <div class="oven-wrapper" id="oven-wrapper" onclick="handleOvenClick(event)">
+            <div class="oven-body">
+              <!-- Main arch -->
+              <div class="oven-arch"></div>
+              <!-- Mouth -->
+              <div class="oven-mouth">
+                <div class="oven-interior"></div>
+                <div class="oven-fire" id="oven-fire"></div>
+              </div>
+              <!-- Base -->
+              <div class="oven-base"></div>
+              <!-- Chimney -->
+              <div class="oven-chimney">
+                <div class="oven-chimney-top"></div>
+                <div class="smoke-puff sp1"></div>
+                <div class="smoke-puff sp2"></div>
+              </div>
+              <!-- Floor stones -->
+              <div class="oven-stones" id="oven-stones"></div>
+              <!-- Label -->
+              <div class="oven-label">FORNO NAPOLETANO</div>
+            </div>
+            <!-- Pizza paddle -->
+            <div class="pizza-paddle" id="pizza-paddle">
+              <div class="paddle-handle"></div>
+              <div class="pizza-on-paddle">🍕</div>
+            </div>
+            <!-- Floaters -->
+            <div class="floaters-wrap" id="floaters-wrap"></div>
+          </div>
+          <div class="click-hint" id="click-hint">¡Haz click en el horno para hacer pizzas!</div>
         </div>
-        <table>
-          <thead><tr><th>Pizzería</th><th>Posición</th><th>Nivel</th><th>🍕 Vendidas</th><th>Reputación</th><th>Última actividad</th><th>Acciones</th></tr></thead>
-          <tbody id="city-table"></tbody>
-        </table>
       </div>
     </div>
 
-    <!-- EVENTS -->
-    <div class="admin-page" id="page-events">
-      <div class="page-header">
-        <h1 class="page-title">⚡ Eventos Globales</h1>
-        <p class="page-sub">Lanza eventos especiales a todos los jugadores</p>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:24px" id="event-cards"></div>
-      <div class="table-wrap">
-        <div class="table-header"><div class="table-title">📜 Historial de eventos lanzados</div></div>
-        <div id="event-history" style="padding:16px;color:rgba(255,255,255,.4);font-size:13px">Sin eventos lanzados aún.</div>
-      </div>
-    </div>
-
-    <!-- LOGS -->
-    <div class="admin-page" id="page-logs">
-      <div class="page-header">
-        <h1 class="page-title">📋 Logs del Sistema</h1>
-        <p class="page-sub">Registro de actividad administrativa</p>
-      </div>
-      <div class="table-wrap">
-        <div class="table-header">
-          <div class="table-title">Actividad reciente</div>
-          <button class="btn-primary" onclick="renderLogs()">🔄 Actualizar</button>
+    <!-- SHOP TAB -->
+    <div class="tab-panel" id="tab-shop">
+      <div class="shop-wrapper">
+        <div class="shop-header">
+          <h2 class="shop-title">🏪 Tienda de Mejoras</h2>
+          <div class="shop-budget" id="shop-budget">0 🍕</div>
         </div>
-        <div id="logs-list"></div>
+        <div class="cat-bar" id="cat-bar"></div>
+        <div class="upgrades-list" id="upgrades-list"></div>
       </div>
     </div>
 
+    <!-- CITY TAB -->
+    <div class="tab-panel" id="tab-city">
+      <div class="city-wrapper">
+        <div class="city-hdr">
+          <h2>🌆 PizzaCity</h2>
+          <p>El corazón del imperio pizzero mundial</p>
+        </div>
+        <div class="city-map-scroll">
+          <div class="city-grid" id="city-grid"></div>
+        </div>
+        <div class="city-legend">
+          <div class="leg"><div class="leg-dot" style="background:#aaa"></div>Principiante</div>
+          <div class="leg"><div class="leg-dot" style="background:#00ff88"></div>Nv.4+</div>
+          <div class="leg"><div class="leg-dot" style="background:#ffcc00"></div>Nv.7+</div>
+          <div class="leg"><div class="leg-dot" style="background:#ff6b00"></div>Nv.10+</div>
+          <div class="leg"><div class="leg-dot" style="background:#ff00ff"></div>Élite</div>
+        </div>
+        <div class="ranking-section">
+          <h3>🏆 Ranking PizzaCity</h3>
+          <div id="ranking-list"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main-area -->
+
+  <!-- Bottom nav -->
+  <nav class="bottom-nav">
+    <button class="bnav-btn active" onclick="switchTab('clicker',this)"><span class="bi">🔥</span><span class="bl">Horno</span></button>
+    <button class="bnav-btn" onclick="switchTab('shop',this)"><span class="bi">🏪</span><span class="bl">Tienda</span></button>
+    <button class="bnav-btn" onclick="switchTab('city',this)"><span class="bi">🌆</span><span class="bl">PizzaCity</span></button>
+  </nav>
+</div>
+
+<!-- ===================== PROFILE MODAL ===================== -->
+<div class="modal-overlay" id="profile-modal" style="display:none" onclick="if(event.target===this)closeProfile()">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-avatar">🍕</div>
+      <div>
+        <div class="modal-uname" id="mod-uname">-</div>
+        <div class="modal-email" id="mod-email">-</div>
+        <div class="modal-title-lv" id="mod-title-lv">-</div>
+      </div>
+      <button class="modal-close" onclick="closeProfile()">✕</button>
+    </div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" onclick="switchModalTab('stats',this)">📊 Stats</button>
+      <button class="modal-tab" onclick="switchModalTab('security',this)">🔒 Seguridad</button>
+    </div>
+    <div id="modal-stats">
+      <div class="stat-grid-m" id="mod-stat-grid"></div>
+      <div class="next-unlock-box" id="mod-next-unlock"></div>
+      <div class="modal-msg" id="mod-msg" style="display:none"></div>
+      <button class="modal-btn" onclick="saveGameUI()">☁️ Guardar partida en la nube</button>
+    </div>
+    <div id="modal-security" style="display:none">
+      <p style="color:rgba(255,200,100,.75);font-size:13px;margin-bottom:14px;font-weight:700">Cambiar contraseña</p>
+      <input type="password" class="sec-input" id="new-pass" placeholder="Nueva contraseña (mín. 6 caracteres)"/>
+      <input type="password" class="sec-input" id="confirm-pass" placeholder="Confirmar nueva contraseña"/>
+      <div class="modal-msg" id="sec-msg" style="display:none"></div>
+      <button class="modal-btn" onclick="changePasswordUI()">🔑 Cambiar contraseña</button>
+    </div>
+    <button class="logout-btn" onclick="logoutUser()">🚪 Cerrar sesión</button>
   </div>
 </div>
 
-<!-- Modal de confirmación -->
-<div class="modal-overlay" id="confirm-modal" style="display:none">
-  <div class="modal-box">
-    <div class="modal-title" id="modal-title">Confirmar acción</div>
-    <div class="modal-text" id="modal-text">¿Estás seguro?</div>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
-      <button class="btn-danger" id="modal-confirm-btn" onclick="confirmModal()">Confirmar</button>
+<!-- Events container -->
+<div id="events-container"></div>
+
+<!-- Level up overlay -->
+<div id="levelup-overlay" onclick="if(event.target===this)closeLevelUp()">
+  <div class="lu-card">
+    <div class="lu-stars">✨✨✨</div>
+    <div class="lu-badge" id="lu-badge">NIVEL 2</div>
+    <div class="lu-title" id="lu-title">Pizzero Novato</div>
+    <div class="lu-unlock-box">
+      <div class="lu-ul-lbl">🔓 Desbloqueado:</div>
+      <div class="lu-ul-val" id="lu-unlock-val">-</div>
     </div>
+    <button class="lu-btn" onclick="closeLevelUp()">¡Genial! 🍕</button>
   </div>
 </div>
 
-<!-- Toast container -->
-<div id="admin-toast"></div>
+<!-- ===================== SCRIPTS ===================== -->
+<script src="js/data.js"></script>
+<script src="js/game.js"></script>
+<script src="js/ui.js"></script>
 
-<!-- Firebase -->
+<!-- Firebase SDK (module) -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, getDoc, doc, updateDoc, deleteDoc, setDoc, addDoc, serverTimestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, updatePassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const ADMIN_EMAILS = ['tonaco92@gmail.com'];
-
-const app  = initializeApp({
-  apiKey:"AIzaSyCkhLFKvgo-iPlHmHau-nxIysdnqp5ZdmI",
-  authDomain:"clicker-ea94f.firebaseapp.com",
-  projectId:"clicker-ea94f",
-  storageBucket:"clicker-ea94f.firebasestorage.app",
-  messagingSenderId:"873459350629",
-  appId:"1:873459350629:web:813bb901d6e928c8e8da8c"
+const app = initializeApp({
+  apiKey: "AIzaSyCkhLFKvgo-iPlHmHau-nxIysdnqp5ZdmI",
+  authDomain: "clicker-ea94f.firebaseapp.com",
+  projectId: "clicker-ea94f",
+  storageBucket: "clicker-ea94f.firebasestorage.app",
+  messagingSenderId: "873459350629",
+  appId: "1:873459350629:web:813bb901d6e928c8e8da8c"
 });
 const auth = getAuth(app);
 const db   = getFirestore(app);
 
-// State
-let allUsers = [];
-let adminLogs = JSON.parse(localStorage.getItem('pizzaAdminLogs')||'[]');
-let modalCallback = null;
-const PER_PAGE = 15;
-let currentPage = 1;
+// Expose Firestore helpers to non-module scripts
+window._db            = db;
+window._db_collection = collection;
+window._db_getDocs    = getDocs;
 
-// ===== AUTH =====
-onAuthStateChanged(auth, user => {
-  if (user && ADMIN_EMAILS.includes(user.email)) {
-    document.getElementById('admin-login').style.display='none';
-    document.getElementById('admin-main').style.display='block';
-    document.getElementById('sb-email').textContent = user.email;
-    loadDashboard();
-  } else if (user) {
-    signOut(auth);
-    showLoginError('⛔ Este email no tiene permisos de administrador');
+// Auth state
+let authMode = 'login';
+window._currentUserId   = null;
+window._currentUsername = '';
+window._currentEmail    = '';
+
+// ---- Auth tab switch ----
+window.switchAuthTab = function(mode) {
+  authMode = mode;
+  document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active', ['login','register','reset'][i]===mode));
+  document.getElementById('field-username').style.display = mode==='register'?'block':'none';
+  document.getElementById('field-password').style.display = mode==='reset'?'none':'block';
+  const btn = document.getElementById('auth-btn');
+  btn.textContent = mode==='login'?'🔥 ¡Entrar al Horno!': mode==='register'?'🍕 ¡Crear mi Pizzería!':'📧 Enviar Email de Recuperación';
+  document.getElementById('auth-msg').innerHTML='';
+};
+
+// ---- Auth submit ----
+window.authSubmit = async function() {
+  const email    = document.getElementById('inp-email').value.trim();
+  const password = document.getElementById('inp-password').value;
+  const username = document.getElementById('inp-username').value.trim();
+  const btn      = document.getElementById('auth-btn');
+  const msgEl    = document.getElementById('auth-msg');
+  msgEl.innerHTML = ''; btn.disabled=true; btn.textContent='⏳ Cargando...';
+  try {
+    if (authMode === 'login') {
+      await signInWithEmailAndPassword(auth, email, password);
+    } else if (authMode === 'register') {
+      if (!username) throw new Error('El nombre de pizzero es obligatorio');
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      const cx = Math.floor(Math.random()*14)+1, cy = Math.floor(Math.random()*10)+1;
+      await setDoc(doc(db,'users',cred.user.uid), {username, email, createdAt:Date.now(), gameState:null, cityPos:{x:cx,y:cy}});
+      await setDoc(doc(db,'city',cred.user.uid),  {userId:cred.user.uid, username, x:cx, y:cy, level:1, reputation:0, pizzasSold:0, upgrades:[], lastActive:Date.now()});
+    } else {
+      await sendPasswordResetEmail(auth, email);
+      msgEl.innerHTML='<div class="auth-success">✅ Email enviado. Revisa tu bandeja de entrada.</div>';
+    }
+  } catch(e) {
+    let m = e.message||'Error desconocido';
+    if (m.includes('user-not-found'))          m='Usuario no encontrado';
+    else if (m.includes('invalid-credential') || m.includes('wrong-password')) m='Email o contraseña incorrectos';
+    else if (m.includes('email-already-in-use')) m='Este email ya está registrado';
+    else if (m.includes('weak-password'))        m='Contraseña muy débil (mínimo 6 caracteres)';
+    msgEl.innerHTML=`<div class="auth-error">⚠️ ${m}</div>`;
+  }
+  btn.disabled=false; switchAuthTab(authMode);
+};
+
+// ---- Firebase game save ----
+window.saveGameToFirebase = async function() {
+  if (!window._currentUserId) return;
+  const save = {pizzas:G.pizzas, total:G.total, level:G.level, xp:G.xp, upgrades:G.upgrades, rep:G.rep};
+  await updateDoc(doc(db,'users',window._currentUserId), {gameState:save});
+  await updateDoc(doc(db,'city', window._currentUserId), {
+    level:G.level, reputation:G.rep, pizzasSold:G.total,
+    upgrades:Object.keys(G.upgrades).filter(k=>G.upgrades[k]>0),
+    lastActive:Date.now()
+  });
+};
+
+// ---- Change password ----
+window._changePassword = async function(newPass) {
+  await updatePassword(auth.currentUser, newPass);
+};
+
+// ---- Logout ----
+window.logoutUser = async function() {
+  await window.saveGameToFirebase().catch(()=>{});
+  await signOut(auth);
+  // Reset state
+  Object.assign(G, {pizzas:0,total:0,ppc:1,pps:0,rep:0,level:1,xp:0,upgrades:{},combo:0,lastClick:0,multiplier:1,secLevel:0,policeCorr:0,detectiveLv:0});
+  window._currentUserId=''; window._currentUsername=''; window._currentEmail='';
+  closeProfile();
+  document.getElementById('game-screen').style.display='none';
+  document.getElementById('auth-screen').style.display='flex';
+};
+
+// ---- Auth state listener ----
+onAuthStateChanged(auth, async user => {
+  if (user) {
+    window._currentUserId = user.uid;
+    window._currentEmail  = user.email;
+    try {
+      const snap = await getDoc(doc(db,'users',user.uid));
+      if (snap.exists()) {
+        const data = snap.data();
+        window._currentUsername = data.username || user.email;
+        if (data.gameState) loadGameState(data.gameState);
+      }
+    } catch(e) { console.log('Offline, using local state'); }
+    startGame();
+  } else {
+    document.getElementById('auth-screen').style.display='flex';
+    document.getElementById('game-screen').style.display='none';
   }
 });
 
-window.adminLogin = async function() {
-  const email = document.getElementById('adm-email').value.trim();
-  const pass  = document.getElementById('adm-pass').value;
-  const btn   = document.getElementById('login-btn');
-  btn.disabled=true; btn.textContent='⏳ Verificando...';
-  hideLoginError();
-  try {
-    await signInWithEmailAndPassword(auth, email, pass);
-  } catch(e) {
-    let m = 'Credenciales incorrectas';
-    if (e.message.includes('invalid-credential') || e.message.includes('wrong-password')) m='Email o contraseña incorrectos';
-    showLoginError(m);
-  }
-  btn.disabled=false; btn.textContent='🔐 Acceder al Panel';
-};
+// ---- Start game ----
+function startGame() {
+  document.getElementById('auth-screen').style.display='none';
+  document.getElementById('game-screen').style.display='flex';
+  document.getElementById('nav-username').textContent = window._currentUsername;
+  buildOvenFlames();
+  buildOvenStones();
+  buildAuthParticles();
+  renderShop();
+  updateUI();
+  startPassiveLoop();
+  startEventLoop();
+  startAutoSave();
+}
 
-window.adminLogout = async function() {
-  await signOut(auth);
-  document.getElementById('admin-login').style.display='flex';
-  document.getElementById('admin-main').style.display='none';
-};
-
-function showLoginError(m){ const e=document.getElementById('login-err'); e.textContent=m; e.style.display='block'; }
-function hideLoginError(){ document.getElementById('login-err').style.display='none'; }
-
-// ===== PAGES =====
-window.showPage = function(name, btn) {
-  document.querySelectorAll('.admin-page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.snav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
-  if(btn) btn.classList.add('active');
-  if(name==='users')  loadUsers();
-  if(name==='city')   loadCity();
-  if(name==='events') renderEventCards();
-  if(name==='logs')   renderLogs();
-};
-
-// ===== DASHBOARD =====
-window.loadDashboard = async function() {
-  try {
-    const [usersSnap, citySnap] = await Promise.all([
-      getDocs(collection(db,'users')),
-      getDocs(collection(db,'city')),
-    ]);
-
-    const users = []; usersSnap.forEach(d=>users.push({id:d.id,...d.data()}));
-    const city  = []; citySnap.forEach(d=>city.push(d.data()));
-
-    const totalUsers    = users.length;
-    const totalPizzas   = city.reduce((s,p)=>s+(p.pizzasSold||0),0);
-    const activeLast24h = city.filter(p=>Date.now()-p.lastActive<86400000).length;
-    const maxLevel      = city.length ? Math.max(...city.map(p=>p.level||1)) : 1;
-
-    document.getElementById('dash-stats').innerHTML = [
-      {icon:'👥', value:totalUsers,          label:'Jugadores registrados'},
-      {icon:'🍕', value:fmt(totalPizzas),    label:'Pizzas totales hechas'},
-      {icon:'⚡', value:activeLast24h,       label:'Activos últimas 24h'},
-      {icon:'🏆', value:'Nv.'+maxLevel,      label:'Nivel máximo alcanzado'},
-    ].map(c=>`<div class="stats-card"><div class="sc-icon">${c.icon}</div><div class="sc-value">${c.value}</div><div class="sc-label">${c.label}</div></div>`).join('');
-
-    // Top players
-    const sorted = [...city].sort((a,b)=>(b.pizzasSold||0)-(a.pizzasSold||0)).slice(0,10);
-    document.getElementById('top-players-table').innerHTML = sorted.map((p,i)=>`
-      <tr>
-        <td><strong style="color:${i<3?'#ffcc00':'rgba(255,255,255,.5)'}">#${i+1}</strong></td>
-        <td><strong>${p.username||'-'}</strong></td>
-        <td><span class="lv-badge" style="background:${getLvColor(p.level||1)}22;color:${getLvColor(p.level||1)};border:1px solid ${getLvColor(p.level||1)}44">Nv.${p.level||1}</span></td>
-        <td style="color:#ffcc00;font-weight:700">${fmt(p.pizzasSold||0)} 🍕</td>
-        <td>${p.reputation||0} ⭐</td>
-        <td style="color:rgba(255,255,255,.4)">${timeAgo(p.lastActive)}</td>
-      </tr>
-    `).join('');
-  } catch(e) {
-    toast('Error cargando dashboard: '+e.message, 'error');
-  }
-};
-
-// ===== USERS =====
-window.loadUsers = async function() {
-  try {
-    const [usersSnap, citySnap] = await Promise.all([
-      getDocs(collection(db,'users')),
-      getDocs(collection(db,'city')),
-    ]);
-    const cityMap = {};
-    citySnap.forEach(d=>{ cityMap[d.id]=d.data(); });
-
-    allUsers = [];
-    usersSnap.forEach(d=>{
-      const u = {id:d.id,...d.data()};
-      const c = cityMap[d.id]||{};
-      u.level = c.level||1;
-      u.pizzasSold = c.pizzasSold||0;
-      u.reputation = c.reputation||0;
-      u.lastActive = c.lastActive||u.createdAt||0;
-      allUsers.push(u);
-    });
-    allUsers.sort((a,b)=>(b.lastActive||0)-(a.lastActive||0));
-    currentPage=1;
-    renderUsersTable(allUsers);
-  } catch(e) {
-    toast('Error cargando usuarios: '+e.message,'error');
-  }
-};
-
-window.filterUsers = function() {
-  const q = document.getElementById('user-search').value.toLowerCase();
-  const filtered = allUsers.filter(u =>
-    (u.username||'').toLowerCase().includes(q) ||
-    (u.email||'').toLowerCase().includes(q)
-  );
-  currentPage=1;
-  renderUsersTable(filtered);
-};
-
-function renderUsersTable(users) {
-  const total = users.length;
-  const pages = Math.ceil(total/PER_PAGE);
-  const slice = users.slice((currentPage-1)*PER_PAGE, currentPage*PER_PAGE);
-
-  document.getElementById('users-table').innerHTML = slice.map(u => {
-    const banned  = u.banned ? '<span class="badge badge-banned">BANEADO</span>' : '';
-    const isAdmin = ADMIN_EMAILS.includes(u.email) ? '<span class="badge badge-admin">ADMIN</span>' : '<span class="badge badge-user">user</span>';
-    return `<tr>
-      <td><strong>${u.username||'Sin nombre'}</strong></td>
-      <td style="color:rgba(255,255,255,.5);font-size:12px">${u.email||'-'}</td>
-      <td><span class="lv-badge" style="background:${getLvColor(u.level)}22;color:${getLvColor(u.level)};border:1px solid ${getLvColor(u.level)}44">Nv.${u.level}</span></td>
-      <td style="color:#ffcc00;font-weight:700">${fmt(u.pizzasSold)} 🍕</td>
-      <td>${isAdmin} ${banned}</td>
-      <td style="color:rgba(255,255,255,.4);font-size:12px">${timeAgo(u.lastActive)}</td>
-      <td><div class="action-btns">
-        ${u.banned
-          ? `<button class="btn-sm btn-unban" onclick="unbanUser('${u.id}','${u.username||u.email}')">✅ Desbanear</button>`
-          : `<button class="btn-sm btn-ban" onclick="banUser('${u.id}','${u.username||u.email}')">🚫 Banear</button>`}
-        <button class="btn-sm btn-reset" onclick="resetUserGame('${u.id}','${u.username||u.email}')">🔄 Reset juego</button>
-        <button class="btn-sm btn-promote" onclick="makeAdmin('${u.id}','${u.email}','${u.username||u.email}')">👑 Admin</button>
-        <button class="btn-sm btn-delete" onclick="deleteUser('${u.id}','${u.username||u.email}')">🗑️ Borrar</button>
-      </div></td>
-    </tr>`;
-  }).join('');
-
-  // Pagination
-  const pag = document.getElementById('users-pagination');
-  pag.innerHTML = `<span class="page-info">${total} usuarios · Página ${currentPage}/${pages||1}</span>`;
-  for(let i=1;i<=pages;i++){
-    const b=document.createElement('button');
-    b.className='page-btn'+(i===currentPage?' active':'');
-    b.textContent=i;
-    b.onclick=()=>{ currentPage=i; renderUsersTable(users); };
-    pag.appendChild(b);
+function buildOvenFlames() {
+  const fire = document.getElementById('oven-fire');
+  fire.innerHTML='';
+  for(let i=0;i<8;i++){
+    const f=document.createElement('div');
+    f.className='fire-tongue';
+    f.style.cssText=`left:${i*12.5}%;height:${28+Math.random()*30}px;animation-delay:${Math.random()*0.5}s;animation-duration:${0.28+Math.random()*0.35}s`;
+    fire.appendChild(f);
   }
 }
 
-// ===== USER ACTIONS =====
-window.banUser = function(uid, name) {
-  openModal('🚫 Banear usuario', `¿Banear a <strong>${name}</strong>? No podrá iniciar sesión.`, async()=>{
-    await updateDoc(doc(db,'users',uid),{banned:true});
-    addLog('warn',`Usuario baneado: ${name}`,uid);
-    toast(`${name} ha sido baneado`,'info');
-    loadUsers();
+function buildOvenStones() {
+  const stones = document.getElementById('oven-stones');
+  stones.innerHTML='';
+  [38,42,36,40,34].forEach(w => {
+    const s=document.createElement('div');
+    s.className='stone';
+    s.style.width=w+'px';
+    stones.appendChild(s);
   });
-};
+}
 
-window.unbanUser = function(uid, name) {
-  openModal('✅ Desbanear usuario',`¿Desbanear a <strong>${name}</strong>?`, async()=>{
-    await updateDoc(doc(db,'users',uid),{banned:false});
-    addLog('success',`Usuario desbaneado: ${name}`,uid);
-    toast(`${name} ha sido desbaneado`,'success');
-    loadUsers();
-  });
-};
-
-window.resetUserGame = function(uid, name) {
-  openModal('🔄 Resetear partida',`¿Resetear completamente la partida de <strong>${name}</strong>? Esta acción no se puede deshacer.`, async()=>{
-    await updateDoc(doc(db,'users',uid),{gameState:null});
-    await updateDoc(doc(db,'city',uid),{level:1,reputation:0,pizzasSold:0,upgrades:[],lastActive:Date.now()});
-    addLog('warn',`Partida reseteada: ${name}`,uid);
-    toast(`Partida de ${name} reseteada`,'info');
-    loadUsers();
-  });
-};
-
-window.makeAdmin = function(uid, email, name) {
-  openModal('👑 Promover a Admin',`¿Dar permisos de administrador a <strong>${name}</strong> (${email})?<br><br><small>Nota: deberás añadir su email a la lista de admins en el código.</small>`, async()=>{
-    await updateDoc(doc(db,'users',uid),{role:'admin'});
-    addLog('success',`Promovido a admin: ${name} (${email})`,uid);
-    toast(`${name} promovido a admin. Añade ${email} al array ADMIN_EMAILS.`,'info');
-  });
-};
-
-window.deleteUser = function(uid, name) {
-  openModal('🗑️ BORRAR USUARIO',`⚠️ ¿Borrar permanentemente a <strong>${name}</strong>? Se eliminarán todos sus datos. ¡IRREVERSIBLE!`, async()=>{
-    await deleteDoc(doc(db,'users',uid));
-    await deleteDoc(doc(db,'city',uid)).catch(()=>{});
-    addLog('error',`Usuario ELIMINADO: ${name}`,uid);
-    toast(`${name} eliminado permanentemente`,'error');
-    loadUsers();
-  });
-};
-
-// ===== CITY =====
-window.loadCity = async function() {
-  try {
-    const snap = await getDocs(collection(db,'city'));
-    const players = [];
-    snap.forEach(d=>players.push({id:d.id,...d.data()}));
-    players.sort((a,b)=>(b.pizzasSold||0)-(a.pizzasSold||0));
-
-    document.getElementById('city-table').innerHTML = players.map(p=>`
-      <tr>
-        <td><strong>🍕 ${p.username||'-'}</strong></td>
-        <td style="color:rgba(255,255,255,.5)">(${p.x||0}, ${p.y||0})</td>
-        <td><span class="lv-badge" style="background:${getLvColor(p.level||1)}22;color:${getLvColor(p.level||1)};border:1px solid ${getLvColor(p.level||1)}44">Nv.${p.level||1}</span></td>
-        <td style="color:#ffcc00;font-weight:700">${fmt(p.pizzasSold||0)}</td>
-        <td>${p.reputation||0} ⭐</td>
-        <td style="color:rgba(255,255,255,.4);font-size:12px">${timeAgo(p.lastActive)}</td>
-        <td><div class="action-btns">
-          <button class="btn-sm btn-reset" onclick="resetCityPos('${p.id}','${p.username||p.id}')">📍 Reubicar</button>
-        </div></td>
-      </tr>
-    `).join('');
-  } catch(e) {
-    toast('Error cargando ciudad: '+e.message,'error');
+function buildAuthParticles() {
+  const c = document.getElementById('auth-particles');
+  c.innerHTML='';
+  for(let i=0;i<18;i++){
+    const d=document.createElement('div');
+    d.className='auth-particle';
+    d.textContent='🍕';
+    d.style.cssText=`left:${Math.random()*100}%;font-size:${12+Math.random()*18}px;animation-delay:${Math.random()*5}s;animation-duration:${3+Math.random()*4}s`;
+    c.appendChild(d);
   }
-};
-
-window.resetCityPos = function(uid, name) {
-  openModal('📍 Reubicar en ciudad',`¿Asignar nueva posición aleatoria a <strong>${name}</strong> en PizzaCity?`, async()=>{
-    const x=Math.floor(Math.random()*14)+1, y=Math.floor(Math.random()*10)+1;
-    await updateDoc(doc(db,'city',uid),{x,y});
-    addLog('info',`Ciudad: ${name} reubicado a (${x},${y})`,uid);
-    toast(`${name} reubicado en (${x},${y})`,'success');
-    loadCity();
-  });
-};
-
-// ===== EVENTS =====
-const GLOBAL_EVENTS = [
-  {emoji:'🎉',name:'Fiesta de la Pizza',desc:'Todos los jugadores reciben un bonus de +20% de pizzas durante 1 hora',color:'rgba(0,200,100,.15)',type:'bonus'},
-  {emoji:'🌋',name:'Erupción del Vesubio',desc:'Todos pierden un 10% de sus pizzas por el terremoto volcánico',color:'rgba(255,80,0,.15)',type:'loss'},
-  {emoji:'👽',name:'Invasión Alienígena',desc:'Los alienígenas compran masivamente. +50% ingresos globales temporalmente',color:'rgba(150,50,255,.15)',type:'bonus'},
-  {emoji:'🚓',name:'Redada Policial',desc:'Todos los jugadores con bajo nivel de seguridad pierden el 15% de pizzas',color:'rgba(80,80,255,.15)',type:'loss'},
-  {emoji:'📱',name:'Viral en Redes',desc:'PizzaClicker se hace viral. Todos ganan +1000 pizzas extra',color:'rgba(255,150,0,.15)',type:'bonus'},
-  {emoji:'❄️',name:'Tormenta de Nieve',desc:'El reparto parado. -50% de ingresos pasivos durante 30 minutos',color:'rgba(100,200,255,.15)',type:'loss'},
-];
-
-function renderEventCards(){
-  document.getElementById('event-cards').innerHTML = GLOBAL_EVENTS.map(e=>`
-    <div style="background:${e.color};border:1.5px solid ${e.color.replace('.15','.4')};border-radius:16px;padding:20px">
-      <div style="font-size:36px;margin-bottom:10px">${e.emoji}</div>
-      <div style="font-size:15px;font-weight:800;color:#fff;margin-bottom:6px">${e.name}</div>
-      <div style="font-size:12px;color:rgba(255,255,255,.55);margin-bottom:14px;line-height:1.5">${e.desc}</div>
-      <button class="btn-primary" onclick="launchEvent('${e.emoji}','${e.name}','${e.type}')">⚡ Lanzar evento</button>
-    </div>
-  `).join('');
-}
-
-window.launchEvent = function(emoji, name, type) {
-  openModal(`${emoji} Lanzar evento global`,`¿Lanzar el evento <strong>"${name}"</strong> a TODOS los jugadores? Este evento se registrará en Firestore.`, async()=>{
-    await addDoc(collection(db,'global_events'),{
-      emoji, name, type, launchedBy: auth.currentUser?.email, timestamp: Date.now(),
-    });
-    addLog('success',`Evento global lanzado: ${name}`,'GLOBAL');
-    toast(`Evento "${name}" lanzado a todos los jugadores`,'success');
-    const hist = document.getElementById('event-history');
-    hist.innerHTML = `<div class="log-entry"><span class="log-dot success"></span><div><div class="log-msg">${emoji} ${name}</div><div class="log-user">Lanzado por ${auth.currentUser?.email} · ahora mismo</div></div></div>` + hist.innerHTML;
-  });
-};
-
-// ===== LOGS =====
-function addLog(type, msg, userId='') {
-  adminLogs.unshift({type, msg, userId, time: Date.now()});
-  if(adminLogs.length>200) adminLogs=adminLogs.slice(0,200);
-  localStorage.setItem('pizzaAdminLogs', JSON.stringify(adminLogs));
-}
-
-window.renderLogs = function() {
-  const list = document.getElementById('logs-list');
-  if(!adminLogs.length){ list.innerHTML='<div style="padding:20px;color:rgba(255,255,255,.3);font-size:13px">Sin actividad registrada aún.</div>'; return; }
-  list.innerHTML = adminLogs.slice(0,50).map(l=>`
-    <div class="log-entry">
-      <div class="log-dot ${l.type}"></div>
-      <div style="flex:1">
-        <div class="log-msg">${l.msg}</div>
-        ${l.userId?`<div class="log-user">UID: ${l.userId}</div>`:''}
-      </div>
-      <div class="log-time">${timeAgo(l.time)}</div>
-    </div>
-  `).join('');
-};
-
-// ===== MODAL =====
-window.openModal = function(title, text, callback) {
-  modalCallback = callback;
-  document.getElementById('modal-title').innerHTML = title;
-  document.getElementById('modal-text').innerHTML  = text;
-  document.getElementById('confirm-modal').style.display = 'flex';
-};
-window.closeModal = function() { document.getElementById('confirm-modal').style.display='none'; modalCallback=null; };
-window.confirmModal = async function() {
-  closeModal();
-  if(modalCallback) { try { await modalCallback(); } catch(e){ toast('Error: '+e.message,'error'); } }
-};
-
-// ===== TOAST =====
-function toast(msg, type='info') {
-  const t = document.createElement('div');
-  t.className=`a-toast ${type}`;
-  t.textContent = msg;
-  document.getElementById('admin-toast').appendChild(t);
-  setTimeout(()=>t.remove(), 3500);
-}
-
-// ===== UTILS =====
-function fmt(n){ n=Math.floor(n); if(n>=1e9)return(n/1e9).toFixed(1)+'B'; if(n>=1e6)return(n/1e6).toFixed(1)+'M'; if(n>=1e3)return(n/1e3).toFixed(1)+'K'; return n.toString(); }
-function getLvColor(lv){ if(lv>=12)return'#ff00ff'; if(lv>=10)return'#ff6b00'; if(lv>=7)return'#ffcc00'; if(lv>=4)return'#00ff88'; return'#aaaaaa'; }
-function timeAgo(ts){
-  if(!ts) return 'Nunca';
-  const d = Date.now()-ts;
-  if(d<60000)  return 'Hace un momento';
-  if(d<3600000) return `Hace ${Math.floor(d/60000)}m`;
-  if(d<86400000)return `Hace ${Math.floor(d/3600000)}h`;
-  if(d<604800000)return `Hace ${Math.floor(d/86400000)}d`;
-  return new Date(ts).toLocaleDateString('es-ES');
 }
 </script>
 </body>
