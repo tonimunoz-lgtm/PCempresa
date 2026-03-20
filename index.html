@@ -177,21 +177,30 @@
     <!-- CITY TAB -->
     <div class="tab-panel" id="tab-city">
       <div class="city-wrapper">
+        <!-- Compact header with legend inline -->
         <div class="city-hdr">
-          <h2>🌆 PizzaCity</h2>
-          <p>El corazón del imperio pizzero mundial</p>
+          <div class="city-hdr-left">
+            <h2>🌆 PizzaCity</h2>
+            <p>El corazón del imperio pizzero mundial</p>
+          </div>
+          <div class="city-legend-inline">
+            <div class="leg-sm"><div class="leg-dot-sm" style="background:#aaa"></div>Nv.1</div>
+            <div class="leg-sm"><div class="leg-dot-sm" style="background:#00ff88"></div>Nv.4</div>
+            <div class="leg-sm"><div class="leg-dot-sm" style="background:#ffcc00"></div>Nv.7</div>
+            <div class="leg-sm"><div class="leg-dot-sm" style="background:#ff6b00"></div>Nv.10</div>
+            <div class="leg-sm"><div class="leg-dot-sm" style="background:#ff00ff"></div>Elite</div>
+          </div>
         </div>
-        <!-- renderCity() fills this -->
+        <!-- Map fills all space -->
         <div id="city-map-scroll"></div>
-        <div class="city-legend">
-          <div class="leg"><div class="leg-dot" style="background:#aaa"></div>Principiante</div>
-          <div class="leg"><div class="leg-dot" style="background:#00ff88"></div>Nv.4+</div>
-          <div class="leg"><div class="leg-dot" style="background:#ffcc00"></div>Nv.7+</div>
-          <div class="leg"><div class="leg-dot" style="background:#ff6b00"></div>Nv.10+</div>
-          <div class="leg"><div class="leg-dot" style="background:#ff00ff"></div>Élite</div>
+      </div>
+      <!-- Ranking drawer anchored to bottom -->
+      <div class="ranking-drawer" id="ranking-drawer">
+        <div class="ranking-drawer-handle" id="ranking-handle">
+          <div class="ranking-drawer-title">🏆 Ranking PizzaCity <span id="ranking-count" style="color:rgba(255,255,255,.4);font-size:11px;font-weight:600"></span></div>
+          <div class="ranking-drawer-arrow" id="ranking-arrow">▲</div>
         </div>
-        <div class="ranking-section">
-          <h3>🏆 Ranking PizzaCity</h3>
+        <div class="ranking-drawer-body">
           <div id="ranking-list"></div>
         </div>
       </div>
