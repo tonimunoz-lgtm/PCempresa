@@ -269,6 +269,9 @@ function showLevelUp(lv) {
   document.getElementById('lu-title').textContent  = lvData.title;
   document.getElementById('lu-unlock-val').textContent = lvData.unlock;
   document.getElementById('levelup-overlay').classList.add('show');
+  // Update oven and world theme on every level up
+  updateOvenVisuals();
+  updateWorldTheme();
 }
 window.closeLevelUp = function() {
   document.getElementById('levelup-overlay').classList.remove('show');
@@ -331,7 +334,7 @@ let _lastOvenTier = 0;
 
 function updateOvenVisuals() {
   const tierData = [...OVEN_TIERS].reverse().find(t => G.level >= t.minLv) || OVEN_TIERS[0];
-  if (tierData.tier === _lastOvenTier) return;
+  // Always apply — don't skip if tier hasn't changed (user may have loaded mid-tier)
   _lastOvenTier = tierData.tier;
 
   const body   = document.getElementById('oven-body');
@@ -544,7 +547,7 @@ let _particleInterval = null;
 
 function updateWorldTheme() {
   const theme = [...WORLD_THEMES].reverse().find(t => G.level >= t.minLv) || WORLD_THEMES[0];
-  if (_lastWorldTheme === theme.name) return;
+  // Always apply
   _lastWorldTheme = theme.name;
 
   // Background glows
