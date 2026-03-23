@@ -510,3 +510,145 @@ function timeAgoNotif(ts) {
 window.loadPvpNotifications = loadPvpNotifications;
 window.updateOvenVisuals    = updateOvenVisuals;
 window.checkOvenOnLevelUp   = checkOvenOnLevelUp;
+
+// ===================== WORLD DECORATION BY LEVEL =====================
+
+const WORLD_THEMES = [
+  { minLv:1,  name:'beginner', cursor:'🍕',
+    bg:'radial-gradient(ellipse at 30% 20%, rgba(139,69,19,0.08), transparent 60%), radial-gradient(ellipse at 70% 80%, rgba(255,80,0,0.06), transparent 60%)',
+    navBg:'rgba(0,0,0,0.55)', accent:'#ff6b00', particle:null },
+  { minLv:4,  name:'novice', cursor:'🔥',
+    bg:'radial-gradient(ellipse at 20% 20%, rgba(205,133,63,0.1), transparent 55%), radial-gradient(ellipse at 80% 70%, rgba(255,120,0,0.08), transparent 55%)',
+    navBg:'rgba(10,5,0,0.6)', accent:'#ffaa00', particle:'✨' },
+  { minLv:7,  name:'master', cursor:'⭐',
+    bg:'radial-gradient(ellipse at 30% 30%, rgba(212,175,55,0.12), transparent 50%), radial-gradient(ellipse at 70% 70%, rgba(255,200,50,0.08), transparent 50%)',
+    navBg:'rgba(15,12,0,0.65)', accent:'#ffd700', particle:'⭐' },
+  { minLv:10, name:'lord', cursor:'👑',
+    bg:'radial-gradient(ellipse at 25% 25%, rgba(150,0,255,0.12), transparent 50%), radial-gradient(ellipse at 75% 65%, rgba(255,50,0,0.1), transparent 50%)',
+    navBg:'rgba(10,0,20,0.7)', accent:'#cc44ff', particle:'💜' },
+  { minLv:13, name:'god', cursor:'🌌',
+    bg:'radial-gradient(ellipse at 20% 20%, rgba(0,150,255,0.14), transparent 45%), radial-gradient(ellipse at 80% 75%, rgba(0,220,255,0.1), transparent 45%), radial-gradient(ellipse at 50% 50%, rgba(0,50,150,0.06), transparent 60%)',
+    navBg:'rgba(0,5,20,0.75)', accent:'#00ccff', particle:'🌟' },
+];
+
+const HORNO_DECOS_AROUND = {
+  1: [],
+  2: ['🕯️','🕯️'],
+  3: ['🏆','⭐','⭐','⭐'],
+  4: ['👑','🚀','💜'],
+  5: ['🌌','🚀','✨','🌟','✨'],
+};
+
+let _lastWorldTheme = null;
+let _particleInterval = null;
+
+function updateWorldTheme() {
+  const theme = [...WORLD_THEMES].reverse().find(t => G.level >= t.minLv) || WORLD_THEMES[0];
+  if (_lastWorldTheme === theme.name) return;
+  _lastWorldTheme = theme.name;
+
+  // Background glows
+  const bg1 = document.querySelector('.bg1');
+  const bg2 = document.querySelector('.bg2');
+  const body = document.getElementById('game-screen');
+  if (body) body.style.setProperty('--theme-accent', theme.accent);
+
+  // Nav accent
+  const nav = document.querySelector('.top-nav');
+  if (nav) nav.style.background = theme.navBg;
+  const bNav = document.querySelector('.bottom-nav');
+  if (bNav) bNav.style.background = theme.navBg;
+
+  // Update CSS accent color on bnav active indicator
+  document.documentElement.style.setProperty('--theme-accent', theme.accent);
+
+  // Background pattern color
+  if (bg1) {
+    const colors = { beginner:'#ff4400', novice:'#ff8800', master:'#ffcc00', lord:'#aa00ff', god:'#0088ff' };
+    bg1.style.background = colors[theme.name] || '#ff4400';
+    bg2.style.background = theme.name === 'god' ? '#00ccff' : theme.name === 'lord' ? '#cc00ff' : '#ff0080';
+  }
+
+  // Cursor
+  updateCursor(theme.cursor);
+
+  // Particles
+  spawnThemeParticles(theme.particle, theme.accent);
+
+  // Oven surroundings decorations
+  updateOvenSurroundings(theme);
+
+  // Flash transition effect
+  const flash = document.createElement('div');
+  flash.style.cssText = `position:fixed;inset:0;z-index:999;background:${theme.accent};opacity:0.15;pointer-events:none;animation:worldFlash 0.8s ease forwards`;
+  document.body.appendChild(flash);
+  setTimeout(() => flash.remove(), 900);
+}
+
+function updateCursor(emoji) {
+  // Create SVG cursor from emoji
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'><text y='26' font-size='24'>${emoji}</text></svg>`;
+  const encoded = encodeURIComponent(svg);
+  document.body.style.cursor = `url("data:image/svg+xml,${encoded}") 0 0, auto`;
+  // Also apply to oven
+  const oven = document.getElementById('oven-wrapper');
+  if (oven) oven.style.cursor = `url("data:image/svg+xml,${encoded}") 0 0, pointer`;
+}
+
+function spawnThemeParticles(emoji, color) {
+  if (_particleInterval) clearInterval(_particleInterval);
+  const container = document.getElementById('theme-particles');
+  if (!container) return;
+  container.innerHTML = '';
+  if (!emoji) return;
+
+  _particleInterval = setInterval(() => {
+    const p = document.createElement('div');
+    p.className = 'theme-particle';
+    p.textContent = emoji;
+    p.style.cssText = `
+      left:${Math.random()*100}%;
+      font-size:${10+Math.random()*14}px;
+      animation-duration:${4+Math.random()*6}s;
+      animation-delay:${Math.random()*2}s;
+      color:${color};
+    `;
+    container.appendChild(p);
+    setTimeout(() => p.remove(), 10000);
+  }, 800);
+}
+
+function updateOvenSurroundings(theme) {
+  const tierData = [...OVEN_TIERS].reverse().find(t => G.level >= t.minLv) || OVEN_TIERS[0];
+  const decos = HORNO_DECOS_AROUND[tierData.tier] || [];
+  let surround = document.getElementById('oven-surround');
+  if (!surround) {
+    surround = document.createElement('div');
+    surround.id = 'oven-surround';
+    surround.className = 'oven-surround';
+    const container = document.querySelector('.oven-container');
+    if (container) container.insertBefore(surround, container.firstChild);
+  }
+  if (!decos.length) { surround.innerHTML=''; return; }
+
+  surround.innerHTML = decos.map((d,i) =>
+    `<span class="surround-deco" style="animation-delay:${i*0.3}s">${d}</span>`
+  ).join('');
+
+  // Add floating elements around the oven
+  const ovenArea = document.querySelector('.oven-container');
+  if (ovenArea) {
+    ovenArea.style.setProperty('--accent', theme.accent);
+    ovenArea.style.boxShadow = `0 0 60px ${theme.accent}22`;
+    ovenArea.style.borderRadius = '20px';
+    ovenArea.style.transition = 'box-shadow 1s ease';
+  }
+}
+
+// Hook updateWorldTheme into level-up
+const _origShowLevelUp = window.showLevelUp || function(){};
+window.showLevelUp = function(lv) {
+  _origShowLevelUp(lv);
+  updateWorldTheme();
+};
+window.updateWorldTheme = updateWorldTheme;
