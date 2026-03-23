@@ -33,6 +33,7 @@
 <div class="bg-glow bg1"></div>
 <div class="bg-glow bg2"></div>
 <div class="bg-pattern"></div>
+<div id="theme-particles"></div>
 
 <!-- ===================== AUTH SCREEN ===================== -->
 <div id="auth-screen">
@@ -482,8 +483,13 @@ function startGame() {
   updateUI();
   // Oven visuals based on current level
   if (window.updateOvenVisuals) updateOvenVisuals();
+  // World theme based on current level
+  if (window.updateWorldTheme) updateWorldTheme();
   // Load PvP notifications (attacks received while offline)
-  setTimeout(() => { if (window.loadPvpNotifications) loadPvpNotifications(); }, 1500);
+  setTimeout(() => {
+    if (window.loadPvpNotifications) loadPvpNotifications();
+    if (window.loadMapEffects) loadMapEffects();
+  }, 1500);
   startPassiveLoop();
   startEventLoop();
   startAutoSave();
