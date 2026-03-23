@@ -431,6 +431,8 @@ async function renderCity() {
   applyTransform();
   setupCityEvents(viewport, world);
   renderRanking(allPlayers);
+  // Apply any active PvP map effects for current user
+  setTimeout(() => { if (window.loadMapEffects) loadMapEffects(); }, 300);
 }
 
 function addCityLife(world, W, H, CELL) {
@@ -877,7 +879,7 @@ window.pvpAction = async function(type, targetId, targetName) {
 
     // Write notification to TARGET player in Firestore
     if (window._db && targetId && !targetId.startsWith('d')) {
-      const lossAmount = Math.floor(1000 * action.lossPercent); // approximate
+      const lossAmount = Math.floor(1000 * action.lossPercent);
       await writePvpNotification(targetId, {
         type, emoji: action.emoji,
         title: msg.title,
@@ -886,6 +888,13 @@ window.pvpAction = async function(type, targetId, targetName) {
         timestamp: Date.now(), read: false,
         attackerName: G.policeCorr > 30 ? 'Desconocido' : (window._currentUsername || 'Rival'),
       });
+      // Write persistent map effect (stays until target sees it)
+      await writeMapEffect(targetId, type);
+      // Spawn rats locally for sabotage (visual feedback for attacker)
+      if (type === 'sabotage') {
+        const target = (cityPlayers||[]).find(p=>p.userId===targetId);
+        if (target) spawnRatsOnMap(target.x||0, target.y||0);
+      }
     }
   }
   const popup = document.getElementById('player-popup');
@@ -1136,3 +1145,145 @@ window.changePasswordUI = async function() {
   } catch(e) { msg.textContent='⚠️ Error. Re-inicia sesión primero.'; }
   setTimeout(()=>msg.style.display='none',3500);
 };
+
+// ===================== MAP EFFECTS (persistent PvP visual effects) =====================
+
+const MAP_EFFECTS = {
+  fire:     { emoji:'🔥', label:'¡Incendio!',   css:'effect-fire',  duration: null }, // null = until seen
+  water:    { emoji:'💧', label:'¡Inundación!',  css:'effect-flood', duration: null },
+  sabotage: { emoji:'🐀', label:'¡Ratas!',       css:'effect-rats',  duration: null },
+  caught:   { emoji:'🚓', label:'¡Policía!',     css:'effect-police',duration: 8000 }, // auto-clear after 8s
+};
+
+// Load active map effects from Firestore and apply to city cells
+async function loadMapEffects() {
+  if (!window._db || !window._currentUserId) return;
+  try {
+    const { collection, query, where, getDocs } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const q = query(
+      collection(window._db, 'map_effects'),
+      where('targetId', '==', window._currentUserId),
+      where('seen', '==', false)
+    );
+    const snap = await getDocs(q);
+    const effects = [];
+    snap.forEach(d => effects.push({ id: d.id, ...d.data() }));
+    if (effects.length > 0) applyMapEffectsToCity(effects);
+  } catch(e) { console.log('Map effects load error:', e.message); }
+}
+
+function applyMapEffectsToCity(effects) {
+  // Find my cell in the city grid
+  const myPlayer = cityPlayers.find(p => p.userId === window._currentUserId);
+  if (!myPlayer) return;
+
+  effects.forEach(effect => {
+    const cfg = MAP_EFFECTS[effect.type] || MAP_EFFECTS.fire;
+    // Find the cell at my position
+    const cells = document.querySelectorAll('.c-cell.is-me');
+    cells.forEach(cell => {
+      applyEffectToCell(cell, effect, cfg);
+    });
+  });
+}
+
+function applyEffectToCell(cell, effect, cfg) {
+  // Remove any existing effect of same type
+  cell.querySelectorAll('.map-effect-overlay').forEach(e => e.remove());
+
+  const overlay = document.createElement('div');
+  overlay.className = `map-effect-overlay ${cfg.css}`;
+  overlay.dataset.effectId = effect.id;
+
+  if (effect.type === 'fire') {
+    overlay.innerHTML = `
+      <div class="fire-overlay">
+        <div class="fire-tongue ft1">🔥</div>
+        <div class="fire-tongue ft2">🔥</div>
+        <div class="fire-tongue ft3">🔥</div>
+      </div>
+    `;
+  } else if (effect.type === 'water') {
+    overlay.innerHTML = `<div class="flood-overlay"><div class="flood-wave"></div><div class="flood-wave fw2"></div><span class="flood-emoji">💧</span></div>`;
+  } else if (effect.type === 'sabotage') {
+    overlay.innerHTML = `
+      <div class="rats-overlay">
+        <span class="rat r1">🐀</span>
+        <span class="rat r2">🐀</span>
+        <span class="rat r3">🐀</span>
+      </div>
+    `;
+  } else if (effect.type === 'caught') {
+    overlay.innerHTML = `<div class="police-overlay"><span>🚓</span></div>`;
+  }
+
+  overlay.title = `${cfg.emoji} ${cfg.label} — Click para marcar como visto`;
+  overlay.style.cursor = 'pointer';
+  overlay.onclick = (e) => {
+    e.stopPropagation();
+    markEffectSeen(effect.id, overlay);
+  };
+
+  cell.appendChild(overlay);
+
+  // Auto-clear effects with duration
+  if (cfg.duration) {
+    setTimeout(() => {
+      overlay.classList.add('fade-out');
+      setTimeout(() => { overlay.remove(); markEffectSeen(effect.id, null); }, 500);
+    }, cfg.duration);
+  }
+}
+
+async function markEffectSeen(effectId, overlay) {
+  if (overlay) {
+    overlay.classList.add('fade-out');
+    setTimeout(() => overlay.remove(), 400);
+  }
+  if (!window._db) return;
+  try {
+    const { doc, updateDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    await updateDoc(doc(window._db, 'map_effects', effectId), { seen: true });
+  } catch(e) {}
+}
+
+// Write map effect to Firestore when attacking
+async function writeMapEffect(targetId, type) {
+  if (!window._db || !targetId || targetId.startsWith('d')) return;
+  try {
+    const { collection, addDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    await addDoc(collection(window._db, 'map_effects'), {
+      targetId, type, seen: false,
+      attackerId: window._currentUserId,
+      attackerName: window._currentUsername || 'Rival',
+      timestamp: Date.now(),
+    });
+  } catch(e) { console.log('Map effect write error:', e.message); }
+}
+window.writeMapEffect = writeMapEffect;
+
+// Also spawn rats walking on the road when sabotage happens live
+function spawnRatsOnMap(targetX, targetY) {
+  const grid = document.querySelector('.city-grid-big');
+  if (!grid) return;
+  const CELL = 46, GAP = 2, totalCell = CELL + GAP;
+  for (let i = 0; i < 4; i++) {
+    const rat = document.createElement('div');
+    rat.className = 'map-rat-walker';
+    rat.textContent = '🐀';
+    const startX = targetX * totalCell + Math.random() * CELL;
+    const startY = targetY * totalCell + Math.random() * CELL;
+    const dir = Math.random() > 0.5 ? 1 : -1;
+    rat.style.cssText = `
+      left:${startX}px; top:${startY}px;
+      animation: ratScurry ${1.5+Math.random()*2}s linear ${i*0.3}s forwards;
+      --rat-dx: ${dir * (30 + Math.random()*50)}px;
+    `;
+    grid.appendChild(rat);
+    setTimeout(() => rat.remove(), 5000);
+  }
+}
+window.spawnRatsOnMap = spawnRatsOnMap;
+
+// Expose loadMapEffects for startGame to call
+window.loadMapEffects = loadMapEffects;
