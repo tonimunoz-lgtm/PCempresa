@@ -723,3 +723,185 @@ html, body {
   97%  { opacity:1; }
   100% { transform:translateX(calc(var(--road-len) + 80px)) scaleX(1); opacity:0; }
 }
+
+/* ===================== PVP NOTIFICATIONS ===================== */
+#pvp-banner {
+  position:fixed;inset:0;z-index:600;
+  background:rgba(0,0,0,.85);
+  display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(10px);
+  animation:fadeIn .3s ease;
+}
+.pvp-banner-card {
+  background:linear-gradient(135deg,#1a0505,#0d0810);
+  border:2px solid rgba(255,50,50,.5);
+  border-radius:24px;padding:28px;
+  width:380px;max-width:94vw;
+  box-shadow:0 0 80px rgba(255,50,0,.4),inset 0 0 40px rgba(255,20,0,.05);
+  animation:popIn .4s cubic-bezier(.34,1.56,.64,1);
+}
+.pvp-banner-header {
+  display:flex;align-items:flex-start;gap:14px;margin-bottom:18px;position:relative;
+}
+.pvp-banner-icon { font-size:44px;flex-shrink:0; }
+.pvp-banner-title { font-size:20px;font-weight:900;color:#ff4444;margin-bottom:4px; }
+.pvp-banner-sub { font-size:12px;color:rgba(255,255,255,.4); }
+.pvp-banner-close {
+  position:absolute;top:0;right:0;
+  background:rgba(255,255,255,.1);border:none;color:#fff;
+  width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;
+}
+.pvp-banner-body {
+  background:rgba(255,50,50,.08);border:1px solid rgba(255,50,50,.2);
+  border-radius:14px;padding:16px;margin-bottom:18px;
+  color:rgba(255,255,255,.8);font-size:14px;line-height:1.6;
+}
+.pvp-banner-loss {
+  font-size:20px;font-weight:900;color:#ff4444;margin-top:10px;
+  text-align:center;
+}
+.pvp-banner-attacker {
+  font-size:11px;color:rgba(255,255,255,.35);margin-top:6px;text-align:center;
+}
+.pvp-banner-footer { display:flex;gap:10px; }
+.pvp-banner-btn {
+  flex:1;padding:12px;background:linear-gradient(135deg,#cc0000,#880000);
+  border:none;border-radius:11px;color:#fff;font-weight:800;font-size:14px;
+  cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;
+}
+.pvp-banner-btn.secondary {
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+  color:rgba(255,255,255,.6);
+}
+.pvp-banner-btn:hover { transform:translateY(-1px); }
+.pvp-banner-counter {
+  text-align:center;margin-bottom:12px;
+  font-size:12px;color:rgba(255,255,255,.35);
+}
+
+/* Inbox button */
+#inbox-btn {
+  position:fixed;top:70px;right:16px;z-index:50;
+  background:linear-gradient(135deg,#cc0000,#880000);
+  border:2px solid rgba(255,50,50,.5);border-radius:20px;
+  padding:6px 14px;display:flex;align-items:center;gap:6px;
+  cursor:pointer;font-weight:800;font-size:13px;
+  box-shadow:0 4px 20px rgba(255,0,0,.4);
+  animation:pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{box-shadow:0 4px 20px rgba(255,0,0,.4)}50%{box-shadow:0 4px 30px rgba(255,0,0,.7)} }
+#inbox-count {
+  background:rgba(255,255,255,.2);border-radius:10px;
+  padding:1px 7px;font-size:12px;
+}
+
+/* Inbox modal */
+#inbox-modal {
+  position:fixed;inset:0;z-index:400;
+  background:rgba(0,0,0,.8);
+  display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(8px);
+}
+.inbox-card {
+  background:#0d0810;border:2px solid rgba(255,150,0,.3);
+  border-radius:22px;padding:24px;
+  width:360px;max-width:94vw;max-height:80vh;
+  overflow:hidden;display:flex;flex-direction:column;
+  box-shadow:0 0 60px rgba(255,80,0,.2);
+}
+.inbox-header {
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:18px;position:relative;
+}
+.inbox-title { font-size:18px;font-weight:900;color:#ffcc00;flex:1; }
+.inbox-list { flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:16px; }
+.inbox-item {
+  background:rgba(255,50,50,.08);border:1px solid rgba(255,50,50,.2);
+  border-radius:12px;padding:14px;
+}
+.inbox-item.read {
+  background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.08);
+  opacity:.7;
+}
+.inbox-item-header { display:flex;align-items:center;gap:8px;margin-bottom:6px; }
+.inbox-item-emoji { font-size:24px; }
+.inbox-item-title { font-weight:800;color:#ff6666;font-size:14px; }
+.inbox-item-time { font-size:10px;color:rgba(255,255,255,.3);margin-left:auto; }
+.inbox-item-desc { font-size:12px;color:rgba(255,255,255,.6);line-height:1.5; }
+.inbox-item-loss { font-size:16px;font-weight:900;color:#ff4444;margin-top:6px; }
+.inbox-empty { text-align:center;padding:30px;color:rgba(255,255,255,.3);font-size:14px; }
+
+/* ===================== OVEN EVOLUTION ===================== */
+.oven-level-badge {
+  background:rgba(255,150,0,.12);border:1px solid rgba(255,150,0,.3);
+  border-radius:20px;padding:5px 16px;font-size:12px;font-weight:800;
+  color:rgba(255,200,100,.9);margin-bottom:10px;text-align:center;
+  letter-spacing:.5px;transition:all .5s ease;
+}
+
+/* Tier 1 (Nv 1-3): basic wood oven */
+.oven-tier-1 .oven-arch {
+  background:linear-gradient(180deg,#8B4513 0%,#6B3410 40%,#7a3a1a 100%);
+}
+.oven-tier-1 .oven-glow { background:radial-gradient(circle,rgba(255,120,0,.5),transparent 70%); }
+
+/* Tier 2 (Nv 4-6): Neapolitan — golden bricks */
+.oven-tier-2 .oven-arch {
+  background:linear-gradient(180deg,#a0522d 0%,#8B4513 30%,#cd853f 60%,#a0522d 100%);
+  box-shadow:inset 0 -20px 40px rgba(0,0,0,.4),inset 0 10px 30px rgba(255,200,50,.1);
+}
+.oven-tier-2 .oven-glow { background:radial-gradient(circle,rgba(255,160,0,.6),transparent 70%); }
+.oven-tier-2 .oven-label::after { content:' ★'; color:#ffcc00; }
+
+/* Tier 3 (Nv 7-9): Master — marble & gold accents */
+.oven-tier-3 .oven-arch {
+  background:linear-gradient(180deg,#c0a060 0%,#8B6914 30%,#d4af37 55%,#8B6914 100%);
+  box-shadow:inset 0 -20px 40px rgba(0,0,0,.3),inset 0 5px 20px rgba(255,220,80,.25),0 0 30px rgba(255,200,50,.2);
+}
+.oven-tier-3 .oven-glow { background:radial-gradient(circle,rgba(255,200,50,.7),transparent 70%); }
+.oven-tier-3 .oven-mouth { box-shadow:inset 0 0 30px rgba(255,150,0,.5),0 0 30px rgba(255,150,0,.3); }
+
+/* Tier 4 (Nv 10-12): Lord — volcanic obsidian */
+.oven-tier-4 .oven-arch {
+  background:linear-gradient(180deg,#2d0a2d 0%,#1a0020 30%,#4a0040 55%,#ff6b00 56%,#cc4400 100%);
+  box-shadow:inset 0 -20px 40px rgba(0,0,0,.5),inset 0 5px 20px rgba(255,100,200,.2),0 0 40px rgba(200,0,255,.25);
+}
+.oven-tier-4 .oven-glow { background:radial-gradient(circle,rgba(200,50,255,.6),rgba(255,100,0,.4),transparent 70%); }
+.oven-tier-4 .oven-mouth { box-shadow:inset 0 0 40px rgba(200,0,255,.4),0 0 30px rgba(200,0,255,.3); }
+.oven-tier-4 .oven-label { color:rgba(220,150,255,.8);letter-spacing:3px; }
+
+/* Tier 5 (Nv 13-15): GOD — cosmic multiverse */
+.oven-tier-5 .oven-arch {
+  background:linear-gradient(180deg,#001a3d 0%,#003366 25%,#0066cc 50%,#ff6600 51%,#cc4400 100%);
+  box-shadow:inset 0 -20px 40px rgba(0,0,0,.4),inset 0 5px 30px rgba(0,200,255,.3),0 0 60px rgba(0,150,255,.4);
+  animation:cosmicPulse 3s ease-in-out infinite alternate;
+}
+@keyframes cosmicPulse {
+  from { box-shadow:inset 0 5px 30px rgba(0,200,255,.3),0 0 60px rgba(0,150,255,.4); }
+  to   { box-shadow:inset 0 5px 30px rgba(255,200,0,.4),0 0 80px rgba(255,100,0,.5); }
+}
+.oven-tier-5 .oven-glow {
+  background:radial-gradient(circle,rgba(0,200,255,.5),rgba(255,100,0,.4),transparent 70%);
+  animation:glowRotate 4s linear infinite;
+}
+@keyframes glowRotate { to { transform:translate(-50%,-50%) rotate(360deg); } }
+.oven-tier-5 .oven-mouth { box-shadow:inset 0 0 50px rgba(0,200,255,.5),0 0 40px rgba(0,200,255,.4); }
+.oven-tier-5 .oven-label { color:rgba(100,220,255,.9);letter-spacing:4px;animation:labelGlow 2s ease-in-out infinite alternate; }
+@keyframes labelGlow { to { text-shadow:0 0 10px rgba(0,200,255,.8); } }
+
+/* Decorations added to oven by level */
+.oven-deco { position:absolute;pointer-events:none; }
+.oven-deco.candles { bottom:85px;left:8px;right:8px;display:flex;justify-content:space-between; }
+.oven-deco.candle  { width:6px;height:14px;background:#e8c870;border-radius:2px;position:relative; }
+.oven-deco.candle::after { content:'🔥';position:absolute;top:-16px;left:-3px;font-size:10px; }
+.oven-deco.banner  { position:absolute;top:8px;left:50%;transform:translateX(-50%);font-size:16px;animation:bannerWave .8s ease-in-out infinite alternate; }
+@keyframes bannerWave { to { transform:translateX(-50%) rotate(5deg); } }
+.oven-deco.stars   { position:absolute;top:-15px;width:100%;display:flex;justify-content:center;gap:4px; }
+.oven-deco.star    { font-size:12px;animation:starTwinkle 1s ease-in-out infinite alternate; }
+.oven-deco.star:nth-child(2) { animation-delay:.3s; }
+.oven-deco.star:nth-child(3) { animation-delay:.6s; }
+@keyframes starTwinkle { to { opacity:.3;transform:scale(.8); } }
+.oven-deco.rockets { position:absolute;top:-20px;right:-10px;font-size:18px;animation:rocketFloat 2s ease-in-out infinite alternate; }
+@keyframes rocketFloat { to { transform:translateY(-8px) rotate(10deg); } }
+.oven-deco.galaxy  { position:absolute;inset:-10px;border-radius:50%;border:2px solid rgba(0,200,255,.2);animation:galaxyRotate 8s linear infinite; }
+@keyframes galaxyRotate { to { transform:rotate(360deg); } }
