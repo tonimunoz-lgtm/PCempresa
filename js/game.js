@@ -299,3 +299,214 @@ function loadGameState(s) {
   if (s.rep      !== undefined) G.rep      = s.rep;
   recalcStats();
 }
+
+// ===================== OVEN EVOLUTION =====================
+const OVEN_TIERS = [
+  { minLv:1,  tier:1, name:'🪵 Horno de Leña',        label:'FORNO A LEGNA' },
+  { minLv:4,  tier:2, name:'🔥 Horno Napolitano',      label:'FORNO NAPOLETANO' },
+  { minLv:7,  tier:3, name:'⭐ Horno Maestro',          label:'FORNO DEL MAESTRO' },
+  { minLv:10, tier:4, name:'💜 Horno Volcánico',        label:'FORNO VULCANICO' },
+  { minLv:13, tier:5, name:'🌌 Horno del Multiverso',  label:'FORNO MULTIVERSALE' },
+];
+
+const OVEN_DECOS = {
+  1: [],
+  2: [{ cls:'candles', html:'<div class="oven-deco candles"><div class="oven-deco candle"></div><div class="oven-deco candle"></div><div class="oven-deco candle"></div></div>' }],
+  3: [
+    { cls:'banner',  html:'<div class="oven-deco banner">🏆</div>' },
+    { cls:'stars',   html:'<div class="oven-deco stars"><div class="oven-deco star">⭐</div><div class="oven-deco star">⭐</div><div class="oven-deco star">⭐</div></div>' },
+  ],
+  4: [
+    { cls:'rockets', html:'<div class="oven-deco rockets">🚀</div>' },
+    { cls:'banner',  html:'<div class="oven-deco banner">👑</div>' },
+  ],
+  5: [
+    { cls:'galaxy',  html:'<div class="oven-deco galaxy"></div>' },
+    { cls:'rockets', html:'<div class="oven-deco rockets">🌌</div>' },
+    { cls:'stars',   html:'<div class="oven-deco stars"><div class="oven-deco star">✨</div><div class="oven-deco star">🌟</div><div class="oven-deco star">✨</div></div>' },
+  ],
+};
+
+let _lastOvenTier = 0;
+
+function updateOvenVisuals() {
+  const tierData = [...OVEN_TIERS].reverse().find(t => G.level >= t.minLv) || OVEN_TIERS[0];
+  if (tierData.tier === _lastOvenTier) return;
+  _lastOvenTier = tierData.tier;
+
+  const body   = document.getElementById('oven-body');
+  const badge  = document.getElementById('oven-level-badge');
+  const label  = document.getElementById('oven-label');
+  const decos  = document.getElementById('oven-decorations');
+  if (!body) return;
+
+  // Remove old tier classes
+  body.classList.remove('oven-tier-1','oven-tier-2','oven-tier-3','oven-tier-4','oven-tier-5');
+  body.classList.add('oven-tier-' + tierData.tier);
+
+  if (badge) badge.textContent = tierData.name;
+  if (label) label.textContent = tierData.label;
+
+  // Add decorations
+  if (decos) {
+    decos.innerHTML = '';
+    (OVEN_DECOS[tierData.tier] || []).forEach(d => {
+      decos.insertAdjacentHTML('beforeend', d.html);
+    });
+  }
+
+  // Flash effect on tier change
+  if (_lastOvenTier > 1) {
+    const glow = document.getElementById('oven-glow');
+    if (glow) {
+      glow.style.opacity = '1';
+      glow.style.transform = 'translate(-50%,-50%) scale(1.5)';
+      setTimeout(() => {
+        glow.style.opacity = '0.25';
+        glow.style.transform = 'translate(-50%,-50%) scale(1)';
+      }, 600);
+    }
+  }
+}
+
+// Hook into addXP to check oven tier on every level change
+const _origAddXP = window._addXPHook;
+function checkOvenOnLevelUp() {
+  updateOvenVisuals();
+}
+
+// ===================== PVP NOTIFICATIONS =====================
+let pvpNotifications = [];
+let pvpBannerIndex  = 0;
+
+async function loadPvpNotifications() {
+  if (!window._db || !window._currentUserId) return;
+  try {
+    const { collection, query, where, getDocs, orderBy } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const q = query(
+      collection(window._db, 'notifications'),
+      where('userId', '==', window._currentUserId),
+      orderBy('timestamp', 'desc')
+    );
+    const snap = await getDocs(q);
+    pvpNotifications = [];
+    snap.forEach(d => pvpNotifications.push({ id: d.id, ...d.data() }));
+
+    const unread = pvpNotifications.filter(n => !n.read);
+    if (unread.length > 0) {
+      showPvpBanner(unread);
+      updateInboxBadge(unread.length);
+    }
+  } catch(e) {
+    console.log('Notifications load error:', e.message);
+  }
+}
+
+function showPvpBanner(notifications) {
+  if (!notifications.length) return;
+  pvpBannerIndex = 0;
+  renderBannerNotif(notifications, 0);
+  document.getElementById('pvp-banner').style.display = 'flex';
+}
+
+function renderBannerNotif(notifications, idx) {
+  const n = notifications[idx];
+  if (!n) return;
+  const total = notifications.length;
+  document.getElementById('pvp-banner-icon').textContent  = n.emoji || '⚔️';
+  document.getElementById('pvp-banner-title').textContent = n.title || '¡Ataque recibido!';
+  document.getElementById('pvp-banner-sub').textContent   = `Mientras estabas offline · ${timeAgoNotif(n.timestamp)}`;
+  document.getElementById('pvp-banner-body').innerHTML = `
+    <div>${n.desc || ''}</div>
+    ${n.pizzaLoss ? `<div class="pvp-banner-loss">-${n.pizzaLoss} 🍕 perdidas</div>` : ''}
+    ${n.attackerName ? `<div class="pvp-banner-attacker">Atacante: ${n.attackerName}</div>` : ''}
+    ${total > 1 ? `<div class="pvp-banner-counter" style="margin-top:10px">Ataque ${idx+1} de ${total}</div>` : ''}
+  `;
+  const nextBtn = document.getElementById('pvp-banner-next');
+  nextBtn.style.display = (idx < total-1) ? 'block' : 'none';
+  nextBtn.onclick = () => {
+    pvpBannerIndex++;
+    renderBannerNotif(notifications, pvpBannerIndex);
+  };
+  // Apply pizza loss
+  if (n.pizzaLoss && !n.applied) {
+    G.pizzas = Math.max(0, G.pizzas - n.pizzaLoss);
+    n.applied = true;
+    updateUI();
+  }
+}
+
+window.closePvpBanner = function() {
+  document.getElementById('pvp-banner').style.display = 'none';
+  markNotificationsRead();
+};
+
+window.openInbox = function() {
+  renderInbox();
+  document.getElementById('inbox-modal').style.display = 'flex';
+};
+window.closeInbox = function() {
+  document.getElementById('inbox-modal').style.display = 'none';
+};
+
+function renderInbox() {
+  const list = document.getElementById('inbox-list');
+  if (!pvpNotifications.length) {
+    list.innerHTML = '<div class="inbox-empty">🍕 Sin ataques recibidos.<br>¡Estás a salvo!</div>';
+    return;
+  }
+  list.innerHTML = pvpNotifications.slice(0,20).map(n => `
+    <div class="inbox-item ${n.read?'read':''}">
+      <div class="inbox-item-header">
+        <span class="inbox-item-emoji">${n.emoji||'⚔️'}</span>
+        <span class="inbox-item-title">${n.title||'Ataque'}</span>
+        <span class="inbox-item-time">${timeAgoNotif(n.timestamp)}</span>
+      </div>
+      <div class="inbox-item-desc">${n.desc||''}</div>
+      ${n.pizzaLoss ? `<div class="inbox-item-loss">-${n.pizzaLoss} 🍕</div>` : ''}
+    </div>
+  `).join('');
+}
+
+window.markAllRead = async function() {
+  closeInbox();
+  markNotificationsRead();
+  updateInboxBadge(0);
+};
+
+async function markNotificationsRead() {
+  if (!window._db) return;
+  try {
+    const { doc, updateDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    for (const n of pvpNotifications.filter(x=>!x.read)) {
+      await updateDoc(doc(window._db, 'notifications', n.id), { read: true });
+      n.read = true;
+    }
+    updateInboxBadge(0);
+  } catch(e) {}
+}
+
+function updateInboxBadge(count) {
+  const btn   = document.getElementById('inbox-btn');
+  const badge = document.getElementById('inbox-count');
+  if (!btn) return;
+  if (count > 0) {
+    btn.style.display = 'flex';
+    badge.textContent = count;
+  } else {
+    btn.style.display = 'none';
+  }
+}
+
+function timeAgoNotif(ts) {
+  if (!ts) return '';
+  const d = Date.now()-ts;
+  if (d<3600000)  return `Hace ${Math.floor(d/60000)}m`;
+  if (d<86400000) return `Hace ${Math.floor(d/3600000)}h`;
+  return `Hace ${Math.floor(d/86400000)}d`;
+}
+
+// Expose so index.html can call after login
+window.loadPvpNotifications = loadPvpNotifications;
+window.updateOvenVisuals    = updateOvenVisuals;
+window.checkOvenOnLevelUp   = checkOvenOnLevelUp;
