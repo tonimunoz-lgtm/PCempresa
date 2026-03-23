@@ -127,19 +127,23 @@
         <!-- THE OVEN -->
         <div class="oven-container">
           <div class="oven-glow" id="oven-glow"></div>
-          <div class="oven-wrapper" id="oven-wrapper" >
-            <div class="oven-body">
+          <!-- Oven level badge -->
+          <div class="oven-level-badge" id="oven-level-badge">🪵 Horno de Leña</div>
+          <div class="oven-wrapper" id="oven-wrapper">
+            <div class="oven-body" id="oven-body">
               <!-- Main arch -->
-              <div class="oven-arch"></div>
+              <div class="oven-arch" id="oven-arch"></div>
+              <!-- Decorative tier elements (unlocked by level) -->
+              <div class="oven-decorations" id="oven-decorations"></div>
               <!-- Mouth -->
-              <div class="oven-mouth">
+              <div class="oven-mouth" id="oven-mouth">
                 <div class="oven-interior"></div>
                 <div class="oven-fire" id="oven-fire"></div>
               </div>
               <!-- Base -->
-              <div class="oven-base"></div>
+              <div class="oven-base" id="oven-base"></div>
               <!-- Chimney -->
-              <div class="oven-chimney">
+              <div class="oven-chimney" id="oven-chimney">
                 <div class="oven-chimney-top"></div>
                 <div class="smoke-puff sp1"></div>
                 <div class="smoke-puff sp2"></div>
@@ -147,7 +151,7 @@
               <!-- Floor stones -->
               <div class="oven-stones" id="oven-stones"></div>
               <!-- Label -->
-              <div class="oven-label">FORNO NAPOLETANO</div>
+              <div class="oven-label" id="oven-label">FORNO NAPOLETANO</div>
             </div>
             <!-- Pizza paddle -->
             <div class="pizza-paddle" id="pizza-paddle">
@@ -253,6 +257,44 @@
 
 <!-- Events container -->
 <div id="events-container"></div>
+
+<!-- PvP Attack Banner (shown on login if pending attacks) -->
+<div id="pvp-banner" style="display:none">
+  <div class="pvp-banner-card">
+    <div class="pvp-banner-header">
+      <span class="pvp-banner-icon" id="pvp-banner-icon">⚔️</span>
+      <div>
+        <div class="pvp-banner-title" id="pvp-banner-title">¡Tu pizzería fue atacada!</div>
+        <div class="pvp-banner-sub" id="pvp-banner-sub">Mientras estabas offline...</div>
+      </div>
+      <button class="pvp-banner-close" id="pvp-banner-close">✕</button>
+    </div>
+    <div class="pvp-banner-body" id="pvp-banner-body"></div>
+    <div class="pvp-banner-footer">
+      <button class="pvp-banner-btn" id="pvp-banner-next">Ver siguiente ▶</button>
+      <button class="pvp-banner-btn secondary" id="pvp-banner-dismiss">Cerrar todo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Inbox button (shown when there are unread notifications) -->
+<div id="inbox-btn" style="display:none" onclick="openInbox()">
+  <span>⚔️</span>
+  <span id="inbox-count">0</span>
+</div>
+
+<!-- Inbox modal -->
+<div id="inbox-modal" style="display:none">
+  <div class="inbox-card">
+    <div class="inbox-header">
+      <span style="font-size:20px">⚔️</span>
+      <span class="inbox-title">Bandeja de Ataques</span>
+      <button class="modal-close" onclick="closeInbox()">✕</button>
+    </div>
+    <div id="inbox-list" class="inbox-list"></div>
+    <button class="modal-btn" onclick="markAllRead()">✅ Marcar todo como leído</button>
+  </div>
+</div>
 
 <!-- Level up overlay -->
 <div id="levelup-overlay" >
@@ -438,9 +480,23 @@ function startGame() {
   buildAuthParticles();
   renderShop();
   updateUI();
+  // Oven visuals based on current level
+  if (window.updateOvenVisuals) updateOvenVisuals();
+  // Load PvP notifications (attacks received while offline)
+  setTimeout(() => { if (window.loadPvpNotifications) loadPvpNotifications(); }, 1500);
   startPassiveLoop();
   startEventLoop();
   startAutoSave();
+  // Wire up banner buttons
+  document.getElementById('pvp-banner-close').addEventListener('click', closePvpBanner);
+  document.getElementById('pvp-banner-dismiss').addEventListener('click', closePvpBanner);
+  // Update oven visuals when level changes (hook into addXP)
+  const _orig = addXP;
+  window._addXPWrapped = function(amount) {
+    const prevLv = G.level;
+    _orig(amount);
+    if (G.level !== prevLv && window.updateOvenVisuals) updateOvenVisuals();
+  };
 }
 
 function buildOvenFlames() {
