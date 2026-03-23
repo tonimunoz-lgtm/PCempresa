@@ -818,12 +818,12 @@ function openPlayerPopup(player, allPlayers) {
 }
 
 // ===================== PVP SYSTEM =====================
-window.pvpAction = function(type, targetId, targetName) {
+window.pvpAction = async function(type, targetId, targetName) {
   const actions = {
-    fire:     { cost:500, name:'Pirómano',    riskBase:0.30, emoji:'🔥' },
-    water:    { cost:300, name:'Sabotaje',    riskBase:0.20, emoji:'💧' },
-    spy:      { cost:200, name:'Detective',   riskBase:0.05, emoji:'🕵️' },
-    sabotage: { cost:150, name:'Ratas',       riskBase:0.15, emoji:'🐀' },
+    fire:     { cost:500, name:'Pirómano',    riskBase:0.30, emoji:'🔥', lossPercent:0.12 },
+    water:    { cost:300, name:'Sabotaje',    riskBase:0.20, emoji:'💧', lossPercent:0.08 },
+    spy:      { cost:200, name:'Detective',   riskBase:0.05, emoji:'🕵️', lossPercent:0 },
+    sabotage: { cost:150, name:'Ratas',       riskBase:0.15, emoji:'🐀', lossPercent:0.06 },
   };
   const action = actions[type];
   if (!action) return;
@@ -835,20 +835,19 @@ window.pvpAction = function(type, targetId, targetName) {
   G.pizzas -= action.cost;
   updateUI();
 
-  // Calculate success based on police corruption and detective level
-  const policeBonus   = G.policeCorr * 0.005;  // reduces chance of getting caught
-  const detectiveBonus = G.detectiveLv * 0.05;  // increases chance of detecting enemy
-  const caughtChance  = Math.max(0.02, action.riskBase - policeBonus);
-  const caught        = Math.random() < caughtChance;
+  const policeBonus  = G.policeCorr * 0.005;
+  const caughtChance = Math.max(0.02, action.riskBase - policeBonus);
+  const caught       = Math.random() < caughtChance;
 
   if (type === 'spy') {
-    // Spy gives info, never caught
     showPvpResult(`🕵️ Detective contratado sobre <strong>${targetName}</strong>:<br>
       • Nivel: ~${Math.floor(Math.random()*3)+G.level-1}<br>
       • Seguridad: ${Math.random()>0.5?'Alta':'Baja'}<br>
       • Actividad: ${Math.random()>0.5?'Muy activo':'Poco activo'}<br>
       • Recomendación: ${Math.random()>0.5?'Atacable':'Bien defendido'}`, 'info');
     playSound('pvp');
+    const popup = document.getElementById('player-popup');
+    if (popup) popup.remove();
     return;
   }
 
@@ -858,18 +857,51 @@ window.pvpAction = function(type, targetId, targetName) {
     updateUI();
     showPvpResult(`🚨 <strong>¡Te han pillado!</strong><br>La policía te ha detenido intentando sabotear a ${targetName}.<br>Multa: -${fmt(fine)} 🍕<br><small>Consejo: sube el nivel de soborno policial</small>`, 'error');
     playSound('event_bad');
+    // Notify attacker got caught — write to their own notifications
+    await writePvpNotification(window._currentUserId, {
+      type:'caught', emoji:'🚨',
+      title:'¡Te han pillado!',
+      desc:`Intentaste atacar a ${targetName} pero la policía te detuvo.`,
+      pizzaLoss: fine,
+      timestamp: Date.now(), read: false,
+    });
   } else {
-    const successMsgs = {
-      fire:     `🔥 El pirómano actuó con éxito. La pizzería de <strong>${targetName}</strong> sufrió daños graves.`,
-      water:    `💧 Las cañerías de <strong>${targetName}</strong> saboteadas. Sin agua durante horas.`,
-      sabotage: `🐀 Las ratas invadieron el local de <strong>${targetName}</strong>. Inspección sanitaria inminente.`,
+    const attackMsgs = {
+      fire:     { title:'¡Incendio provocado!',   desc:`El pirómano quemó parte del local de ${targetName}.` },
+      water:    { title:'¡Cañerías saboteadas!',  desc:`Sin agua en la pizzería de ${targetName} durante horas.` },
+      sabotage: { title:'¡Invasión de ratas!',    desc:`Las ratas arruinaron el stock de ${targetName}.` },
     };
-    showPvpResult(`✅ ${successMsgs[type]}<br><small>No te han pillado. ${G.policeCorr>0?'El soborno funcionó.':''}</small>`, 'success');
+    const msg = attackMsgs[type];
+    showPvpResult(`✅ ${msg.title}<br>${msg.desc}<br><small>${G.policeCorr>0?'El soborno funcionó. Sin rastros.':''}</small>`, 'success');
     playSound('event_good');
+
+    // Write notification to TARGET player in Firestore
+    if (window._db && targetId && !targetId.startsWith('d')) {
+      const lossAmount = Math.floor(1000 * action.lossPercent); // approximate
+      await writePvpNotification(targetId, {
+        type, emoji: action.emoji,
+        title: msg.title,
+        desc: msg.desc + ` Tu pizzería fue atacada por un rival anónimo.`,
+        pizzaLoss: lossAmount,
+        timestamp: Date.now(), read: false,
+        attackerName: G.policeCorr > 30 ? 'Desconocido' : (window._currentUsername || 'Rival'),
+      });
+    }
   }
   const popup = document.getElementById('player-popup');
   if (popup) popup.remove();
 };
+
+async function writePvpNotification(userId, notif) {
+  try {
+    if (!window._db) return;
+    const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const key = `notif_${Date.now()}_${Math.random().toString(36).slice(2,7)}`;
+    await setDoc(doc(window._db, 'notifications', userId + '_' + key), {
+      ...notif, userId,
+    });
+  } catch(e) { console.log('Notif write error:', e.message); }
+}
 
 function showPvpResult(html, type) {
   const colors = { success:'rgba(50,200,100,.5)', error:'rgba(255,50,50,.5)', info:'rgba(80,150,255,.5)' };
