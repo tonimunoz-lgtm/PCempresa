@@ -389,15 +389,31 @@ async function renderCity() {
 
       if (player) {
         const col = getLvColor(player.level||1);
-        cell.style.background = `radial-gradient(circle at 50% 60%, ${col}30, ${getTileBg(tile)})`;
-        cell.style.border = isMe ? `2px solid ${col}` : `1px solid ${col}44`;
-        const vis = getPizzeriaVisual(player);
+        const tier = getPizzeriaTier(player.level||1);
+        // Background glow based on tier
+        const glowColors = {t1:'rgba(139,69,19,.3)',t2:'rgba(180,90,30,.35)',t3:'rgba(220,140,40,.35)',t4:'rgba(212,175,55,.4)',t5:'rgba(180,50,255,.35)',t6:'rgba(200,50,255,.4)',t7:'rgba(100,100,255,.4)',t8:'rgba(0,200,255,.4)',t9:'rgba(0,255,150,.4)',t10:'rgba(255,200,0,.5)'};
+        cell.style.background = `radial-gradient(circle at 50% 40%, ${glowColors[tier.id]||'rgba(255,100,0,.2)'}, ${getTileBg(tile)} 75%)`;
+        cell.style.border = isMe ? `2px solid ${col}` : `1px solid ${col}55`;
+        if (isMe) cell.style.boxShadow = `0 0 10px ${col}66, inset 0 0 6px ${col}22`;
+        // Build SVG tile
+        const svgContent = getPizzeriaSVG(tier.id, CELL, isMe);
         cell.innerHTML = `
-          <div class="cell-inner">
-            <span style="font-size:${isMe?22:18}px;line-height:1">${vis.size}</span>
-            ${vis.decor ? `<span style="font-size:10px;position:absolute;top:2px;right:3px">${vis.decor}</span>` : ''}
-            <span style="font-size:8px;color:${col};font-weight:900;text-shadow:0 1px 3px #000;max-width:${CELL-4}px;overflow:hidden;white-space:nowrap;text-align:center">${(player.username||'?').substring(0,7)}</span>
-            ${isMe ? '<span style="font-size:7px;color:#ffcc00;font-weight:900">★ YO</span>' : ''}
+          <svg viewBox="0 0 ${CELL} ${CELL}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;position:absolute;inset:0">
+            <defs>
+              <style>
+                @keyframes wl{from{fill:#ffe090}to{fill:#ff9920}}
+                @keyframes su{0%{transform:translateY(0) scale(1);opacity:.5}100%{transform:translateY(-${CELL*.25}px) scale(2.5);opacity:0}}
+                @keyframes np{from{opacity:.6}to{opacity:1}}
+                @keyframes st{from{opacity:1}to{opacity:.2}}
+                @keyframes fw{from{transform:scaleX(.85) scaleY(.9)}to{transform:scaleX(1.15) scaleY(1.1)}}
+                @keyframes cs{to{transform:rotate(360deg)}}
+              </style>
+            </defs>
+            ${svgContent}
+          </svg>
+          <div style="position:absolute;bottom:2px;left:0;right:0;text-align:center;z-index:2">
+            <div style="font-size:${Math.max(CELL*.14,7)}px;color:${col};font-weight:900;text-shadow:0 1px 3px #000;overflow:hidden;white-space:nowrap;padding:0 2px">${(player.username||'?').substring(0,6)}</div>
+            ${isMe ? `<div style="font-size:${Math.max(CELL*.11,6)}px;color:#ffcc00;font-weight:900;line-height:1">★ YO</div>` : ''}
           </div>`;
         cell.onclick = () => openPlayerPopup(player, allPlayers);
       } else if (tile===2) {
@@ -1287,3 +1303,56 @@ window.spawnRatsOnMap = spawnRatsOnMap;
 
 // Expose loadMapEffects for startGame to call
 window.loadMapEffects = loadMapEffects;
+
+// ===================== PIZZERIA EXPANSION =====================
+// Players with garden/recreation/full-block upgrades occupy adjacent cells
+
+function getPlayerExpansions(player) {
+  const upgList = player.upgrades || [];
+  const expansions = [];
+  if (upgList.includes('decor_garden'))    expansions.push('garden');
+  if (upgList.includes('decor_recreation')) expansions.push('recreation');
+  if (expansions.length >= 2)              expansions.push('fullblock');
+  return expansions;
+}
+
+function renderExpansionCell(cell, expansionType, player) {
+  const col = getLvColor(player.level||1);
+  if (expansionType === 'garden') {
+    cell.style.background = 'linear-gradient(135deg,#0a1e0e,#061408)';
+    cell.style.border = `1px solid rgba(50,200,80,.4)`;
+    cell.innerHTML = `<svg viewBox="0 0 ${CELL} ${CELL}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;position:absolute;inset:0">
+      <rect x="0" y="0" width="${CELL}" height="${CELL}" fill="#0a1808"/>
+      <rect x="${CELL*.1}" y="${CELL*.1}" width="${CELL*.8}" height="${CELL*.8}" rx="4" fill="#0e2010"/>
+      <rect x="${CELL*.45}" y="${CELL*.1}" width="${CELL*.1}" height="${CELL*.8}" fill="#1a2e12" opacity=".6"/>
+      <rect x="${CELL*.1}" y="${CELL*.45}" width="${CELL*.8}" height="${CELL*.1}" fill="#1a2e12" opacity=".6"/>
+      <circle cx="${CELL*.5}" cy="${CELL*.5}" r="${CELL*.12}" fill="#0a1a30"/>
+      <circle cx="${CELL*.5}" cy="${CELL*.5}" r="${CELL*.07}" fill="#0e2040"/>
+      <ellipse cx="${CELL*.2}" cy="${CELL*.25}" rx="${CELL*.14}" ry="${CELL*.12}" fill="#1a5010"/>
+      <rect x="${CELL*.17}" y="${CELL*.33}" width="${CELL*.07}" height="${CELL*.17}" fill="#3a2010"/>
+      <ellipse cx="${CELL*.8}" cy="${CELL*.25}" rx="${CELL*.14}" ry="${CELL*.12}" fill="#206020"/>
+      <rect x="${CELL*.77}" y="${CELL*.33}" width="${CELL*.07}" height="${CELL*.17}" fill="#3a2010"/>
+      <circle cx="${CELL*.33}" cy="${CELL*.67}" r="${CELL*.05}" fill="#ff4488"/>
+      <circle cx="${CELL*.67}" cy="${CELL*.67}" r="${CELL*.05}" fill="#ff6600"/>
+    </svg>
+    <div style="position:absolute;bottom:2px;right:3px;font-size:${Math.max(CELL*.15,8)}px;z-index:2">🌳</div>`;
+  } else if (expansionType === 'recreation') {
+    cell.style.background = 'linear-gradient(135deg,#0c1810,#081410)';
+    cell.style.border = `1px solid rgba(255,150,50,.35)`;
+    cell.innerHTML = `<svg viewBox="0 0 ${CELL} ${CELL}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;position:absolute;inset:0">
+      <rect x="0" y="0" width="${CELL}" height="${CELL}" fill="#08100e"/>
+      <rect x="${CELL*.07}" y="${CELL*.07}" width="${CELL*.87}" height="${CELL*.87}" rx="4" fill="#0c1810"/>
+      <rect x="${CELL*.1}" y="${CELL*.3}" width="${CELL*.05}" height="${CELL*.4}" fill="#cc8844"/>
+      <path d="M${CELL*.15},${CELL*.33} Q${CELL*.3},${CELL*.5} ${CELL*.28},${CELL*.68}" stroke="#ffaa44" stroke-width="${CELL*.04}" fill="none"/>
+      <rect x="${CELL*.4}" y="${CELL*.1}" width="${CELL*.33}" height="${CELL*.04}" rx="2" fill="#885522"/>
+      <rect x="${CELL*.41}" y="${CELL*.1}" width="${CELL*.04}" height="${CELL*.28}" fill="#885522"/>
+      <rect x="${CELL*.68}" y="${CELL*.1}" width="${CELL*.04}" height="${CELL*.28}" fill="#885522"/>
+      <rect x="${CELL*.45}" y="${CELL*.33}" width="${CELL*.08}" height="${CELL*.05}" rx="${CELL*.025}" fill="#cc6644"/>
+      <circle cx="${CELL*.8}" cy="${CELL*.3}" r="${CELL*.18}" fill="#226622"/>
+      <circle cx="${CELL*.8}" cy="${CELL*.3}" r="${CELL*.12}" fill="#1a5518"/>
+      <line x1="${CELL*.62}" y1="${CELL*.3}" x2="${CELL*.97}" y2="${CELL*.3}" stroke="#44aa44" stroke-width="${CELL*.03}"/>
+      <line x1="${CELL*.8}" y1="${CELL*.12}" x2="${CELL*.8}" y2="${CELL*.48}" stroke="#44aa44" stroke-width="${CELL*.03}"/>
+    </svg>
+    <div style="position:absolute;bottom:2px;right:3px;font-size:${Math.max(CELL*.15,8)}px;z-index:2">🎡</div>`;
+  }
+}
