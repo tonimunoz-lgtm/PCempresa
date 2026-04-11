@@ -330,13 +330,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .reach-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:3px;transition:.4s}
 
 /* ====== RESPONSIVE ====== */
-/* Animació vaga */
-@keyframes pulseBorder {
-  from { border-color: rgba(239,68,68,.4); }
-  to   { border-color: rgba(239,68,68,.9); }
-}
-.opacity-5 { opacity: 0.5; }
-
 @media(max-width:640px){
   .dash-top{grid-template-columns:1fr 1fr}
   .dash-mid{grid-template-columns:1fr}
@@ -408,128 +401,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .company-status-banner{display:flex;align-items:center;gap:12px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:12px;padding:14px;margin-bottom:16px}
 .company-status-banner.warn{background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.2)}
 .company-status-banner.bad{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.2)}
-
-/* Auth role toggle */
-.auth-role-btn{flex:1;padding:10px;border:1.5px solid var(--border2);border-radius:8px;background:transparent;color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:.2s}
-.auth-role-btn.active{border-color:var(--accent);background:rgba(79,127,255,.12);color:var(--accent)}
-
-/* ====== NOUS MÒDULS ====== */
-::-webkit-scrollbar{width:4px;height:4px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-
-/* Botons generals */
-.btn-primary{padding:11px 20px;background:var(--accent);border:none;border-radius:9px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);transition:.2s}
-.btn-primary:hover{background:#3d6dee;transform:translateY(-1px);box-shadow:0 6px 20px rgba(79,127,255,.4)}
-.btn-secondary{padding:11px 20px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:9px;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);transition:.2s}
-.btn-secondary:hover{background:rgba(255,255,255,.1)}
-.btn-danger{padding:11px 20px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:9px;color:#f87171;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);transition:.2s}
-.btn-danger:hover{background:rgba(239,68,68,.25)}
-.btn-gold{padding:11px 20px;background:linear-gradient(135deg,#f59e0b,#d97706);border:none;border-radius:9px;color:#000;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font);transition:.2s}
-.btn-gold:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(245,158,11,.4)}
-.danger-box{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:12px;color:rgba(252,165,165,.9);line-height:1.7}
-.form-textarea{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:8px;padding:11px 14px;color:var(--text);font-size:13px;font-family:var(--font);outline:none;resize:vertical;min-height:70px;line-height:1.5}
-.form-textarea::placeholder{color:var(--text3)}
-
-/* BORSA */
-.borsa-wrap{padding:16px;max-width:1100px;margin:0 auto}
-.borsa-disclaimer{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:12px;padding:14px 18px;margin-bottom:16px;font-size:12px;color:rgba(252,165,165,.9);line-height:1.7}
-.stocks-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
-.stock-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;transition:.2s}
-.stock-card:hover{border-color:var(--border2)}
-.stock-card.owned{border-color:rgba(79,127,255,.4);background:rgba(79,127,255,.06)}
-.stock-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
-.stock-ticker{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:var(--text)}
-.stock-name{font-size:11px;color:var(--text2);margin-top:2px}
-.stock-price{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--gold)}
-.stock-change{font-size:12px;font-weight:700;padding:2px 8px;border-radius:20px}
-.stock-change.up{background:rgba(16,185,129,.15);color:#34d399}
-.stock-change.down{background:rgba(239,68,68,.15);color:#f87171}
-.stock-chart{height:50px;margin:8px 0}
-.stock-chart svg{width:100%;height:100%}
-.crypto-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.crypto-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;transition:.2s;cursor:pointer}
-.crypto-card:hover{border-color:var(--border2)}
-.crypto-icon{font-size:28px;margin-bottom:6px}
-.crypto-name{font-size:13px;font-weight:700;color:var(--text)}
-.crypto-price{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--gold);margin-top:4px}
-.portfolio-table{width:100%;border-collapse:collapse}
-.portfolio-table th{text-align:left;font-size:10px;font-weight:700;color:var(--text2);letter-spacing:.6px;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--border)}
-.portfolio-table td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px}
-.risk-meter{height:8px;border-radius:4px;overflow:hidden;margin-top:4px}
-.risk-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--green),var(--gold),var(--red))}
-
-/* JUNTA */
-.junta-wrap{padding:16px;max-width:900px;margin:0 auto}
-.junta-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:12px}
-.junta-header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
-.accionista-avatar{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-.agenda-item{padding:12px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer;transition:.2s}
-.agenda-item:hover{border-color:var(--border2)}
-.agenda-item.urgent{border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.05)}
-.agenda-item-title{font-size:13px;font-weight:700;color:var(--text)}
-.agenda-item-desc{font-size:11px;color:var(--text2);margin-top:3px}
-.crisis-badge{background:var(--red);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:10px;letter-spacing:.5px}
-.emp-btn{padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);border:1px solid;transition:.2s}
-.emp-btn.fire{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:#f87171}
-.emp-btn.raise{background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.3);color:#34d399}
-.emp-btn.promote{background:rgba(79,127,255,.1);border-color:rgba(79,127,255,.3);color:#93bbff}
-
-/* COMERÇ */
-.trade-wrap{padding:16px;max-width:1000px;margin:0 auto}
-.country-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;align-items:center;gap:14px;transition:.2s;cursor:pointer;margin-bottom:8px}
-.country-card:hover{border-color:var(--border2);transform:translateX(4px)}
-.country-card.active{border-color:rgba(79,127,255,.4);background:rgba(79,127,255,.06)}
-.country-flag{font-size:32px;flex-shrink:0}
-.incoterm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.incoterm-card{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;cursor:pointer;transition:.2s}
-.incoterm-card:hover{border-color:var(--accent)}
-
-/* FRANQUÍCIES */
-.franc-wrap{padding:16px;max-width:1000px;margin:0 auto}
-.franc-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:12px;transition:.2s}
-.franc-card:hover{border-color:var(--border2)}
-.franc-header{display:flex;align-items:center;gap:14px;margin-bottom:14px}
-.franc-logo{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
-.franc-conditions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
-.franc-cond{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center}
-.franc-cond-val{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--gold)}
-.franc-cond-label{font-size:10px;color:var(--text2);margin-top:3px}
-.royalty-meter{height:6px;border-radius:3px;overflow:hidden;margin:4px 0}
-.royalty-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2))}
-
-/* MODE PROFESSOR */
-.prof-wrap{padding:16px;max-width:1200px;margin:0 auto}
-.prof-header{background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(79,127,255,.08));border:1px solid rgba(245,158,11,.25);border-radius:16px;padding:20px;margin-bottom:16px;display:flex;align-items:center;gap:16px}
-.prof-class-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
-.student-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;transition:.2s;cursor:pointer}
-.student-card:hover{border-color:var(--border2);transform:translateY(-2px)}
-.student-card.crisis{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.05)}
-.prof-leaderboard{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden}
-.prof-lb-row{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);transition:.2s}
-.prof-lb-row:last-child{border-bottom:none}
-.prof-lb-row:hover{background:rgba(255,255,255,.03)}
-.prof-lb-pos{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;width:28px;color:var(--text3)}
-.prof-lb-pos.gold{color:var(--gold)}
-.prof-lb-pos.silver{color:#94a3b8}
-.prof-lb-pos.bronze{color:#cd7f32}
-.ratio-box{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
-.ratio-val{font-size:20px;font-weight:700;font-family:'JetBrains Mono',monospace}
-.ratio-label{font-size:10px;color:var(--text2);margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:.6px}
-
-/* Responsive nous mòduls */
-@media(max-width:640px){
-  .stocks-grid{grid-template-columns:1fr}
-  .crypto-grid{grid-template-columns:1fr 1fr}
-  .franc-conditions{grid-template-columns:1fr 1fr}
-  .incoterm-grid{grid-template-columns:1fr 1fr}
-  .prof-class-grid{grid-template-columns:1fr 1fr}
-  .nav-lbl{font-size:7px}
-}
-@media(min-width:1200px){
-  .stocks-grid{grid-template-columns:repeat(3,1fr)}
-  .crypto-grid{grid-template-columns:repeat(4,1fr)}
-}
 </style>
 </head>
 <body>
@@ -589,18 +460,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
         <div class="form-group">
           <label>Contrasenya (mínim 6 caràcters)</label>
           <input class="form-input" type="password" id="reg-pass" placeholder="••••••••">
-        </div>
-        <div class="form-group">
-          <label>Rol</label>
-          <div style="display:flex;gap:8px">
-            <button type="button" class="auth-role-btn active" id="role-alumne" onclick="selectRole(this)">🎓 Alumne/a</button>
-            <button type="button" class="auth-role-btn" id="role-professor" onclick="selectRole(this)">👩‍🏫 Professor/a</button>
-          </div>
-        </div>
-        <div id="prof-code-group" style="display:none" class="form-group">
-          <label>Codi professor/a</label>
-          <input class="form-input" type="text" id="reg-prof-code" placeholder="Codi facilitat pel centre" style="letter-spacing:2px;text-transform:uppercase">
-          <div style="font-size:11px;color:var(--text3);margin-top:5px">ℹ️ Contacta amb l admin del sistema per obtenir el codi.</div>
         </div>
         <button class="auth-btn" onclick="doRegister()">Crear compte →</button>
       </div>
@@ -667,37 +526,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
         <span class="nav-icon">🗺️</span>
         <span class="nav-lbl">Mapa</span>
       </button>
-      <div class="nav-sep"></div>
-      <button class="nav-btn" onclick="showTab('borsa')" id="nav-borsa">
-        <span class="nav-icon">📈</span>
-        <span class="nav-lbl">Borsa</span>
-      </button>
-      <button class="nav-btn" onclick="showTab('junta')" id="nav-junta">
-        <span class="nav-icon">🏛️</span>
-        <span class="nav-lbl">Junta</span>
-      </button>
-      <button class="nav-btn" onclick="showTab('trade')" id="nav-trade">
-        <span class="nav-icon">🌍</span>
-        <span class="nav-lbl">Comerç</span>
-      </button>
-      <button class="nav-btn" onclick="showTab('franquicies')" id="nav-franquicies">
-        <span class="nav-icon">🏪</span>
-        <span class="nav-lbl">Franquíc.</span>
-      </button>
-      <div class="nav-sep"></div>
-      <button class="nav-btn" onclick="showTab('proveidors')" id="nav-proveidors">
-        <span class="nav-icon">🏭</span>
-        <span class="nav-lbl">Proveïdors</span>
-      </button>
-      <button class="nav-btn" onclick="showTab('laborals')" id="nav-laborals">
-        <span class="nav-icon">⚖️</span>
-        <span class="nav-lbl">Laborals</span>
-      </button>
-      <div class="nav-sep" id="prof-sep" style="display:none"></div>
-      <button class="nav-btn" onclick="showTab('professor')" id="nav-professor" style="display:none">
-        <span class="nav-icon">👩‍🏫</span>
-        <span class="nav-lbl">Classe</span>
-      </button>
     </div>
 
     <!-- Content -->
@@ -758,12 +586,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
             <div class="section-title">🏢 Departaments</div>
             <div class="dept-grid" id="dept-grid"></div>
           </div>
-
-          <div class="section-card" style="margin-top:10px">
-            <div class="section-title">📬 Sol·licituds dels caps de departament <span>IA en temps real</span></div>
-            <div id="dept-requests-panel">
-              <div style="color:var(--text3);font-size:12px;text-align:center;padding:16px">Carregant...</div>
-            </div>
 
           <div class="section-card" id="annual-summary" style="display:none">
             <div class="section-title">📋 Resum anual <span id="annual-year"></span></div>
@@ -929,7 +751,28 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       </div>
 
       <!-- SALES -->
-      <div class="tab-panel" id="tab-sales"></div>
+      <div class="tab-panel" id="tab-sales">
+        <div style="padding:16px;max-width:1000px;margin:0 auto">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text)">📦 Vendes i Clients</h2>
+            <button class="week-advance-btn" onclick="openNewClient()">+ Nou client</button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="section-card">
+              <div class="section-title">📊 Resum vendes</div>
+              <div id="sales-summary" style="font-size:13px;color:var(--text2);line-height:2"></div>
+            </div>
+            <div class="section-card">
+              <div class="section-title">⚠️ Reclamacions pendents</div>
+              <div id="claims-list" style="display:flex;flex-direction:column;gap:8px"></div>
+            </div>
+          </div>
+          <div class="section-card" style="margin-top:12px">
+            <div class="section-title">🤝 Clients actius</div>
+            <div id="clients-list" style="display:flex;flex-direction:column;gap:8px;margin-top:4px"></div>
+          </div>
+        </div>
+      </div>
 
       <!-- MAP -->
       <div class="tab-panel" id="tab-map">
@@ -950,27 +793,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
           </div>
         </div>
       </div>
-
-      <!-- BORSA -->
-      <div class="tab-panel" id="tab-borsa"></div>
-
-      <!-- JUNTA ACCIONISTES -->
-      <div class="tab-panel" id="tab-junta"></div>
-
-      <!-- COMERÇ INTERNACIONAL -->
-      <div class="tab-panel" id="tab-trade"></div>
-
-      <!-- FRANQUÍCIES -->
-      <div class="tab-panel" id="tab-franquicies"></div>
-
-      <!-- MODE PROFESSOR -->
-      <div class="tab-panel" id="tab-professor"></div>
-
-      <!-- PROVEÏDORS -->
-      <div class="tab-panel" id="tab-proveidors"></div>
-
-      <!-- RELACIONS LABORALS -->
-      <div class="tab-panel" id="tab-laborals"></div>
 
     </div><!-- /content -->
   </div><!-- /main-area -->
@@ -1111,115 +933,33 @@ const EVENT_POOL = [
 ];
 
 const JOBS_BY_PRESTIGI = [
-  {minPrest:0,  maxPrest:10, roles:['Cap de vendes','Responsable RRHH','Gerent','Director Operacions']},
-  {minPrest:10, maxPrest:25, roles:['Director Comercial','Director Financer','Gerent General']},
-  {minPrest:25, maxPrest:50, roles:['CEO','Director Estratègia','Conseller Delegat']},
-  {minPrest:50, maxPrest:999,roles:['CEO Corporatiu','President Executiu','Conseller Delegat']},
+  {minPrest:0,maxPrest:10,roles:['Cap de vendes','Responsable RRHH','Gerent','Director Operacions']},
+  {minPrest:10,maxPrest:25,roles:['Director Comercial','Director Financer','Gerent General']},
+  {minPrest:25,maxPrest:50,roles:['CEO','Director Estratègia','Conseller Delegat']},
+  {minPrest:50,maxPrest:999,roles:['CEO Corporatiu','President Executiu','Conseller Delegat']},
 ];
-
-// ---- Borsa ----
-const STOCKS = [
-  {ticker:'INDT', name:'Inditex',          sector:'moda',      basePrice:28.40, volatility:0.030, icon:'👔', desc:'Grup de moda global (Zara, Massimo Dutti...)'},
-  {ticker:'RPSOL',name:'Repsol',           sector:'energia',   basePrice:13.20, volatility:0.040, icon:'⛽', desc:'Empresa petroliera integrada'},
-  {ticker:'SAN',  name:'Banco Santander',  sector:'finances',  basePrice:4.80,  volatility:0.050, icon:'🏦', desc:'Banc multinacional espanyol'},
-  {ticker:'IBE',  name:'Iberdrola',        sector:'energia',   basePrice:12.60, volatility:0.025, icon:'⚡', desc:'Líder energies renovables'},
-  {ticker:'TEF',  name:'Telefónica',       sector:'telco',     basePrice:3.90,  volatility:0.030, icon:'📡', desc:'Telecomunicacions'},
-  {ticker:'AMS',  name:'Amades Tech SL',   sector:'tecnologia',basePrice:45.00, volatility:0.080, icon:'💻', desc:'Startup tecnologia IA'},
-  {ticker:'VFOOD',name:'Vallès Foods SA',  sector:'alimentacio',basePrice:8.20, volatility:0.035, icon:'🍎', desc:'Agroalimentació regional'},
-  {ticker:'BMED', name:'BarcelonaMed SA',  sector:'salut',     basePrice:22.50, volatility:0.045, icon:'💊', desc:'Biotecnologia i farmàcia'},
-];
-
-const CRYPTOS = [
-  {symbol:'BTC',  name:'Bitcoin',   icon:'₿',  basePrice:65000, volatility:0.12, desc:'La primera criptomoneda. Molt volàtil.'},
-  {symbol:'ETH',  name:'Ethereum',  icon:'Ξ',  basePrice:3200,  volatility:0.14, desc:'Plataforma de contractes intel·ligents.'},
-  {symbol:'SOL',  name:'Solana',    icon:'◎',  basePrice:180,   volatility:0.18, desc:'Blockchain d\'alta velocitat.'},
-  {symbol:'ADA',  name:'Cardano',   icon:'₳',  basePrice:0.65,  volatility:0.16, desc:'Blockchain acadèmic i peer-reviewed.'},
-  {symbol:'DOGE', name:'Dogecoin',  icon:'Ð',  basePrice:0.18,  volatility:0.25, desc:'Cripto meme. Altament especulativa!'},
-  {symbol:'RIBA', name:'RibaCoin', icon:'🏭',  basePrice:0.08,  volatility:0.40, desc:'Cripto fictícia local. Risc màxim!'},
-];
-
-// ---- Comerç Internacional ----
-const COUNTRIES = [
-  {code:'FR',name:'França',     flag:'🇫🇷',tariff:0.00,distance:'proper',demand:0.85,notes:'Mercat UE. Lliure comerç.'},
-  {code:'DE',name:'Alemanya',   flag:'🇩🇪',tariff:0.00,distance:'proper',demand:0.95,notes:'Gran mercat industrial.'},
-  {code:'IT',name:'Itàlia',     flag:'🇮🇹',tariff:0.00,distance:'proper',demand:0.80,notes:'Mercat UE. Fort en moda.'},
-  {code:'UK',name:'Regne Unit', flag:'🇬🇧',tariff:0.04,distance:'mitja', demand:0.75,notes:'Post-Brexit. Aranzels nous.'},
-  {code:'MA',name:'Marroc',     flag:'🇲🇦',tariff:0.08,distance:'mitja', demand:0.60,notes:'Mercat emergent proper.'},
-  {code:'US',name:'EUA',        flag:'🇺🇸',tariff:0.06,distance:'lluny', demand:1.10,notes:'Mercat enorme. Logística cara.'},
-  {code:'CN',name:'Xina',       flag:'🇨🇳',tariff:0.12,distance:'lluny', demand:0.90,notes:'Gran mercat. Normativa complexa.'},
-  {code:'MX',name:'Mèxic',      flag:'🇲🇽',tariff:0.05,distance:'lluny', demand:0.65,notes:'TLCAN. Oportunitats en moda.'},
-];
-
-// ---- Franquícies ----
-const FRANCHISES = [
-  {id:'fast_food',  name:'BurgerVallès',   icon:'🍔',color:'linear-gradient(135deg,#dc2626,#b91c1c)',
-   sector:'alimentacio',entryFee:80000,royalty:0.06,adFund:0.02,minCapital:150000,contract:10,stores:45,
-   desc:'Franquícia de menjar ràpid consolidada al mercat català.',
-   requirements:'Local mínim 150m², 2 cuiners, 3 cambrers.',expectedRevenue:280000,margin:0.18},
-  {id:'tech_store', name:'TecnoShop',      icon:'📱',color:'linear-gradient(135deg,#3b82f6,#1d4ed8)',
-   sector:'tecnologia',entryFee:35000,royalty:0.04,adFund:0.015,minCapital:80000,contract:5,stores:120,
-   desc:'Botiga de tecnologia i serveis tècnics. En expansió.',
-   requirements:'Local 80m², tècnic certificat.',expectedRevenue:180000,margin:0.22},
-  {id:'gym',        name:'FitVallès',      icon:'💪',color:'linear-gradient(135deg,#f59e0b,#d97706)',
-   sector:'salut',entryFee:60000,royalty:0.07,adFund:0.025,minCapital:200000,contract:8,stores:28,
-   desc:'Gimnàs low-cost en expansió per tot el Vallès.',
-   requirements:'Local 500m², instructor certificat.',expectedRevenue:220000,margin:0.30},
-  {id:'cleaners',   name:'Neteja Express', icon:'🧹',color:'linear-gradient(135deg,#10b981,#059669)',
-   sector:'logistica',entryFee:15000,royalty:0.08,adFund:0.01,minCapital:30000,contract:3,stores:200,
-   desc:'Servei de neteja professional. Baix cost d\'entrada.',
-   requirements:'Furgoneta, 2 operaris.',expectedRevenue:95000,margin:0.25},
-  {id:'real_estate',name:'ImmoCasa Vallès',icon:'🏠',color:'linear-gradient(135deg,#7c3aed,#5b21b6)',
-   sector:'comerc',entryFee:25000,royalty:0.03,adFund:0.01,minCapital:60000,contract:5,stores:85,
-   desc:'Agència immobiliària. Gran oportunitat de mercat.',
-   requirements:'Oficina 50m², agent certificat API.',expectedRevenue:150000,margin:0.35},
-];
-
-function generateShareholders(legalForm, capital) {
-  if (legalForm === 'autonomia') return [];
-  const profiles = [
-    {name:'Familia Roca',          icon:'👨‍👩‍👧',type:'familiar',  patience:8,risk:'baix',style:'conservador'},
-    {name:'Fons Capital Vallès',   icon:'🏦',    type:'inversor',  patience:5,risk:'mig', style:'equilibrat'},
-    {name:'Acceleradora StartVIC', icon:'🚀',    type:'venture',   patience:3,risk:'alt', style:'agressiu'},
-    {name:'Business Angel Puig',   icon:'👔',    type:'angel',     patience:6,risk:'mig', style:'estratègic'},
-    {name:'Cooperativa Obrera',    icon:'✊',    type:'cooperatiu',patience:9,risk:'baix',style:'social'},
-  ];
-  const count = legalForm==='sa'?4:legalForm==='cooperativa'?3:2;
-  const selected = profiles.slice(0, count);
-  let remaining = 0.6;
-  return selected.map((p, i) => {
-    const pct = i===selected.length-1 ? remaining : Math.round(remaining*(0.3+Math.random()*0.4)*10)/10;
-    remaining -= pct;
-    return {...p, pct:Math.max(0.05,pct), shares:Math.round(capital*pct/10), satisfaction:70+Math.floor(Math.random()*20)};
-  });
-}
 
 // ==================== STATE ====================
 let G = {
   user: null,
   uid: null,
   gameData: null,
-  isProf: false,
   currentTab: 'dashboard',
   rankingOpen: false,
   otherPlayers: [],
-  allStudents: [],
   activeEvents: [],
   initialized: false,
 };
-// Exposar G globalment perquè els mòduls externs puguin accedir-hi
-window.G = G;
-window._db = null; // s'assigna després de Firebase init
 
 function defaultGameData(uid, displayName) {
-  const now = new Date(); // DATA REAL DEL SISTEMA
-  const year = now.getFullYear();
+  const now = new Date(2024, 0, 1);
   return {
     uid,
     displayName,
     mode: null, // 'create' | 'hired'
     week: 1,
-    year,
-    month: now.getMonth()+1,
+    year: 2024,
+    month: 1,
     date: now.toISOString(),
     prestigi: 0,
     company: null,
@@ -1242,13 +982,6 @@ function defaultGameData(uid, displayName) {
     notifications: [],
     events: [],
     mktBudget: 0,
-    // Nous mòduls
-    portfolio:    { stocks: {}, crypto: {} },
-    trade:        { imports: [], exports: [], incoterms: {} },
-    franchise:    null,
-    shareholders: [],
-    boardDecisions: [],
-    isProf: false,
     lastSaved: Date.now(),
   };
 }
@@ -1269,34 +1002,18 @@ window.doLogin = async function() {
   }
 };
 
-// Codi secret professor (en producció hauria d'anar al backend)
-const PROF_CODE = 'PROF2024';
-
-window.selectRole = function(btn) {
-  document.querySelectorAll('.auth-role-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  const isProf = btn.id === 'role-professor';
-  document.getElementById('prof-code-group').style.display = isProf ? '' : 'none';
-};
-
 window.doRegister = async function() {
-  const name    = document.getElementById('reg-name').value.trim();
+  const name = document.getElementById('reg-name').value.trim();
   const surname = document.getElementById('reg-surname').value.trim();
-  const email   = document.getElementById('reg-email').value.trim();
-  const pass    = document.getElementById('reg-pass').value;
-  const isProf  = document.getElementById('role-professor')?.classList.contains('active');
-  const profCode = document.getElementById('reg-prof-code')?.value.trim().toUpperCase();
-
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-pass').value;
   if (!name || !surname || !email || !pass) { showAuthErr('Omple tots els camps.'); return; }
-  if (pass.length < 6) { showAuthErr('La contrasenya ha de tenir minim 6 caracters.'); return; }
-  if (isProf && profCode !== PROF_CODE) { showAuthErr('Codi de professor incorrecte.'); return; }
-
+  if (pass.length < 6) { showAuthErr('La contrasenya ha de tenir mínim 6 caràcters.'); return; }
   try {
     const btn = document.querySelector('#register-form .auth-btn');
     btn.disabled = true; btn.textContent = 'Creant compte...';
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     const gd = defaultGameData(cred.user.uid, name + ' ' + surname);
-    gd.isProf = !!isProf;
     await setDoc(doc(db, 'games', cred.user.uid), gd);
   } catch(e) {
     showAuthErr('Error: ' + e.message);
@@ -1360,16 +1077,13 @@ async function saveGameData() {
 }
 
 function startRealtimeListeners() {
-  // Listen other players for map + professor mode
-  const q = query(collection(db, 'games'), limit(30));
+  // Listen other players for map
+  const q = query(collection(db, 'games'), limit(20));
   onSnapshot(q, (snap) => {
     G.otherPlayers = [];
-    G.allStudents  = [];
     snap.forEach(d => {
-      const dat = d.data();
-      G.allStudents.push(dat);
-      if (d.id !== G.uid && dat.company) {
-        G.otherPlayers.push(dat);
+      if (d.id !== G.uid && d.data().company) {
+        G.otherPlayers.push(d.data());
       }
     });
     if (G.currentTab === 'map') renderMap();
@@ -1382,28 +1096,17 @@ function initUI() {
   const gd = G.gameData;
   document.getElementById('profile-name').textContent = gd.displayName || 'Jugador';
   updateTopStats();
-
-  // Mode professor: mostrar botó de classe
-  G.isProf = !!gd.isProf;
-  if (G.isProf) {
-    document.getElementById('nav-professor').style.display = '';
-    document.getElementById('prof-sep').style.display = '';
-  }
-
   if (!gd.mode) {
-    // Nou jugador sense empresa → anar directament a Setup
     showSetupInit();
-    showTab('setup');
   } else {
     showActiveGame();
-    showTab('dashboard');
-    renderDashboard();
-    renderFinances();
-    renderHR();
-    renderProduction();
-    renderMarketing();
-    renderSales();
   }
+  renderDashboard();
+  renderFinances();
+  renderHR();
+  renderProduction();
+  renderMarketing();
+  renderSales();
   G.initialized = true;
 }
 
@@ -1900,28 +1603,20 @@ function showHiredMode() {
   renderJobOffers();
 }
 
-async function renderJobOffers() {
+function renderJobOffers() {
   const prest = G.gameData.prestigi || 0;
-  const { EMPRESA_PROFILES } = await import('./js/data-empreses.js');
-
-  let available = EMPRESA_PROFILES.filter(e => {
+  let available = VALLES_EMPRESES.filter(e => {
     if (prest < 10) return e.size === 'small';
-    if (prest < 30) return e.size === 'small' || e.size === 'medium';
+    if (prest < 25) return e.size !== 'corp';
     return true;
   });
-  available = available.sort(() => Math.random() - 0.5).slice(0, 5);
-
-  const rolesList = JOBS_BY_PRESTIGI.find(j => prest >= j.minPrest && prest < j.maxPrest) || JOBS_BY_PRESTIGI[0];
-
+  available = available.sort(() => Math.random() - 0.5).slice(0, 6);
   document.getElementById('offers-grid').innerHTML = available.map(e => {
-    const sizeLabel = {small:'Petita',medium:'Mitjana',large:'Gran'}[e.size] || 'Empresa';
+    const sizeLabel = {small:'Petita',medium:'Mitjana',large:'Gran',corp:'Corporació'}[e.size];
     const sectorD = SECTORS.find(s => s.id === e.sector) || SECTORS[0];
-    const salary = {small:36000, medium:55000, large:78000}[e.size] || 40000;
-    const role = rolesList.roles[Math.floor(Math.random()*rolesList.roles.length)];
-    const empCount = e.employees_real || 20;
-    const fact = (e.facturacio_anual/1000000).toFixed(1);
-    const clients = e.clients_destacats?.length || 0;
-
+    const salary = e.size === 'small' ? 2800 : e.size === 'medium' ? 4200 : e.size === 'large' ? 6500 : 9000;
+    const roles = JOBS_BY_PRESTIGI.find(j => prest >= j.minPrest && prest < j.maxPrest) || JOBS_BY_PRESTIGI[0];
+    const role = roles.roles[Math.floor(Math.random()*roles.roles.length)];
     return `
       <div class="offer-card">
         <div class="offer-top">
@@ -1932,86 +1627,52 @@ async function renderJobOffers() {
           </div>
           <div class="offer-size-badge ${e.size}">${sizeLabel}</div>
         </div>
-        <div class="offer-salary">💰 ${salary.toLocaleString('ca')}€/any · Fundada ${e.founded}</div>
-        <div class="offer-prestigi">Facturació: ~${fact}M€/any · Capital social: ${(e.capital_social/1000).toFixed(0)}k€</div>
+        <div class="offer-salary">💰 ${salary.toLocaleString('ca')}€/any</div>
+        <div class="offer-prestigi">Facturació: ~${(e.fact/1000000).toFixed(1)}M€ · ${e.emp} empleats</div>
         <div class="offer-details">
           <span class="offer-tag">📍 ${e.muni}</span>
-          <span class="offer-tag">👥 ${empCount} empleats</span>
-          <span class="offer-tag">🤝 ${clients} clients clau</span>
-          <span class="offer-tag">📋 ${e.legalForm.toUpperCase()}</span>
+          <span class="offer-tag">👥 ${e.emp} persones</span>
+          <span class="offer-tag">🏭 ${sectorD.sector}</span>
         </div>
-        <div style="font-size:11px;color:var(--text2);margin-top:8px;padding:8px;background:rgba(255,255,255,.03);border-radius:8px">
-          <strong style="color:var(--text)">Situació financera:</strong>
-          Capital: ${(e.capital_social/1000).toFixed(0)}k€ · Reserves: ${(e.reserves/1000).toFixed(0)}k€ ·
-          Deute llarg termini: ${(e.deutes_llarg/1000).toFixed(0)}k€
-        </div>
-        <button class="offer-btn" onclick="acceptOffer(this.dataset.name, this.dataset.role, ${salary})" data-name="${e.name}" data-role="${role}">Acceptar oferta →</button>
+        <button class="offer-btn" onclick="acceptOffer(${JSON.stringify(e).replace(/"/g,'&quot;')}, '${role}', ${salary})">Acceptar oferta →</button>
       </div>`;
   }).join('');
 }
 
-window.acceptOffer = async function(companyName, role, salary) {
-  // Suport per a crida directa o via dataset
-  if (companyName && typeof companyName === 'object' && companyName.dataset) {
-    role   = companyName.dataset.role;
-    salary = parseInt(companyName.dataset.salary || salary);
-    companyName = companyName.dataset.name;
-  }
-  const now = new Date();
-  // Carregar dades creïbles de l'empresa des de data-empreses.js
-  const { EMPRESA_PROFILES, generateHiredCompanyData } = await import('./js/data-empreses.js');
-  const profile = EMPRESA_PROFILES.find(p => p.name === companyName);
-
-  let newData;
-  if (profile) {
-    newData = generateHiredCompanyData(profile, G.uid, G.gameData.displayName);
-  } else {
-    // Empresa genèrica si no té perfil específic
-    newData = G.gameData;
-    newData.mode = 'hired';
-  }
-
-  // Conservar dades d'usuari
-  newData.uid = G.uid;
-  newData.displayName = G.gameData.displayName;
-  newData.isProf = G.gameData.isProf;
-  newData.week  = 1;
-  newData.year  = now.getFullYear();
-  newData.month = now.getMonth() + 1;
-  newData.startDate = now.toISOString();
-
-  if (newData.company) {
-    newData.company.myRole    = role;
-    newData.company.mySalary  = salary;
-    newData.company.nif       = 'B' + Math.floor(10000000 + Math.random()*89999999);
-    newData.company.iae       = getIAE(newData.company.sector);
-    newData.company.regime    = 'lloguer';
-  }
-
-  // Recalcular ingressos mensuals des dels serveis
-  if (newData.serveis?.length) {
-    newData.finances.monthly_revenue = newData.serveis.reduce((s, sv) => s + sv.preu * sv.unitats_mes, 0);
-    newData.finances.monthly_costs   = newData.finances.monthly_revenue * 0.68; // margen aproximat
-  }
-
-  newData.notifications = [
-    { id: Date.now(), icon: '💼', title: "Incorporació a " + companyName,
-      desc: "Has sigut contractat/da com a " + role + ". Sou: " + salary.toLocaleString('ca') + "€/any. Trobaràs l'empresa amb clients, empleats i finances reals. Analitza la situació.",
-      time: 'Ara', urgent: false, read: false },
-    { id: Date.now()+1, icon: '📊', title: "Revisa el balanç",
-      desc: "L'empresa ja porta temps funcionant. Revisa finances, clients i proveïdors per entendre la situació actual.",
-      time: 'Ara', urgent: false, read: false },
-  ];
-
-  G.gameData = newData;
-  window.G = G;
-
+window.acceptOffer = async function(company, role, salary) {
+  const sectorData = SECTORS.find(s => s.id === company.sector) || SECTORS[0];
+  G.gameData.mode = 'hired';
+  G.gameData.prestigi = (G.gameData.prestigi || 0) + 3;
+  G.gameData.company = {
+    name: company.name,
+    sector: company.sector,
+    sectorData,
+    legalForm: 'sa',
+    legalFormName: 'Societat Anònima',
+    nif: 'A' + Math.floor(10000000 + Math.random()*89999999),
+    municipality: company.muni,
+    myRole: role,
+    mySalary: salary,
+    totalEmployees: company.emp,
+    annualRevenue: company.fact,
+    size: company.size,
+    surface: company.size === 'small' ? 150 : company.size === 'medium' ? 500 : 2000,
+    monthlyRent: company.size === 'small' ? 1200 : company.size === 'medium' ? 4000 : 12000,
+    regime: 'lloguer',
+  };
+  G.gameData.finances.cash = company.fact * 0.1; // 10% facturació com a cash
+  G.gameData.finances.monthly_revenue = company.fact / 12;
+  G.gameData.finances.monthly_costs = (company.fact / 12) * 0.78;
+  G.gameData.employees = generateHiredEmployees(company);
+  G.gameData.notifications.push({
+    id: Date.now(), icon: '💼', title: 'Incorporació a l\'empresa!',
+    desc: `Has sigut contractat/da com a ${role} a ${company.name}. Sou: ${salary.toLocaleString('ca')}€/any`,
+    time: 'Ara', urgent: false, read: false,
+  });
   await saveGameData();
   showActiveGame();
-  showTab('dashboard');
   renderDashboard(); renderFinances(); renderHR(); renderMarketing();
-  import('./js/ui-sales.js').then(m => m.renderSales());
-  showEventToast('💼', 'Contractat/da!', "Inici com a " + role + " a " + companyName, true);
+  showEventToast('💼', 'Contractat/da!', `Inici com a ${role} a ${company.name}`, true);
 };
 
 function generateHiredEmployees(company) {
@@ -2109,24 +1770,6 @@ function renderDashboard() {
       <div class="notif-time">${n.time||''}</div>
     </div>`).join('') || '<div style="color:var(--text3);font-size:12px;text-align:center;padding:20px">Sense notificacions</div>';
 
-  // Il·lustració instal·lació
-  if (c) {
-    let facilEl = document.getElementById('facility-illustration-dash');
-    if (!facilEl) {
-      facilEl = document.createElement('div');
-      facilEl.id = 'facility-illustration-dash';
-      const dashWrap = document.querySelector('.dash-wrap');
-      if (dashWrap) dashWrap.insertBefore(facilEl, dashWrap.firstChild);
-    }
-    import('./js/ui-visuals.js').then(m => m.renderFacilityIllustration('facility-illustration-dash'));
-  }
-
-  // Sol·licituds de departaments (IA caps)
-  import('./js/engine2.js').then(m => {
-    m.generateDeptAIRequests(gd);
-    m.renderDeptRequests();
-  }).catch(()=>{});
-
   // Departments
   const depts = [
     {icon:'💰',name:'Finances',status: cash >= 0 ? 'ok' : 'bad', statusTxt: cash >= 0 ? 'Estable' : 'Crítica'},
@@ -2136,9 +1779,8 @@ function renderDashboard() {
     {icon:'📣',name:'Màrqueting',status:'ok',statusTxt:'Actiu'},
     {icon:'🏗️',name:'Instal·lacions',status:'ok',statusTxt: c ? c.municipality : '—'},
   ];
-  const tabMap = {Finances:'finances',RRHH:'hr','Producció':'production',Vendes:'sales','Màrqueting':'marketing'};
   document.getElementById('dept-grid').innerHTML = depts.map(d => `
-    <div class="dept-card" data-tab="${tabMap[d.name]||'dashboard'}" onclick="showTab(this.dataset.tab)">
+    <div class="dept-card" onclick="showTab('${d.name==='Finances'?'finances':d.name==='RRHH'?'hr':d.name==='Producció'?'production':d.name==='Vendes'?'sales':d.name==='Màrqueting'?'marketing':'dashboard'}')">
       <div class="dept-icon">${d.icon}</div>
       <div class="dept-name">${d.name}</div>
       <div class="dept-status ${d.status}">${d.statusTxt}</div>
@@ -2163,62 +1805,14 @@ function renderFinances() {
   const mktCost = gd.mktBudget || 0;
   const otherCosts = costs - salaries - rent - mktCost - loanPayments;
 
-  // Ingressos per servei/producte (clicable)
-  const serveis = gd.serveis || [];
-  const ingDesgloss = serveis.length > 0
-    ? serveis.map(sv => {
-        const fact = sv.preu * sv.unitats_mes;
-        return `<div class="bal-row" style="padding-left:16px;opacity:.85">
-          <div class="bal-row-label" style="font-size:11px">↳ ${sv.name} (${sv.unitats_mes} u × ${sv.preu}€)</div>
-          <div class="bal-row-val" style="color:var(--green);font-size:11px">+${fact.toLocaleString('ca')}€</div>
-        </div>`}).join('')
-    : '';
-  
-  const salariesBrutes = (gd.employees||[]).reduce((s,e) => s+(e.salary||0), 0);
-  const salariesSS     = Math.round(salariesBrutes * 0.30);
-  const provCosts      = (gd.proveidors||[]).reduce((s,p) => s+(p.cost_mes||0), 0);
-  const tradeImport    = (gd.trade?.imports||[]).reduce((s,i) => s+(i.weeklyCost||0)*4.33, 0);
-  const franchRoyalty  = gd.franchise?.mode==='franquiciat' ? Math.round(rev*(gd.franchise?.royaltyRate||0.06)) : 0;
-  
   document.getElementById('pyg-table').innerHTML = `
-    <div class="bal-row" style="cursor:pointer" onclick="toggleFinDetail('ing-detail')">
-      <div class="bal-row-label" style="font-weight:700">▶ Ingressos d'explotació <span style="font-size:10px;color:var(--accent)">(desglossa)</span></div>
-      <div class="bal-row-val" style="color:var(--green);font-weight:700">+${rev.toLocaleString('ca')}€</div>
-    </div>
-    <div id="ing-detail" style="display:none">${ingDesgloss||'<div style="padding:4px 16px;font-size:11px;color:var(--text3)">Defineix productes/serveis a Vendes</div>'}</div>
-    
-    <div class="bal-row" style="cursor:pointer" onclick="toggleFinDetail('sal-detail')">
-      <div class="bal-row-label" style="font-weight:700">▶ Nòmines (SS inclosa) <span style="font-size:10px;color:var(--accent)">(desglossa)</span></div>
-      <div class="bal-row-val" style="color:var(--red)">-${(salariesBrutes+salariesSS).toLocaleString('ca')}€</div>
-    </div>
-    <div id="sal-detail" style="display:none">
-      <div class="bal-row" style="padding-left:16px;opacity:.85">
-        <div class="bal-row-label" style="font-size:11px">↳ Nòmines brutes (${(gd.employees||[]).length} empleats)</div>
-        <div class="bal-row-val" style="color:var(--red);font-size:11px">-${salariesBrutes.toLocaleString('ca')}€</div>
-      </div>
-      <div class="bal-row" style="padding-left:16px;opacity:.85">
-        <div class="bal-row-label" style="font-size:11px">↳ Seguretat Social empresa (~30%)</div>
-        <div class="bal-row-val" style="color:var(--red);font-size:11px">-${salariesSS.toLocaleString('ca')}€</div>
-      </div>
-    </div>
-    
+    <div class="bal-row"><div class="bal-row-label">Ingressos d'explotació</div><div class="bal-row-val" style="color:var(--green)">+${rev.toLocaleString('ca')}€</div></div>
+    <div class="bal-row"><div class="bal-row-label">Nòmines (SS inclosa)</div><div class="bal-row-val" style="color:var(--red)">-${salaries.toFixed(0).toLocaleString('ca')}€</div></div>
     <div class="bal-row"><div class="bal-row-label">Lloguer instal·lacions</div><div class="bal-row-val" style="color:var(--red)">-${rent.toLocaleString('ca')}€</div></div>
-    ${provCosts > 0 ? `<div class="bal-row"><div class="bal-row-label">Cost proveïdors</div><div class="bal-row-val" style="color:var(--red)">-${provCosts.toLocaleString('ca')}€</div></div>` : ''}
     <div class="bal-row"><div class="bal-row-label">Màrqueting i publicitat</div><div class="bal-row-val" style="color:var(--red)">-${mktCost.toLocaleString('ca')}€</div></div>
-    ${loanPayments > 0 ? `<div class="bal-row"><div class="bal-row-label">Quota préstecs / leasing</div><div class="bal-row-val" style="color:var(--red)">-${loanPayments.toLocaleString('ca')}€</div></div>` : ''}
-    ${tradeImport > 0 ? `<div class="bal-row"><div class="bal-row-label">Importacions internacionals</div><div class="bal-row-val" style="color:var(--red)">-${Math.round(tradeImport).toLocaleString('ca')}€</div></div>` : ''}
-    ${franchRoyalty > 0 ? `<div class="bal-row"><div class="bal-row-label">Royalties franquícia</div><div class="bal-row-val" style="color:var(--red)">-${franchRoyalty.toLocaleString('ca')}€</div></div>` : ''}
-    <div class="bal-row total"><div class="bal-row-label">Resultat mensual</div><div class="bal-row-val" style="color:${result>=0?'var(--green)':'var(--red)'};">${result>=0?'+':''}${Math.round(result).toLocaleString('ca')}€</div></div>`;
-  
-  // IS estimat
-  if (result > 0) {
-    const tax = gd.company?.legalForm === 'cooperativa' ? 0.20 : 0.25;
-    const pygEl = document.getElementById('pyg-table');
-    if (pygEl) {
-      pygEl.innerHTML += `<div class="bal-row" style="opacity:.7"><div class="bal-row-label" style="font-size:11px">* IS estimat anual (${tax*100}%)</div>
-        <div class="bal-row-val" style="font-size:11px;color:var(--text2)">-${Math.round(result*12*tax).toLocaleString('ca')}€/any</div></div>`;
-    }
-  }
+    <div class="bal-row"><div class="bal-row-label">Quota préstecs</div><div class="bal-row-val" style="color:var(--red)">-${loanPayments.toLocaleString('ca')}€</div></div>
+    <div class="bal-row"><div class="bal-row-label">Altres despeses</div><div class="bal-row-val" style="color:var(--red)">-${Math.max(0,otherCosts).toFixed(0)}€</div></div>
+    <div class="bal-row total"><div class="bal-row-label">Resultat mensual</div><div class="bal-row-val" style="color:${result>=0?'var(--green)':'var(--red)'}">${result>=0?'+':''}${result.toFixed(0)}€</div></div>`;
 
   document.getElementById('treasury-info').innerHTML = `
     <div class="bal-row"><div class="bal-row-label">Tresoreria actual</div><div class="bal-row-val" style="color:var(--gold)">${(f.cash||0).toLocaleString('ca')}€</div></div>
@@ -2265,73 +1859,36 @@ function renderFinances() {
 
 // ==================== HR ====================
 function renderHR() {
-  const gd = G.gameData;
-  const emps = gd.employees || [];
-  const lr    = gd.laborRelations || { satisfaccio: 72 };
-  const totalBrut = emps.reduce((s, e) => s + (e.salary || 0), 0);
-  const totalSS   = Math.round(totalBrut * 0.30);  // ~30% SS empresa
-  const totalCost = totalBrut + totalSS;
+  const emps = G.gameData.employees || [];
+  const totalSalary = emps.reduce((s, e) => s + (e.salary || 0) * 1.3, 0);
   const moraleAvg = emps.length > 0 ? Math.round(emps.reduce((s, e) => s + (e.morale || 60), 0) / emps.length) : 0;
-  const satColor  = lr.satisfaccio >= 70 ? 'var(--green)' : lr.satisfaccio >= 50 ? 'var(--gold)' : 'var(--red)';
-
-  // Agrupar per nivell jeràrquic
-  const directius  = emps.filter(e => e.nivel === 'directiu');
-  const intermedis = emps.filter(e => e.nivel === 'intermedi');
-  const base       = emps.filter(e => !e.nivel || e.nivel === 'base');
-
-  function empCard(e) {
-    const moraleColor = e.morale >= 70 ? 'var(--green)' : e.morale >= 40 ? 'var(--gold)' : 'var(--red)';
-    const ssEmp  = Math.round((e.salary||0) * 0.30);
-    const costTotal = (e.salary||0) + ssEmp;
-    const vagaBadge = e.en_vaga ? '<span style="background:var(--red);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:10px;margin-left:6px">EN VAGA</span>' : '';
-    return `
-      <div class="emp-card" style="${e.en_vaga ? 'border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.04)' : ''}">
-        <div class="emp-avatar" style="background:${e.nivel==='directiu'?'linear-gradient(135deg,var(--gold),#d97706)':e.nivel==='intermedi'?'linear-gradient(135deg,var(--accent),var(--accent2))':'linear-gradient(135deg,#374151,#1f2937)'}">${e.avatar||e.emoji||'👤'}</div>
-        <div class="emp-info">
-          <div class="emp-name">${e.name}${vagaBadge}</div>
-          <div class="emp-role">${e.dept?.toUpperCase()||'—'} · ${e.role||e.name} · ${Math.round(e.seniority||0)} anys</div>
-          <div style="font-size:11px;margin-top:4px">
-            <span class="emp-salary">${(e.salary||0).toLocaleString('ca')}€</span>
-            <span style="color:var(--text3);margin-left:6px">+SS ${ssEmp.toLocaleString('ca')}€ = <strong style="color:var(--red)">${costTotal.toLocaleString('ca')}€/mes empresa</strong></span>
-          </div>
-          <div class="emp-morale" style="display:flex;align-items:center;gap:8px;margin-top:5px">
-            <div class="morale-bar"><div class="morale-fill" style="width:${e.morale||60}%;background:${moraleColor}"></div></div>
-            <span style="font-size:10px;color:${moraleColor}">${e.morale||60}%</span>
-          </div>
-        </div>
-        <div class="emp-actions" style="display:flex;flex-direction:column;gap:4px">
-          <button class="emp-btn raise" data-eid="${e.id}" onclick="raiseEmployee(this.dataset.eid)">💰 Pujada</button>
-          <button class="emp-btn fire"  data-eid="${e.id}" onclick="fireEmployee(this.dataset.eid)">❌ Acomiadar</button>
-        </div>
-      </div>`;
-  }
-
-  function section(title, icon, list) {
-    if (!list.length) return '';
-    return `<div style="margin-bottom:14px">
-      <div style="font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px;padding:0 4px;display:flex;align-items:center;gap:6px">
-        <span>${icon}</span>${title} <span style="color:var(--text3)">(${list.length})</span>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:6px">${list.map(empCard).join('')}</div>
-    </div>`;
-  }
 
   document.getElementById('employees-list').innerHTML = emps.length === 0
     ? '<div style="text-align:center;color:var(--text2);padding:30px;font-size:14px">Sense empleats. Contracta el teu primer treballador!</div>'
-    : section('Direcció i Alta Gerència','👔', directius) +
-      section('Càrrecs Intermedis','🏅', intermedis) +
-      section('Treballadors','👷', base);
+    : emps.map(e => {
+      const moraleColor = e.morale >= 70 ? 'var(--green)' : e.morale >= 40 ? 'var(--gold)' : 'var(--red)';
+      return `
+        <div class="emp-card">
+          <div class="emp-avatar">${e.avatar||'👤'}</div>
+          <div class="emp-info">
+            <div class="emp-name">${e.name}</div>
+            <div class="emp-role">${e.dept?.toUpperCase()||'—'} · ${e.role} · ${e.seniority||0} anys</div>
+            <div class="emp-salary">${e.salary?.toLocaleString('ca')||0}€ bruts/mes</div>
+            <div class="emp-morale">
+              <div class="morale-bar"><div class="morale-fill" style="width:${e.morale||60}%;background:${moraleColor}"></div></div>
+              <span style="font-size:10px;color:${moraleColor}">${e.morale||60}% ànim</span>
+            </div>
+          </div>
+          <div class="emp-actions">
+            <button class="emp-btn raise" onclick="raiseEmployee('${e.id}')">💰 Pujada</button>
+            <button class="emp-btn fire" onclick="fireEmployee('${e.id}')">❌ Acomiadar</button>
+          </div>
+        </div>`}).join('');
 
   document.getElementById('salary-summary').innerHTML = `
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-      <div class="ratio-box"><div class="ratio-val" style="font-size:16px">${emps.length}</div><div class="ratio-label">Empleats</div></div>
-      <div class="ratio-box"><div class="ratio-val" style="font-size:16px;color:var(--red)">${totalCost.toLocaleString('ca')}€</div><div class="ratio-label">Cost total/mes empresa</div></div>
-      <div class="ratio-box"><div class="ratio-val" style="font-size:16px;color:${satColor}">${lr.satisfaccio||72}%</div><div class="ratio-label">Satisfacció laboral</div></div>
-    </div>
-    <div style="margin-top:10px;font-size:11px;color:var(--text2);background:rgba(255,255,255,.03);border-radius:8px;padding:10px">
-      💡 <strong style="color:var(--text)">Seguretat Social empresa:</strong> Per cada €1 de nòmina bruta, l'empresa paga ~0,30€ addicionals en cotitzacions (SS, FOGASA, atur). 
-      Nòmines brutes: <strong style="color:var(--text)">${totalBrut.toLocaleString('ca')}€</strong> + SS: <strong style="color:var(--red)">${totalSS.toLocaleString('ca')}€</strong> = Cost total: <strong style="color:var(--red)">${totalCost.toLocaleString('ca')}€</strong>
-    </div>`;
+    Empleats: <strong style="color:var(--text)">${emps.length}</strong> · 
+    Cost mensual total (SS inclosa): <strong style="color:var(--red)">${totalSalary.toFixed(0)}€</strong> · 
+    Mora mitjana: <strong style="color:${moraleAvg>=70?'var(--green)':moraleAvg>=40?'var(--gold)':'var(--red)'}">${moraleAvg}%</strong>`;
 }
 
 window.fireEmployee = async function(id) {
@@ -2358,28 +1915,28 @@ window.raiseEmployee = async function(id) {
 
 window.openHireModal = function() {
   const roles = [
-    {name:'Comercial',            dept:'vendes',   salary:1800, icon:'📊'},
-    {name:'Operari/a',            dept:'produccio', salary:1400, icon:'⚙️'},
-    {name:'Administratiu/va',     dept:'admin',     salary:1600, icon:'📋'},
-    {name:'Tècnic/a especialista',dept:'tecnic',    salary:2400, icon:'🔧'},
-    {name:'Cap de vendes',        dept:'vendes',    salary:3200, icon:'🏆'},
-    {name:'Director/a financer/a',dept:'finances',  salary:4500, icon:'💰'},
+    {name:'Comercial', dept:'vendes', salary:1800, icon:'📊'},
+    {name:'Operari/a', dept:'produccio', salary:1400, icon:'⚙️'},
+    {name:'Administratiu/va', dept:'admin', salary:1600, icon:'📋'},
+    {name:'Tècnic/a especialista', dept:'tecnic', salary:2400, icon:'🔧'},
+    {name:'Cap de vendes', dept:'vendes', salary:3200, icon:'🏆'},
+    {name:'Director/a financer/a', dept:'finances', salary:4500, icon:'💰'},
   ];
   const names = ['Pau Ferrer','Laia Costa','Xavi Rovira','Marta Duran','Joan Albà','Carla Prat','Gerard Roca','Ester Solà'];
-  window._hireCandidates = roles.map((r, i) => ({
+  const candidates = roles.map((r, i) => ({
     ...r, name: names[i % names.length] + ' ' + String.fromCharCode(65 + i),
     id: 'cand_' + Date.now() + '_' + i, morale: 80 + Math.floor(Math.random()*20)
   }));
-  document.getElementById('hire-candidates').innerHTML = window._hireCandidates.map((c, i) => `
+  document.getElementById('hire-candidates').innerHTML = candidates.map(c => `
     <div class="offer-card" style="padding:14px">
       <div style="display:flex;align-items:center;gap:12px">
         <span style="font-size:30px">${c.icon}</span>
         <div style="flex:1">
           <div style="font-weight:700;font-size:14px;color:var(--text)">${c.name}</div>
-          <div style="font-size:12px;color:var(--text2)">${c.name} · Dept: ${c.dept}</div>
+          <div style="font-size:12px;color:var(--text2)">${c.role} · Dept: ${c.dept}</div>
           <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--gold);margin-top:4px">${c.salary.toLocaleString('ca')}€/mes bruts</div>
         </div>
-        <button class="offer-btn" onclick="hireCandidate(${i})" style="width:auto;padding:8px 14px">Contractar</button>
+        <button class="offer-btn" onclick="hireCandidate(${JSON.stringify(c).replace(/"/g,'&quot;')})" style="width:auto;padding:8px 14px">Contractar</button>
       </div>
     </div>`).join('');
   document.getElementById('hire-modal').style.display = 'flex';
@@ -2387,12 +1944,10 @@ window.openHireModal = function() {
 
 window.closeHireModal = function() { document.getElementById('hire-modal').style.display = 'none'; };
 
-window.hireCandidate = async function(idx) {
-  const c = window._hireCandidates?.[idx];
-  if (!c) return;
-  const newEmp = {id:'emp_'+Date.now(), name:c.name, dept:c.dept, role:c.name, salary:c.salary, morale:c.morale, seniority:0, avatar:c.icon||'👤', nivel:'base'};
+window.hireCandidate = async function(c) {
+  const newEmp = {id:'emp_'+Date.now(), name:c.name, dept:c.dept, role:c.role, salary:c.salary, morale:c.morale, seniority:0, avatar:'👤'};
   G.gameData.employees.push(newEmp);
-  G.gameData.notifications.push({id:Date.now(), icon:'👥', title:'Nou empleat!', desc:`${c.name} s'incorpora com a ${c.name}`, time:'Ara', urgent:false});
+  G.gameData.notifications.push({id:Date.now(), icon:'👥', title:'Nou empleat!', desc:`${c.name} s'incorpora com a ${c.role}`, time:'Ara', urgent:false});
   await saveGameData();
   closeHireModal(); renderHR(); renderDashboard();
   showToast(`✅ ${c.name} contractat/da!`);
@@ -2524,9 +2079,8 @@ function renderMarketing() {
           </div>
           ${isActive ? '<span style="color:var(--green);font-weight:700;font-size:13px">✅ Actiu</span>' :
             `<button class="offer-btn" style="width:auto;padding:8px 14px;${!canAfford||!meetsReq?'opacity:.5;cursor:not-allowed':''}" 
-              data-spid="${sp.id}" data-spcost="${sp.cost}"
-              ${canAfford && meetsReq ? 'onclick="activateSponsor(this.dataset.spid, parseInt(this.dataset.spcost))"' : 'disabled'}>
-              ${!meetsReq ? '⭐' + sp.prestigi_req + ' necessari' : !canAfford ? 'Sense fons' : 'Activar'}
+              ${canAfford && meetsReq ? `onclick="activateSponsor('${sp.id}', ${sp.cost})"` : ''}>
+              ${!meetsReq ? `⭐${sp.prestigi_req} necessari` : !canAfford ? 'Sense fons' : 'Activar'}
             </button>`}
         </div>
       </div>`;
@@ -2719,213 +2273,128 @@ window.toggleRanking = function() {
 
 // ==================== WEEK ADVANCE ====================
 window.advanceWeek = async function() {
-  if (!G.gameData.mode) { showToast("⚠️ Crea o incorpora't a una empresa primer!"); return; }
+  if (!G.gameData.mode) { showToast('⚠️ Crea o incorpora\'t a una empresa primer!'); return; }
   const gd = G.gameData;
   gd.week++;
+  // Month/year progression
+  const weekInYear = ((gd.week - 1) % 52) + 1;
+  gd.month = Math.ceil(weekInYear / 4.33);
+  if (gd.week > 1 && (gd.week - 1) % 52 === 0) {
+    gd.year++;
+    endOfYear();
+  }
 
-  // ── Data real de joc ──
-  const startDate = gd.startDate ? new Date(gd.startDate) : new Date();
-  const gameDate  = new Date(startDate.getTime() + (gd.week - 1) * 7 * 86400000);
-  gd.year  = gameDate.getFullYear();
-  gd.month = gameDate.getMonth() + 1;
-  const isNewYear = gd.week > 1 && gameDate.getMonth() === 0 && gameDate.getDate() <= 7;
-  if (isNewYear) endOfYear();
-
-  // ── Ingressos des de serveis reals ──
-  const serveis  = gd.serveis || [];
-  const clients  = gd.clients || [];
-  const prestigi = gd.prestigi || 0;
-  let revMensual = serveis.reduce((s, sv) => s + sv.preu * sv.unitats_mes, 0);
-  revMensual += clients.reduce((s, cl) => s + (cl.monthly_value || 0), 0);
-  if (revMensual === 0) revMensual = gd.finances?.monthly_revenue || 0;
-
-  const weekVariation = 0.92 + Math.random() * 0.16 + prestigi * 0.001;
-  let weekRev = (revMensual / 4.33) * weekVariation;
-
-  // Vaga redueix ingressos
-  const vaga = gd.laborRelations?.vaga;
-  if (vaga?.activa) weekRev *= (1 - (vaga.adherencia || 0.5));
-
-  // Events actius
-  let revMult = 1;
-  (gd.events || []).forEach(ev => { if ((ev.weeksLeft||0) > 0) revMult += (ev.impact || 0); });
-  gd.events = (gd.events || []).map(ev => ({...ev, weeksLeft: (ev.weeksLeft||0) - 1})).filter(ev => ev.weeksLeft > 0);
-  weekRev = Math.max(0, weekRev * revMult);
-
-  // Exportacions i franquícia
-  weekRev += (gd.trade?.exports || []).reduce((s, e) => s + (e.weeklyValue || 0), 0);
-  if (gd.franchise?.mode === 'franquiciador') weekRev += (gd.franchise.royaltyWeekly || 0);
-
-  // ── Costos setmanals ──
+  // Revenue simulation
   const emps = gd.employees || [];
-  const salariesSetm = emps.filter(e => !e.en_vaga)
-    .reduce((s, e) => s + (e.salary || 0) * 1.30, 0) / 4.33;
-  const rent        = (gd.company?.monthlyRent || 0) / 4.33;
-  const machines    = gd.machines || [];
+  const salesEmps = emps.filter(e => e.dept === 'vendes').length;
+  const machines = gd.machines || [];
+  const capacity = machines.reduce((s, m) => s + m.capacity, 0);
+  const mktChannels = gd.marketing?.channels || {};
+  const mktSpend = Object.values(mktChannels).reduce((s, v) => s + v, 0);
+  const sponsors = gd.marketing?.sponsors || [];
+  const prestigi = gd.prestigi || 0;
+
+  // Base revenue calculation
+  let baseRev = capacity * 0.8 * 5; // 5€ per unit
+  baseRev += salesEmps * 3500; // Each sales person generates 3500/week
+  baseRev += mktSpend * 2.5; // Marketing ROI
+  baseRev += sponsors.length * 800;
+  baseRev += prestigi * 50;
+  baseRev = Math.max(baseRev, 0);
+
+  // Costs
+  const salaries = emps.reduce((s, e) => s + e.salary * 1.3, 0) / 4.33;
+  const rent = (gd.company?.monthlyRent || 0) / 4.33;
   const maintenance = machines.reduce((s, m) => s + (m.maintenance || 0), 0) / 4.33;
-  const loanPays    = (gd.finances.loans || []).reduce((s, l) => s + (l.monthlyPayment || 0) / 4.33, 0);
-  const mktSpend    = Object.values(gd.marketing?.channels || {}).reduce((s, v) => s + v, 0) / 4.33;
-  const provCosts   = (gd.proveidors || []).reduce((s, p) => s + (p.cost_mes || 0), 0) / 4.33;
-  const impCosts    = (gd.trade?.imports || []).reduce((s, i) => s + (i.weeklyCost || 0), 0);
-  const franchCost  = gd.franchise?.mode === 'franquiciat' ? weekRev * (gd.franchise.royaltyRate || 0.06) : 0;
+  const loanPayments = (gd.finances.loans || []).reduce((s, l) => s + l.monthlyPayment / 4.33, 0);
+  const totalCosts = salaries + rent + maintenance + loanPayments + mktSpend / 4.33;
 
-  const totalCosts = salariesSetm + rent + maintenance + loanPays + mktSpend + provCosts + impCosts + franchCost;
+  // Apply active events
+  let revenueMultiplier = 1;
+  (gd.events || []).forEach(ev => {
+    if (ev.weeksLeft > 0) revenueMultiplier += ev.impact;
+  });
+  // Reduce weeks left
+  gd.events = (gd.events || []).map(ev => ({...ev, weeksLeft: ev.weeksLeft - 1})).filter(ev => ev.weeksLeft > 0);
+
+  const weekRev = baseRev * revenueMultiplier;
   const weekResult = weekRev - totalCosts;
-
-  // ── Actualitzar finances ──
-  if (!gd.finances.actiu)  gd.finances.actiu  = {immobilitzat:0, existencies:0, tresoreria:0, clients:0};
-  if (!gd.finances.passiu) gd.finances.passiu = {capital:0, reserves:0, deutes_llarg:0, deutes_curt:0, proveidors:0};
 
   gd.finances.cash = (gd.finances.cash || 0) + weekResult;
   gd.finances.monthly_revenue = weekRev * 4.33;
-  gd.finances.monthly_costs   = totalCosts * 4.33;
-  gd.finances.annual_revenue  = (gd.finances.annual_revenue || 0) + weekRev;
-  gd.finances.annual_costs    = (gd.finances.annual_costs || 0) + totalCosts;
-  gd.finances.actiu.tresoreria  = gd.finances.cash;
-  gd.finances.actiu.clients     = Math.round(revMensual * 0.45);
-  gd.finances.passiu.proveidors = Math.round(provCosts * 4.33 * 0.30);
+  gd.finances.monthly_costs = totalCosts * 4.33;
+  gd.finances.annual_revenue = (gd.finances.annual_revenue || 0) + weekRev;
+  gd.finances.annual_costs = (gd.finances.annual_costs || 0) + totalCosts;
+  gd.finances.actiu.tresoreria = gd.finances.cash;
 
+  // Revenue history
   if (!gd.finances.revenue_history) gd.finances.revenue_history = [];
-  gd.finances.revenue_history.push({week:gd.week, rev:weekRev, costs:totalCosts, result:weekResult});
+  gd.finances.revenue_history.push({week: gd.week, rev: weekRev, costs: totalCosts, result: weekResult});
   if (gd.finances.revenue_history.length > 52) gd.finances.revenue_history.shift();
 
-  // ── Empleats ──
+  // Morale drift
   emps.forEach(e => {
-    e.morale = gd.finances.cash < 0 ? Math.max(0,(e.morale||60)-4) : Math.min(100,(e.morale||60)+0.8);
-    e.seniority = (e.seniority||0) + 1/52;
+    if (gd.finances.cash < 0) e.morale = Math.max(0, (e.morale||60) - 5);
+    else e.morale = Math.min(100, (e.morale||60) + 1);
+    e.seniority = (e.seniority || 0) + 1/52;
   });
 
-  // ── Accionistes ──
-  (gd.shareholders||[]).forEach(sh => {
-    sh.satisfaction = weekResult > 0 ? Math.min(100,sh.satisfaction+0.8) : Math.max(0,sh.satisfaction-2);
-  });
-
-  // ── Relacions laborals ──
-  if (gd.laborRelations) {
-    gd.laborRelations.satisfaccio = weekResult > 0
-      ? Math.min(100,(gd.laborRelations.satisfaccio||72)+0.3)
-      : Math.max(0,(gd.laborRelations.satisfaccio||72)-0.8);
-    if ((gd.laborRelations.satisfaccio||72) < 25 && !gd.laborRelations.vaga?.activa && Math.random() < 0.12) {
-      gd.laborRelations.vaga = {activa:true, dia_vaga:1, adherencia:0.45+Math.random()*0.35, motiu:"Condicions laborals insatisfactòries"};
-      gd.notifications.push({id:Date.now(), icon:"🔴", title:"VAGA ESPONTÀNIA!", desc:"La insatisfacció laboral ha derivat en una vaga. Atén les reivindicacions!", time:"S"+gd.week, urgent:true});
-      showEventToast("🔴","VAGA!","Els treballadors han decretat vaga espontàniament.",false);
-    }
-    if (gd.laborRelations.vaga?.activa) gd.laborRelations.vaga.dia_vaga = (gd.laborRelations.vaga.dia_vaga||1)+7;
-  }
-
-  // ── Captació clients ──
-  const mktBoost = Object.values(gd.marketing?.channels||{}).reduce((s,v)=>s+v,0) > 3000;
-  if (Math.random() < 0.12 + prestigi*0.004 + (mktBoost?0.05:0)) {
-    const sector = gd.company?.sector || "default";
-    const clientMap = {
-      alimentacio:["Cadena hostaleria","Restaurant local","Hotel boutique"],
-      tecnologia: ["Startup IA","Administració pública","Empresa industrial"],
-      salut:      ["Clínica dental","Centre mèdic","Residència gent gran"],
-      construccio:["Promotora immobiliària","Ajuntament","Cooperativa habitatge"],
-      logistica:  ["E-commerce","Fabricant industrial","Distribuïdora nacional"],
-      default:    ["Empresa B2B","Client corporatiu","Particular"]
+  // Client acquisition (simplified)
+  if (Math.random() < 0.15 + prestigi * 0.01) {
+    const clientTypes = ['🏢 Empresa industrial','🏪 Comerç local','🏥 Centre mèdic','🏫 Centre educatiu','🏨 Hotel'];
+    const newClient = {
+      id:'cl_'+Date.now(), icon:'🤝',
+      name: clientTypes[Math.floor(Math.random()*clientTypes.length)],
+      type: Math.random() > 0.5 ? 'B2B' : 'B2C',
+      monthly_value: Math.round(500 + Math.random() * 5000),
+      satisfaction: 70 + Math.floor(Math.random()*25),
     };
-    const types = clientMap[sector]||clientMap.default;
-    const cl = {
-      id:"cl_"+Date.now(), icon:"🤝",
-      name: types[Math.floor(Math.random()*types.length)] + " " + Math.floor(Math.random()*99+1),
-      type: Math.random()>0.35?"B2B":"B2C",
-      monthly_value: Math.round((revMensual*0.05)*(0.5+Math.random())),
-      satisfaction: 72+Math.floor(Math.random()*22),
-    };
-    if (!gd.clients) gd.clients=[];
-    gd.clients.push(cl);
-    showEventToast("🤝","Nou client!",cl.name+" vol contractar els teus serveis!",true);
-    gd.notifications.push({id:Date.now(),icon:"🤝",title:"Nou client!",desc:cl.name,time:"S"+gd.week,urgent:false});
+    if (!gd.clients) gd.clients = [];
+    gd.clients.push(newClient);
+    showEventToast('🤝', 'Nou client!', `${newClient.name} vol contractar els teus serveis!`, true);
+    gd.notifications.push({id:Date.now(), icon:'🤝', title:'Nou client!', desc:`${newClient.name} s'incorpora com a client`, time:`S${gd.week}`, urgent:false});
   }
 
-  // ── Pèrdua clients ──
-  if (gd.clients) {
-    gd.clients = gd.clients.filter(cl => {
-      cl.satisfaction = Math.max(0,(cl.satisfaction||70)+(weekResult>=0?0.5:-2));
-      if (cl.satisfaction < 20 && Math.random() < 0.35) {
-        showEventToast("💔","Client perdut!",cl.name+" ha cancel·lat el contracte.",false);
-        return false;
-      }
-      return true;
-    });
-  }
-
-  // ── Reclamació ──
-  if ((gd.clients||[]).length > 0 && Math.random() < 0.06) {
+  // Random claims
+  if (gd.clients?.length > 0 && Math.random() < 0.08) {
     const cl = gd.clients[Math.floor(Math.random()*gd.clients.length)];
-    const issues = ["Retard en el lliurament","Defecte en el producte","Error en la facturació","Mala atenció al client","Producte no conforme"];
-    const issue  = issues[Math.floor(Math.random()*issues.length)];
-    if (!gd.claims) gd.claims=[];
-    gd.claims.push({id:"claim_"+Date.now(),client:cl.name,issue,compensation:Math.round(300+Math.random()*2000),clientSat:cl.satisfaction||65});
-    gd.notifications.push({id:Date.now(),icon:"⚠️",title:"Reclamació!",desc:cl.name+": "+issue,time:"S"+gd.week,urgent:true});
-    showEventToast("⚠️","Reclamació!",cl.name+": "+issue,false);
+    const issue = ['Retard en el lliurament','Defecte en el producte','Error en la facturació','Mala atenció al client'][Math.floor(Math.random()*4)];
+    if (!gd.claims) gd.claims = [];
+    gd.claims.push({id:'claim_'+Date.now(), client:cl.name, issue, compensation:Math.round(200+Math.random()*1000)});
+    gd.notifications.push({id:Date.now(), icon:'⚠️', title:'Reclamació!', desc:`${cl.name}: ${issue}`, time:`S${gd.week}`, urgent:true});
+    showEventToast('⚠️', 'Reclamació!', `${cl.name}: ${issue}`, false);
   }
 
-  // ── Events aleatoris ──
-  if (Math.random() < 0.10) {
+  // Random events
+  if (Math.random() < 0.12) {
     const ev = EVENT_POOL[Math.floor(Math.random()*EVENT_POOL.length)];
-    if (Math.random() < (ev.probability||0.05)*5) {
-      gd.events.push({...ev, id:"ev_"+Date.now(), weeksLeft:ev.duration||2});
-      const impact = (ev.impact>=0?"+":"")+(ev.impact*100).toFixed(0)+"%";
-      gd.notifications.push({id:Date.now(),icon:ev.icon,title:ev.title,desc:ev.desc+" (Impacte: "+impact+")",time:"S"+gd.week,urgent:ev.impact<0});
-      showEventToast(ev.icon,ev.title,ev.desc,ev.impact>=0);
+    if (Math.random() < ev.probability * 5) {
+      const activeEv = {...ev, id:'ev_'+Date.now(), weeksLeft: ev.duration || 1};
+      gd.events.push(activeEv);
+      const impact = ev.impact >= 0 ? `+${(ev.impact*100).toFixed(0)}%` : `${(ev.impact*100).toFixed(0)}%`;
+      gd.notifications.push({id:Date.now(), icon:ev.icon, title:ev.title, desc:ev.desc + ` (Impacte: ${impact})`, time:`S${gd.week}`, urgent:ev.impact<0});
+      showEventToast(ev.icon, ev.title, ev.desc, ev.impact >= 0);
     }
   }
 
-  // ── Junta trimestral ──
-  if (gd.week%13===0 && (gd.shareholders||[]).length>0) {
-    const avgSat = Math.round(gd.shareholders.reduce((s,sh)=>s+sh.satisfaction,0)/gd.shareholders.length);
-    gd.notifications.push({id:Date.now(),icon:"🏛️",title:"Junta d'accionistes",desc:"Satisfacció: "+avgSat+"%. Revisa el panell Junta.",time:"S"+gd.week,urgent:avgSat<50});
+  // Prestigi update
+  if (weekResult > 0) gd.prestigi = Math.min(100, (gd.prestigi||0) + 0.1);
+  else if (weekResult < -5000) gd.prestigi = Math.max(0, (gd.prestigi||0) - 0.2);
+
+  // Insolvency check
+  if (gd.finances.cash < -50000) {
+    gd.notifications.push({id:Date.now(), icon:'🚨', title:'ALERTA: Concurs de creditors', desc:'La tresoreria és críticament negativa. Risc de suspensió de pagaments.', time:`S${gd.week}`, urgent:true});
+    showEventToast('🚨', 'Alerta financera!', 'Tresoreria crítica. Risc de suspensió de pagaments!', false);
   }
 
-  // ── Demandes IA caps departament (cada 4 setmanes) ──
-  if (gd.week%4===0) generateDeptRequests(gd);
-
-  // ── Prestigi ──
-  if (weekResult>500) gd.prestigi=Math.min(100,prestigi+0.12);
-  else if (weekResult>0) gd.prestigi=Math.min(100,prestigi+0.04);
-  else if (weekResult<-3000) gd.prestigi=Math.max(0,prestigi-0.2);
-
-  // ── Alerta insolvència ──
-  if (gd.finances.cash < -100000 && !gd._insolvWarned) {
-    gd._insolvWarned = true;
-    gd.notifications.push({id:Date.now(),icon:"🚨",title:"ALERTA: Concurs de creditors",desc:"Tresoreria críticament negativa!",time:"S"+gd.week,urgent:true});
-    showEventToast("🚨","Alerta financera!","Tresoreria crítica. Risc concurs!",false);
-  } else if (gd.finances.cash>=0) gd._insolvWarned=false;
-
-  // ── UI ──
-  const dateStr = gameDate.toLocaleDateString("ca-ES",{day:"numeric",month:"short",year:"numeric"});
-  document.getElementById("week-display").textContent = "S"+gd.week+" · "+dateStr;
+  document.getElementById('week-display').textContent = `Setmana ${gd.week} · ${gd.year}`;
   updateTopStats();
-  renderDashboard(); renderFinances(); renderHR();
-  if (G.currentTab==="production") renderProduction();
-  if (G.currentTab==="marketing")  renderMarketing();
-  if (G.currentTab==="map") renderMap();
-  const extTabs = ["sales","borsa","junta","trade","franquicies","proveidors","laborals","professor"];
-  if (extTabs.includes(G.currentTab)) showTab(G.currentTab);
+  renderDashboard(); renderFinances(); renderHR(); renderProduction(); renderMarketing(); renderSales();
+  if (G.currentTab === 'map') renderMap();
 
-  showToast("⏩ "+dateStr+" · "+(weekResult>=0?"+":"")+Math.round(weekResult).toLocaleString("ca")+"€");
+  showToast(`⏩ Setmana ${gd.week} · Resultat: ${weekResult >= 0 ? '+' : ''}${weekResult.toFixed(0)}€`);
   await saveGameData();
 };
-
-function generateDeptRequests(gd) {
-  const emps=gd.employees||[], machines=gd.machines||[];
-  const cash=gd.finances?.cash||0, rev=gd.finances?.monthly_revenue||0;
-  const requests=[];
-  const comercials=emps.filter(e=>e.dept==="vendes").length;
-  if (comercials<2&&Math.random()<0.5) requests.push({icon:"📊",dept:"Vendes",emissor:"Cap Comercial",msg:"Necessitem "+Math.max(1,3-comercials)+" comercial(s) més per assolir els objectius. La competència ens guanya terreny.",urgent:comercials===0});
-  const cap=machines.reduce((s,m)=>s+m.capacity,0)*0.8;
-  if (cap<rev/20&&Math.random()<0.4) requests.push({icon:"🏭",dept:"Producció",emissor:"Director Operacions",msg:"La capacitat productiva és insuficient per atendre la demanda. Proposo nova maquinària o ampliar torn.",urgent:cap<rev/40});
-  const avgMorale=emps.length>0?emps.reduce((s,e)=>s+(e.morale||60),0)/emps.length:70;
-  if (avgMorale<55&&Math.random()<0.6) requests.push({icon:"👥",dept:"RRHH",emissor:"Director RRHH",msg:"La moral de l'equip és crítica ("+Math.round(avgMorale)+"%). Proposo bonificacions o millora de condicions laborals.",urgent:avgMorale<40});
-  if (cash<rev&&cash>0&&Math.random()<0.35) requests.push({icon:"💰",dept:"Finances",emissor:"Director Financer (CFO)",msg:"La tresoreria és ajustada. Recomanaria una línia de crèdit o optimitzar cobrament de clients.",urgent:false});
-  const mkt=Object.values(gd.marketing?.channels||{}).reduce((s,v)=>s+v,0);
-  if (mkt<rev*0.03&&Math.random()<0.4) requests.push({icon:"📣",dept:"Màrqueting",emissor:"Director Marketing",msg:"El pressupost de màrqueting és baix (<3% vendes). Proposo incrementar-lo per captar nous clients.",urgent:false});
-  if (!gd.notifications) gd.notifications=[];
-  requests.forEach(r=>gd.notifications.push({id:Date.now()+Math.random(),icon:r.icon,title:"["+r.dept+"] "+r.emissor,desc:r.msg,time:"S"+gd.week,urgent:r.urgent,read:false}));
-}
-
 
 function endOfYear() {
   const gd = G.gameData;
@@ -2940,126 +2409,25 @@ function endOfYear() {
 }
 
 // ==================== LOAN ====================
-window.toggleFinDetail = function(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const isOpen = el.style.display !== 'none';
-  el.style.display = isOpen ? 'none' : '';
-  // Canviar el triangle
-  const row = el.previousElementSibling;
-  if (row) {
-    const lbl = row.querySelector('.bal-row-label');
-    if (lbl) lbl.innerHTML = lbl.innerHTML.replace(isOpen ? '▼' : '▶', isOpen ? '▶' : '▼');
-  }
-};
-
 window.requestLoan = async function() {
   if (!G.gameData.company) { showToast('⚠️ Crea una empresa primer'); return; }
-  const amount = parseFloat(document.getElementById('loan-amount')?.value || 0);
-  const years  = parseInt(document.getElementById('loan-years')?.value || 7);
+  const amount = parseFloat(document.getElementById('loan-amount').value || 0);
+  const years = parseInt(document.getElementById('loan-years').value || 7);
   if (amount < 5000) { showToast('⚠️ Import mínim: 5.000€'); return; }
-
-  const gd = G.gameData;
-  const f  = gd.finances;
-
-  // ── Anàlisi bancari real ──
-  const cash        = f.cash || 0;
-  const totalActiu  = (f.actiu?.immobilitzat||0)+(f.actiu?.existencies||0)+cash+(f.actiu?.clients||0);
-  const totalDeute  = (f.passiu?.deutes_llarg||0)+(f.passiu?.deutes_curt||0);
-  const capital     = (f.passiu?.capital||0)+(f.passiu?.reserves||0);
-  const rev         = f.monthly_revenue || 0;
-  const costs       = f.monthly_costs  || 0;
-  const ebitda      = (rev - costs) * 12;  // anual
-  const loanPaysMes = (f.loans||[]).reduce((s,l)=>s+(l.monthlyPayment||0),0);
-
-  // Ràtios que analitza el banc
-  const ratioEndeut  = capital > 0 ? totalDeute / capital : 99;        // <2 OK
-  const ratioSolv    = totalDeute > 0 ? totalActiu / totalDeute : 99;  // >1.5 OK  
-  const debtService  = ebitda > 0 ? (loanPaysMes*12 + amount*0.06) / ebitda : 99; // <0.35 OK
-  const garantia     = totalActiu - totalDeute;                         // >import demanat OK
-
-  const resultEl = document.getElementById('loan-result');
-
-  // Mostrar anàlisi mentre espera (simulem processament)
-  resultEl.innerHTML = `<div style="color:var(--text2);font-size:12px;padding:12px;background:rgba(255,255,255,.03);border-radius:8px;margin-top:8px">
-    🏦 <strong style="color:var(--text)">Anàlisi bancari en curs...</strong>
-    <div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px">
-      <div>Ràtio endeutament: <strong style="color:${ratioEndeut<2?'var(--green)':'var(--red)'}">${ratioEndeut.toFixed(2)}</strong> (ok <2)</div>
-      <div>Solvència: <strong style="color:${ratioSolv>1.5?'var(--green)':'var(--red)'}">${ratioSolv.toFixed(2)}</strong> (ok >1.5)</div>
-      <div>Cobertura deute: <strong style="color:${debtService<0.35?'var(--green)':'var(--red)'}">${(debtService*100).toFixed(0)}%</strong> (ok <35%)</div>
-      <div>Garantia neta: <strong style="color:${garantia>amount?'var(--green)':'var(--gold)'}">${garantia.toLocaleString('ca')}€</strong></div>
-    </div>
-  </div>`;
-
-  // Simular temps de processament
-  await new Promise(r => setTimeout(r, 1800));
-
-  // Decisió bancària basada en ràtios
-  let approved = false, counterOffer = 0, reason = '';
-  const interest = Math.max(3.5, Math.min(8.5, 3.5 + ratioEndeut * 0.8 + (debtService > 0.3 ? 1.5 : 0)));
-
-  if (ratioEndeut > 4)      { reason = "Endeutament excessiu. Ràtio deute/capital > 4."; }
-  else if (ratioSolv < 1)   { reason = "Solvència insuficient. L"actiu no cobreix el passiu."; }
-  else if (debtService > 0.5){ reason = "La cobertura del servei del deute és massa alta (>50% EBITDA)."; }
-  else if (cash < 0)         { reason = "Tresoreria negativa. Necessitem situació de liquiditat positiva."; }
-  else {
-    approved = true;
-    // Contraoferta si l'import és molt alt
-    if (amount > garantia * 0.8 || debtService > 0.3) {
-      counterOffer = Math.round(Math.min(amount * 0.6, garantia * 0.6));
-    }
-  }
-
-  const monthlyPayment = (offerAmt) => Math.round(offerAmt * (interest/100/12) / (1 - Math.pow(1+interest/100/12, -(years*12))));
-
+  const interest = 5.5;
+  const monthlyPayment = Math.round(amount * (interest/100/12) / (1 - Math.pow(1+interest/100/12, -years*12)));
+  const approved = Math.random() > 0.25; // 75% approval
   if (!approved) {
-    resultEl.innerHTML = `
-      <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:14px;margin-top:8px">
-        <div style="font-weight:800;color:var(--red);margin-bottom:8px">❌ Sol·licitud denegada</div>
-        <div style="font-size:12px;color:var(--text2);margin-bottom:12px"><strong>Motiu:</strong> ${reason}</div>
-        <div style="font-size:11px;color:var(--text3)">Consell: Redueix el deute existent, augmenta el capital o aporta avals addicionals.</div>
-      </div>`;
+    document.getElementById('loan-result').innerHTML = `<span style="color:var(--red)">❌ Sol·licitud denegada. Millora el teu historial de crèdit o aporta avals.</span>`;
     return;
   }
-
-  if (counterOffer > 0 && counterOffer < amount) {
-    resultEl.innerHTML = `
-      <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:14px;margin-top:8px">
-        <div style="font-weight:800;color:var(--gold);margin-bottom:8px">🔄 Contraoferta del banc</div>
-        <div style="font-size:12px;color:var(--text2);margin-bottom:12px">
-          Has demanat <strong>${amount.toLocaleString('ca')}€</strong> però el banc ofereix <strong style="color:var(--gold)">${counterOffer.toLocaleString('ca')}€</strong>
-          al <strong>${interest.toFixed(2)}%</strong> TIN · Quota: <strong>${monthlyPayment(counterOffer).toLocaleString('ca')}€/mes</strong>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn-primary" style="flex:1;font-size:12px" onclick="acceptLoan(${counterOffer},${interest},${years})">✅ Acceptar ${counterOffer.toLocaleString('ca')}€</button>
-          <button class="btn-danger"  style="flex:1;font-size:12px" onclick="document.getElementById('loan-result').innerHTML=''">❌ Rebutjar</button>
-        </div>
-      </div>`;
-    return;
-  }
-
-  // Aprovat complet
-  await acceptLoan(amount, interest, years);
-};
-
-window.acceptLoan = async function(amount, interest, years) {
-  const monthlyPayment = Math.round(amount * (interest/100/12) / (1 - Math.pow(1+interest/100/12, -(years*12))));
   G.gameData.finances.cash += amount;
-  G.gameData.finances.passiu.deutes_llarg = (G.gameData.finances.passiu.deutes_llarg||0) + amount;
+  G.gameData.finances.passiu.deutes_llarg = (G.gameData.finances.passiu.deutes_llarg || 0) + amount;
   G.gameData.finances.loans = G.gameData.finances.loans || [];
-  G.gameData.finances.loans.push({
-    id: 'loan_'+Date.now(), entitat: 'Banc Sabadell',
-    amount, remaining: amount, interest, years, monthlyPayment,
-    startWeek: G.gameData.week
-  });
+  G.gameData.finances.loans.push({id:'loan_'+Date.now(), amount, remaining:amount, interest, years, monthlyPayment, startWeek:G.gameData.week});
   await saveGameData();
   renderFinances(); renderDashboard(); renderActiveCompany();
-  const el = document.getElementById('loan-result');
-  if (el) el.innerHTML = `<div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);border-radius:10px;padding:12px;margin-top:8px">
-    <strong style="color:var(--green)">✅ Préstec aprovat!</strong>
-    <div style="font-size:12px;color:var(--text2);margin-top:6px">${amount.toLocaleString('ca')}€ al ${interest.toFixed(2)}% TIN · Quota: ${monthlyPayment.toLocaleString('ca')}€/mes · ${years} anys</div>
-  </div>`;
-  showToast('✅ Préstec aprovat: ' + amount.toLocaleString('ca') + '€');
+  document.getElementById('loan-result').innerHTML = `<span style="color:var(--green)">✅ Préstec de ${amount.toLocaleString('ca')}€ aprovat! Quota mensual: ${monthlyPayment.toLocaleString('ca')}€</span>`;
 };
 
 // ==================== NAV ====================
@@ -3069,21 +2437,13 @@ window.showTab = function(tab) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + tab)?.classList.add('active');
   document.getElementById('nav-' + tab)?.classList.add('active');
-  if (tab === 'map')         { setTimeout(() => { renderMap(); renderRanking(); }, 100); }
-  if (tab === 'dashboard')   renderDashboard();
-  if (tab === 'finances')    renderFinances();
-  if (tab === 'hr')          renderHR();
-  if (tab === 'production')  renderProduction();
-  if (tab === 'marketing')   renderMarketing();
-  if (tab === 'sales')       renderSales();
-  if (tab === 'borsa')       { import('./js/ui-borsa.js').then(m => m.renderBorsa()); }
-  if (tab === 'junta')       { import('./js/ui-junta.js').then(m => m.renderJunta()); }
-  if (tab === 'trade')       { import('./js/ui-trade.js').then(m => m.renderTrade()); }
-  if (tab === 'franquicies') { import('./js/ui-franquicies.js').then(m => m.renderFranquicies()); }
-  if (tab === 'professor')   { import('./js/ui-professor.js').then(m => m.renderProfessor()); }
-  if (tab === 'proveidors')  { import('./js/ui-proveidors.js').then(m => m.renderProveidors()); }
-  if (tab === 'laborals')    { import('./js/ui-laborals.js').then(m => m.renderLaborals()); }
-  if (tab === 'sales')       { import('./js/ui-sales.js').then(m => m.renderSales()); }
+  if (tab === 'map') { setTimeout(() => { renderMap(); renderRanking(); }, 100); }
+  if (tab === 'dashboard') renderDashboard();
+  if (tab === 'finances') renderFinances();
+  if (tab === 'hr') renderHR();
+  if (tab === 'production') renderProduction();
+  if (tab === 'marketing') renderMarketing();
+  if (tab === 'sales') renderSales();
 };
 
 // ==================== PROFILE ====================
@@ -3162,23 +2522,6 @@ document.addEventListener('keydown', e => {
 });
 
 console.log('🏢 EmpresaBat carregat correctament');
-
-// ===== EXPOSAR API GLOBAL PER ALS MÒDULS EXTERNS =====
-window.saveGameData   = saveGameData;
-window.showToast      = showToast;
-window.showEventToast = showEventToast;
-window.fmt    = (n) => (n||0).toLocaleString('ca');
-window.fmtPct = (n) => (n*100).toFixed(1)+'%';
-
-// Constants per als mòduls nous
-window.STOCKS_DATA      = STOCKS;
-window.CRYPTOS_DATA     = CRYPTOS;
-window.COUNTRIES_DATA   = COUNTRIES;
-window.FRANCHISES_DATA  = FRANCHISES;
-window.SPONSORS_DATA    = SPONSORS;
-window.EVENT_POOL_DATA  = EVENT_POOL;
-window.SECTORS_DATA     = SECTORS;
-window.generateShareholders = generateShareholders;
 </script>
 </body>
 </html>
