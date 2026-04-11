@@ -1902,7 +1902,7 @@ function showHiredMode() {
 
 async function renderJobOffers() {
   const prest = G.gameData.prestigi || 0;
-  const { EMPRESA_PROFILES } = await import('./js/data-empreses.js');
+  const { EMPRESA_PROFILES } = await import('./data-empreses.js');
 
   let available = EMPRESA_PROFILES.filter(e => {
     if (prest < 10) return e.size === 'small';
@@ -1959,7 +1959,7 @@ window.acceptOffer = async function(companyName, role, salary) {
   }
   const now = new Date();
   // Carregar dades creïbles de l'empresa des de data-empreses.js
-  const { EMPRESA_PROFILES, generateHiredCompanyData } = await import('./js/data-empreses.js');
+  const { EMPRESA_PROFILES, generateHiredCompanyData } = await import('./data-empreses.js');
   const profile = EMPRESA_PROFILES.find(p => p.name === companyName);
 
   let newData;
