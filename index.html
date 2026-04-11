@@ -1945,12 +1945,18 @@ async function renderJobOffers() {
           Capital: ${(e.capital_social/1000).toFixed(0)}k€ · Reserves: ${(e.reserves/1000).toFixed(0)}k€ ·
           Deute llarg termini: ${(e.deutes_llarg/1000).toFixed(0)}k€
         </div>
-        <button class="offer-btn" onclick="acceptOffer('${e.name.replace(/'/g,\"\\'\")}', '${role}', ${salary})">Acceptar oferta →</button>
+        <button class="offer-btn" onclick="acceptOffer(this.dataset.name, this.dataset.role, ${salary})" data-name="${e.name}" data-role="${role}">Acceptar oferta →</button>
       </div>`;
   }).join('');
 }
 
 window.acceptOffer = async function(companyName, role, salary) {
+  // Suport per a crida directa o via dataset
+  if (companyName && typeof companyName === 'object' && companyName.dataset) {
+    role   = companyName.dataset.role;
+    salary = parseInt(companyName.dataset.salary || salary);
+    companyName = companyName.dataset.name;
+  }
   const now = new Date();
   // Carregar dades creïbles de l'empresa des de data-empreses.js
   const { EMPRESA_PROFILES, generateHiredCompanyData } = await import('./js/data-empreses.js');
@@ -2130,8 +2136,9 @@ function renderDashboard() {
     {icon:'📣',name:'Màrqueting',status:'ok',statusTxt:'Actiu'},
     {icon:'🏗️',name:'Instal·lacions',status:'ok',statusTxt: c ? c.municipality : '—'},
   ];
+  const tabMap = {Finances:'finances',RRHH:'hr','Producció':'production',Vendes:'sales','Màrqueting':'marketing'};
   document.getElementById('dept-grid').innerHTML = depts.map(d => `
-    <div class="dept-card" onclick="showTab('${d.name==='Finances'?'finances':d.name==='RRHH'?'hr':d.name==='Producció'?'production':d.name==='Vendes'?'sales':d.name==='Màrqueting'?'marketing':'dashboard'}')">
+    <div class="dept-card" data-tab="${tabMap[d.name]||'dashboard'}" onclick="showTab(this.dataset.tab)">
       <div class="dept-icon">${d.icon}</div>
       <div class="dept-name">${d.name}</div>
       <div class="dept-status ${d.status}">${d.statusTxt}</div>
@@ -2266,28 +2273,28 @@ window.raiseEmployee = async function(id) {
 
 window.openHireModal = function() {
   const roles = [
-    {name:'Comercial', dept:'vendes', salary:1800, icon:'📊'},
-    {name:'Operari/a', dept:'produccio', salary:1400, icon:'⚙️'},
-    {name:'Administratiu/va', dept:'admin', salary:1600, icon:'📋'},
-    {name:'Tècnic/a especialista', dept:'tecnic', salary:2400, icon:'🔧'},
-    {name:'Cap de vendes', dept:'vendes', salary:3200, icon:'🏆'},
-    {name:'Director/a financer/a', dept:'finances', salary:4500, icon:'💰'},
+    {name:'Comercial',            dept:'vendes',   salary:1800, icon:'📊'},
+    {name:'Operari/a',            dept:'produccio', salary:1400, icon:'⚙️'},
+    {name:'Administratiu/va',     dept:'admin',     salary:1600, icon:'📋'},
+    {name:'Tècnic/a especialista',dept:'tecnic',    salary:2400, icon:'🔧'},
+    {name:'Cap de vendes',        dept:'vendes',    salary:3200, icon:'🏆'},
+    {name:'Director/a financer/a',dept:'finances',  salary:4500, icon:'💰'},
   ];
   const names = ['Pau Ferrer','Laia Costa','Xavi Rovira','Marta Duran','Joan Albà','Carla Prat','Gerard Roca','Ester Solà'];
-  const candidates = roles.map((r, i) => ({
+  window._hireCandidates = roles.map((r, i) => ({
     ...r, name: names[i % names.length] + ' ' + String.fromCharCode(65 + i),
     id: 'cand_' + Date.now() + '_' + i, morale: 80 + Math.floor(Math.random()*20)
   }));
-  document.getElementById('hire-candidates').innerHTML = candidates.map(c => `
+  document.getElementById('hire-candidates').innerHTML = window._hireCandidates.map((c, i) => `
     <div class="offer-card" style="padding:14px">
       <div style="display:flex;align-items:center;gap:12px">
         <span style="font-size:30px">${c.icon}</span>
         <div style="flex:1">
           <div style="font-weight:700;font-size:14px;color:var(--text)">${c.name}</div>
-          <div style="font-size:12px;color:var(--text2)">${c.role} · Dept: ${c.dept}</div>
+          <div style="font-size:12px;color:var(--text2)">${c.name} · Dept: ${c.dept}</div>
           <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--gold);margin-top:4px">${c.salary.toLocaleString('ca')}€/mes bruts</div>
         </div>
-        <button class="offer-btn" onclick="hireCandidate(${JSON.stringify(c).replace(/"/g,'&quot;')})" style="width:auto;padding:8px 14px">Contractar</button>
+        <button class="offer-btn" onclick="hireCandidate(${i})" style="width:auto;padding:8px 14px">Contractar</button>
       </div>
     </div>`).join('');
   document.getElementById('hire-modal').style.display = 'flex';
@@ -2295,10 +2302,12 @@ window.openHireModal = function() {
 
 window.closeHireModal = function() { document.getElementById('hire-modal').style.display = 'none'; };
 
-window.hireCandidate = async function(c) {
-  const newEmp = {id:'emp_'+Date.now(), name:c.name, dept:c.dept, role:c.role, salary:c.salary, morale:c.morale, seniority:0, avatar:'👤'};
+window.hireCandidate = async function(idx) {
+  const c = window._hireCandidates?.[idx];
+  if (!c) return;
+  const newEmp = {id:'emp_'+Date.now(), name:c.name, dept:c.dept, role:c.name, salary:c.salary, morale:c.morale, seniority:0, avatar:c.icon||'👤', nivel:'base'};
   G.gameData.employees.push(newEmp);
-  G.gameData.notifications.push({id:Date.now(), icon:'👥', title:'Nou empleat!', desc:`${c.name} s'incorpora com a ${c.role}`, time:'Ara', urgent:false});
+  G.gameData.notifications.push({id:Date.now(), icon:'👥', title:'Nou empleat!', desc:`${c.name} s'incorpora com a ${c.name}`, time:'Ara', urgent:false});
   await saveGameData();
   closeHireModal(); renderHR(); renderDashboard();
   showToast(`✅ ${c.name} contractat/da!`);
@@ -2430,8 +2439,9 @@ function renderMarketing() {
           </div>
           ${isActive ? '<span style="color:var(--green);font-weight:700;font-size:13px">✅ Actiu</span>' :
             `<button class="offer-btn" style="width:auto;padding:8px 14px;${!canAfford||!meetsReq?'opacity:.5;cursor:not-allowed':''}" 
-              ${canAfford && meetsReq ? `onclick="activateSponsor('${sp.id}', ${sp.cost})"` : ''}>
-              ${!meetsReq ? `⭐${sp.prestigi_req} necessari` : !canAfford ? 'Sense fons' : 'Activar'}
+              data-spid="${sp.id}" data-spcost="${sp.cost}"
+              ${canAfford && meetsReq ? 'onclick="activateSponsor(this.dataset.spid, parseInt(this.dataset.spcost))"' : 'disabled'}>
+              ${!meetsReq ? '⭐' + sp.prestigi_req + ' necessari' : !canAfford ? 'Sense fons' : 'Activar'}
             </button>`}
         </div>
       </div>`;
