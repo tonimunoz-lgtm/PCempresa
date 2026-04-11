@@ -2122,7 +2122,7 @@ function renderDashboard() {
   }
 
   // Sol·licituds de departaments (IA caps)
-  import('./js/engine2.js').then(m => {
+  import('./engine.js').then(m => {
     m.generateDeptAIRequests(gd);
     m.renderDeptRequests();
   }).catch(()=>{});
