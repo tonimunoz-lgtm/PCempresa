@@ -2141,7 +2141,8 @@ function renderDashboard() {
       <div class="notif-time">${n.time||''}</div>
     </div>`).join('') || '<div style="color:var(--text3);font-size:12px;text-align:center;padding:20px">Sense notificacions</div>';
 
-  // Il·lustració instal·lació
+    // Il·lustració instal·lació - DESACTIVAT temporalment (fitxer no existeix)
+  /*
   if (c) {
     let facilEl = document.getElementById('facility-illustration-dash');
     if (!facilEl) {
@@ -2152,7 +2153,7 @@ function renderDashboard() {
     }
     import('./js/ui-visuals.js').then(m => m.renderFacilityIllustration('facility-illustration-dash'));
   }
-
+  */
   // Sol·licituds de departaments (IA caps)
   //import('./js/engine2.js').then(m => {
   // m.generateDeptAIRequests(gd);
