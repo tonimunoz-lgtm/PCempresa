@@ -714,7 +714,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
             </div>
           </div>
 
-                    <div class="dash-top">
+          <div class="dash-top">
             <div class="kpi-card">
               <div class="kpi-icon">💰</div>
               <div class="kpi-label">Tresoreria</div>
@@ -738,12 +738,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
               <div class="kpi-label">Prestigi empresa</div>
               <div class="kpi-val" id="kpi-prest">—</div>
               <div class="kpi-change" id="kpi-prest-ch">—</div>
-            </div>
-            <div class="kpi-card" style="grid-column:1/-1;margin-top:10px">
-              <div class="kpi-icon">📊</div>
-              <div class="kpi-label">Resultat mensual</div>
-              <div class="kpi-val" id="kpi-result">—</div>
-              <div class="kpi-change" id="kpi-result-ch">—</div>
             </div>
           </div>
 
@@ -934,34 +928,8 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
         </div>
       </div>
 
-           <!-- SALES -->
-      <div class="tab-panel" id="tab-sales">
-        <div class="fin-wrap" style="padding:16px;max-width:1000px;margin:0 auto">
-          <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);margin-bottom:16px">📦 Vendes</h2>
-          
-          <div class="section-card" style="margin-bottom:14px">
-            <div class="section-title">📊 Resum de vendes</div>
-            <div id="sales-summary" style="font-size:13px;color:var(--text2);line-height:2;padding:10px">
-              Carregant dades...
-            </div>
-          </div>
-          
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-            <div class="section-card">
-              <div class="section-title">⚠️ Reclamacions</div>
-              <div id="claims-list" style="padding:10px">
-                <div style="color:var(--text2);font-size:13px">Sense reclamacions</div>
-              </div>
-            </div>
-            <div class="section-card">
-              <div class="section-title">🤝 Clients actius</div>
-              <div id="clients-list" style="padding:10px">
-                <div style="color:var(--text2);font-size:13px">Sense clients</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- SALES -->
+      <div class="tab-panel" id="tab-sales"></div>
 
       <!-- MAP -->
       <div class="tab-panel" id="tab-map">
@@ -1934,7 +1902,7 @@ function showHiredMode() {
 
 async function renderJobOffers() {
   const prest = G.gameData.prestigi || 0;
-  const { EMPRESA_PROFILES } = await import('./data-empreses.js');
+  const { EMPRESA_PROFILES } = await import('./js/data-empreses.js');
 
   let available = EMPRESA_PROFILES.filter(e => {
     if (prest < 10) return e.size === 'small';
@@ -1991,7 +1959,7 @@ window.acceptOffer = async function(companyName, role, salary) {
   }
   const now = new Date();
   // Carregar dades creïbles de l'empresa des de data-empreses.js
-  const { EMPRESA_PROFILES, generateHiredCompanyData } = await import('./data-empreses.js');
+  const { EMPRESA_PROFILES, generateHiredCompanyData } = await import('./js/data-empreses.js');
   const profile = EMPRESA_PROFILES.find(p => p.name === companyName);
 
   let newData;
@@ -2154,7 +2122,7 @@ function renderDashboard() {
   }
 
   // Sol·licituds de departaments (IA caps)
-  import('./engine.js').then(m => {
+  import('./js/engine2.js').then(m => {
     m.generateDeptAIRequests(gd);
     m.renderDeptRequests();
   }).catch(()=>{});
@@ -3031,7 +2999,7 @@ window.requestLoan = async function() {
   const interest = Math.max(3.5, Math.min(8.5, 3.5 + ratioEndeut * 0.8 + (debtService > 0.3 ? 1.5 : 0)));
 
   if (ratioEndeut > 4)      { reason = "Endeutament excessiu. Ràtio deute/capital > 4."; }
-  else if (ratioSolv < 1)   { reason = "Solvència insuficient. L\'actiu no cobreix el passiu."; }
+  else if (ratioSolv < 1)   { reason = "Solvència insuficient. L"actiu no cobreix el passiu."; }
   else if (debtService > 0.5){ reason = "La cobertura del servei del deute és massa alta (>50% EBITDA)."; }
   else if (cash < 0)         { reason = "Tresoreria negativa. Necessitem situació de liquiditat positiva."; }
   else {
@@ -3108,14 +3076,14 @@ window.showTab = function(tab) {
   if (tab === 'production')  renderProduction();
   if (tab === 'marketing')   renderMarketing();
   if (tab === 'sales')       renderSales();
-  if (tab === 'borsa')       { import('./ui-borsa.js').then(m => m.renderBorsa()); }
-  if (tab === 'junta')       { import('./ui-junta.js').then(m => m.renderJunta()); }
-  if (tab === 'trade')       { import('./ui-trade.js').then(m => m.renderTrade()); }
-  if (tab === 'franquicies') { import('./ui-franquicies.js').then(m => m.renderFranquicies()); }
-  if (tab === 'professor')   { import('./ui-professor.js').then(m => m.renderProfessor()); }
-  if (tab === 'proveidors')  { import('./ui-proveidors.js').then(m => m.renderProveidors()); }
-  if (tab === 'laborals')    { import('./ui-laborals.js').then(m => m.renderLaborals()); }
-  if (tab === 'sales')       { import('./ui-sales.js').then(m => m.renderSales()); }
+  if (tab === 'borsa')       { import('./js/ui-borsa.js').then(m => m.renderBorsa()); }
+  if (tab === 'junta')       { import('./js/ui-junta.js').then(m => m.renderJunta()); }
+  if (tab === 'trade')       { import('./js/ui-trade.js').then(m => m.renderTrade()); }
+  if (tab === 'franquicies') { import('./js/ui-franquicies.js').then(m => m.renderFranquicies()); }
+  if (tab === 'professor')   { import('./js/ui-professor.js').then(m => m.renderProfessor()); }
+  if (tab === 'proveidors')  { import('./js/ui-proveidors.js').then(m => m.renderProveidors()); }
+  if (tab === 'laborals')    { import('./js/ui-laborals.js').then(m => m.renderLaborals()); }
+  if (tab === 'sales')       { import('./js/ui-sales.js').then(m => m.renderSales()); }
 };
 
 // ==================== PROFILE ====================
