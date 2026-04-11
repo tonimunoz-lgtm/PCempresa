@@ -2999,7 +2999,7 @@ window.requestLoan = async function() {
   const interest = Math.max(3.5, Math.min(8.5, 3.5 + ratioEndeut * 0.8 + (debtService > 0.3 ? 1.5 : 0)));
 
   if (ratioEndeut > 4)      { reason = 'Endeutament excessiu. Ràtio deute/capital > 4.'; }
-  else if (ratioSolv < 1)   { reason = 'Solvència insuficient. L'actiu no cobreix el passiu.'; }
+  else if (ratioSolv < 1)   { reason = 'Solvència insuficient. L\'actiu no cobreix el passiu.'; }
   else if (debtService > 0.5){ reason = 'La cobertura del servei del deute és massa alta (>50% EBITDA).'; }
   else if (cash < 0)         { reason = 'Tresoreria negativa. Necessitem situació de liquiditat positiva.'; }
   else {
