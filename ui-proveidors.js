@@ -63,7 +63,6 @@ const PROVEIDORS_MERCAT = {
 export function renderProveidors() {
   const gd = getG()?.gameData;
   if (!gd) return;
-  const gd = getG().gameData;
   if (!gd?.company) {
     document.getElementById('tab-proveidors').innerHTML = `
       <div style="padding:40px;text-align:center;color:var(--text2)">

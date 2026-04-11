@@ -10,7 +10,6 @@ const fmt = (...a) => window.fmt(...a);
 export function renderSales() {
   const gd = getG()?.gameData;
   if (!gd) return;
-  const gd = getG().gameData;
   if (!gd?.company) {
     document.getElementById('tab-sales').innerHTML = `
       <div style="padding:40px;text-align:center;color:var(--text2)">

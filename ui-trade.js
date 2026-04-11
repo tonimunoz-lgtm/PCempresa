@@ -14,7 +14,6 @@ const getCOUNTRIES = () => window.COUNTRIES_DATA || [];
 export function renderTrade() {
   const gd = getG()?.gameData;
   if (!gd) return;
-  const gd = getG().gameData;
   if (!gd.company) {
     document.getElementById('tab-trade').innerHTML = `
       <div style="padding:40px;text-align:center;color:var(--text2)">

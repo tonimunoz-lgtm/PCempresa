@@ -90,7 +90,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .main-area{flex:1;overflow:hidden;display:flex;position:relative}
 
 /* Sidebar */
-.sidebar{width:62px;background:rgba(6,8,15,.9);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px;flex-shrink:0;z-index:9}
+.sidebar{width:64px;background:rgba(6,8,15,.9);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:2px;flex-shrink:0;z-index:9;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
 .nav-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 8px;border:none;background:transparent;color:var(--text2);cursor:pointer;border-radius:10px;transition:.2s;width:50px;position:relative;font-family:var(--font)}
 .nav-btn:hover{background:rgba(255,255,255,.06);color:var(--text)}
 .nav-btn.active{background:rgba(79,127,255,.15);color:var(--accent)}
@@ -796,6 +796,11 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
               <div class="choice-desc">Rep ofertes de feina d'empreses reals del Vallès. Gestiona una empresa existent. El teu prestigi determinarà quines ofertes rebràs.</div>
             </div>
           </div>
+          <div style="text-align:center;margin-top:-16px;margin-bottom:16px">
+            <button onclick="activateProfMode()" style="background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:10px 20px;color:var(--gold);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:.2s" onmouseover="this.style.background='rgba(245,158,11,.2)'" onmouseout="this.style.background='rgba(245,158,11,.12)'">
+              👩‍🏫 Accedir com a Professor/a
+            </button>
+          </div>
         </div>
 
         <!-- COMPANY CREATION WIZARD -->
@@ -1303,7 +1308,9 @@ window.doRegister = async function() {
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     const gd = defaultGameData(cred.user.uid, name + ' ' + surname);
     gd.isProf = !!isProf;
+    gd.mode   = null; // Assegurar que comença a l'elecció
     await setDoc(doc(db, 'games', cred.user.uid), gd);
+    console.log('Registre OK: isProf=', gd.isProf);
   } catch(e) {
     showAuthErr('Error: ' + e.message);
     document.querySelector('#register-form .auth-btn').disabled = false;
@@ -1352,7 +1359,18 @@ async function loadGameData() {
     await setDoc(ref, G.gameData);
   } else {
     G.gameData = snap.data();
+    if (!G.gameData.hasOwnProperty('isProf'))     G.gameData.isProf     = false;
+    if (!G.gameData.portfolio)      G.gameData.portfolio      = {stocks:{},crypto:{}};
+    if (!G.gameData.trade)          G.gameData.trade          = {imports:[],exports:[],incoterms:{}};
+    if (!G.gameData.shareholders)   G.gameData.shareholders   = [];
+    if (!G.gameData.boardDecisions) G.gameData.boardDecisions = [];
+    if (!G.gameData.laborRelations) G.gameData.laborRelations = {satisfaccio:72,convenis:[],negociacio:null,vaga:null};
+    if (!G.gameData.serveis)        G.gameData.serveis        = [];
+    if (!G.gameData.proveidors)     G.gameData.proveidors     = [];
+    if (!G.gameData.startDate)      G.gameData.startDate      = new Date().toISOString();
   }
+  window.G = G;
+  console.log('loadGameData: mode=', G.gameData.mode, 'isProf=', G.gameData.isProf);
   initUI();
 }
 
@@ -1366,40 +1384,76 @@ async function saveGameData() {
 }
 
 function startRealtimeListeners() {
-  // Listen other players for map + professor mode
-  const q = query(collection(db, 'games'), limit(30));
-  onSnapshot(q, (snap) => {
-    G.otherPlayers = [];
-    G.allStudents  = [];
-    snap.forEach(d => {
-      const dat = d.data();
-      G.allStudents.push(dat);
-      if (d.id !== G.uid && dat.company) {
-        G.otherPlayers.push(dat);
+  // Listener del propi document (sempre permès)
+  onSnapshot(doc(db, 'games', G.uid), (snap) => {
+    if (snap.exists()) {
+      // Actualitzar dades en temps real si han canviat externament
+      // (p.ex. professor injectant capital)
+      const remoteData = snap.data();
+      if (remoteData.lastSaved > (G.gameData.lastSaved || 0) + 2000) {
+        G.gameData = remoteData;
+        window.G = G;
+        if (G.initialized) {
+          updateTopStats();
+          renderDashboard();
+        }
       }
-    });
-    if (G.currentTab === 'map') renderMap();
-    renderRanking();
+    }
   });
+
+  // Intentar llegir altres jugadors per al mapa (pot fallar per permisos)
+  // Si falla, simplement no mostrem altres jugadors
+  try {
+    const q = query(collection(db, 'games'), limit(30));
+    onSnapshot(q, (snap) => {
+      G.otherPlayers = [];
+      G.allStudents  = [];
+      snap.forEach(d => {
+        const dat = d.data();
+        G.allStudents.push(dat);
+        if (d.id !== G.uid && dat.company) {
+          G.otherPlayers.push(dat);
+        }
+      });
+      if (G.currentTab === 'map') renderMap();
+      renderRanking();
+    }, (err) => {
+      // Permission denied és normal si les regles no permeten llegir tots
+      console.log('Mapa multi: accés limitat (normal sense regles obertes)');
+      G.otherPlayers = [];
+      G.allStudents  = [G.gameData];
+    });
+  } catch(e) {
+    console.log('Listener multi no disponible:', e.message);
+  }
 }
 
 // ==================== UI INIT ====================
 function initUI() {
   const gd = G.gameData;
+  console.log('initUI: mode=', gd.mode, 'isProf=', gd.isProf, 'company=', gd.company?.name);
+
   document.getElementById('profile-name').textContent = gd.displayName || 'Jugador';
   updateTopStats();
 
-  // Mode professor: mostrar botó de classe
+  // Mode professor
   G.isProf = !!gd.isProf;
-  if (G.isProf) {
-    document.getElementById('nav-professor').style.display = '';
-    document.getElementById('prof-sep').style.display = '';
-  }
+  const navProf = document.getElementById('nav-professor');
+  const profSep = document.getElementById('prof-sep');
+  if (navProf) navProf.style.display = G.isProf ? '' : 'none';
+  if (profSep) profSep.style.display = G.isProf ? '' : 'none';
 
   if (!gd.mode) {
-    // Nou jugador sense empresa → anar directament a Setup
+    // Sense empresa → pantalla d'elecció
     showSetupInit();
-    showTab('setup');
+    // Activar el tab setup manualment sense invocar showTab (que podria sobreescriure)
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    const setupPanel = document.getElementById('tab-setup');
+    if (setupPanel) setupPanel.classList.add('active');
+    const navSetup = document.getElementById('nav-setup');
+    if (navSetup) navSetup.classList.add('active');
+    G.currentTab = 'setup';
   } else {
     showActiveGame();
     showTab('dashboard');
@@ -3152,6 +3206,29 @@ window.markRead = function(id) {
 document.addEventListener('keydown', e => {
   if (e.key === ' ' && e.ctrlKey) { e.preventDefault(); advanceWeek(); }
 });
+
+// Activar mode professor manualment (amb codi)
+window.activateProfMode = async function() {
+  const code = prompt('Introdueix el codi de professor/a:');
+  if (!code) return;
+  if (code.toUpperCase() !== PROF_CODE) {
+    showToast('❌ Codi incorrecte');
+    return;
+  }
+  G.gameData.isProf = true;
+  G.isProf = true;
+  window.G = G;
+  await saveGameData();
+  // Mostrar botó professor
+  const navProf = document.getElementById('nav-professor');
+  const profSep = document.getElementById('prof-sep');
+  if (navProf) navProf.style.display = '';
+  if (profSep) profSep.style.display = '';
+  showToast('✅ Mode professor activat!');
+  showEventToast('👩‍🏫', 'Mode professor activat!', 'Ara pots veure tots els alumnes a la pestanya Classe.', true);
+  // Anar al panell professor
+  setTimeout(() => showTab('professor'), 500);
+};
 
 console.log('🏢 EmpresaBat carregat correctament');
 

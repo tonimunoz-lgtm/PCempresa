@@ -231,7 +231,7 @@ export function renderProfessor() {
             return `
             <tr style="border-bottom:1px solid rgba(255,255,255,.04);${isCrisis?'background:rgba(239,68,68,.05)':''}">
               <td style="padding:8px 10px;font-weight:600;color:var(--text)">${s.displayName}${isCrisis?'  🚨':''}</td>
-              <td style="padding:8px 10px;color:var(--text2)">${s.company?.name||<span style="color:var(--text3)">Sense empresa</span>}</td>
+              <td style="padding:8px 10px;color:var(--text2)">${s.company?.name||'Sense empresa'}</td>
               <td style="padding:8px 10px">${s.company?.sectorData?.icon||'—'} ${s.company?.sector||'—'}</td>
               <td style="padding:8px 10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${(s.finances?.cash||0)>=0?'var(--gold)':'var(--red)'}">${fmt(Math.round(s.finances?.cash||0))}€</td>
               <td style="padding:8px 10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${res>=0?'var(--green)':'var(--red)'}">${res>=0?'+':''}${fmt(Math.round(res))}€</td>

@@ -19,7 +19,6 @@ export function renderBorsa() {
   const gd = getG()?.gameData;
   if (!gd) { document.getElementById('tab-borsa').innerHTML = '<div style="padding:40px;text-align:center;color:var(--text2)">Carregant dades...</div>'; return; }
   if (!initialized) initBorsaPrices();
-  const gd = getG().gameData;
   const cash = gd.finances?.cash || 0;
   const port = gd.portfolio || { stocks:{}, crypto:{} };
 

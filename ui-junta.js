@@ -14,7 +14,6 @@ const fmtPct = (...a) => window.fmtPct(...a);
 export function renderJunta() {
   const gd = getG()?.gameData;
   if (!gd) return;
-  const gd = getG().gameData;
   if (!gd.company) {
     document.getElementById('tab-junta').innerHTML = `
       <div style="padding:40px;text-align:center;color:var(--text2)">

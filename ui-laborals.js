@@ -21,7 +21,6 @@ const RECLAMACIONS_POOL = [
 export function renderLaborals() {
   const gd = getG()?.gameData;
   if (!gd) return;
-  const gd = getG().gameData;
   if (!gd?.company) {
     document.getElementById('tab-laborals').innerHTML = `
       <div style="padding:40px;text-align:center;color:var(--text2)">
@@ -224,7 +223,6 @@ function renderVagaActiva(vaga, gd) {
 
 // ---- Operacions ----
 window.acceptarReivindicacio = async function(id) {
-  const gd = getG().gameData;
   const r = RECLAMACIONS_POOL.find(r => r.id === id);
   if (!r) return;
   const costExtra = Math.round((gd.finances?.monthly_costs||0) * r.cost_perc);

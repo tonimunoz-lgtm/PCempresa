@@ -14,7 +14,6 @@ const getFRANCHISES = () => window.FRANCHISES_DATA || [];
 export function renderFranquicies() {
   const gd = getG()?.gameData;
   if (!gd) return;
-  const gd = getG().gameData;
   const franchise = gd.franchise;
 
   document.getElementById('tab-franquicies').innerHTML = `
