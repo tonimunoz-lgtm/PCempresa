@@ -1927,10 +1927,10 @@ function initUI() {
     // Sense empresa → pantalla d'elecció
     showSetupInit();
     // Activar el tab setup manualment sense invocar showTab (que podria sobreescriure)
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     const setupPanel = document.getElementById('tab-setup');
-    if (setupPanel) setupPanel.classList.add('active');
+    if (setupPanel) { setupPanel.classList.add('active'); setupPanel.style.display = 'block'; }
     const navSetup = document.getElementById('nav-setup');
     if (navSetup) navSetup.classList.add('active');
     G.currentTab = 'setup';
@@ -3598,11 +3598,15 @@ function refreshExternalTab(tab) {
 
 window.showTab = function(tab) {
   G.currentTab = tab;
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => {
+    p.classList.remove('active');
+    p.style.display = 'none';
+  });
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   const panel = document.getElementById('tab-' + tab);
   if (!panel) { console.warn('Tab panel not found:', tab); return; }
   panel.classList.add('active');
+  panel.style.display = 'block';
   document.getElementById('nav-' + tab)?.classList.add('active');
 
   // Tabs inline
