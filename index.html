@@ -3109,14 +3109,14 @@ window.showTab = function(tab) {
   if (tab === 'production')  renderProduction();
   if (tab === 'marketing')   renderMarketing();
   if (tab === 'sales')       renderSales();
-  if (tab === 'borsa')       { import('./js/ui-borsa.js').then(m => m.renderBorsa()); }
-  if (tab === 'junta')       { import('./js/ui-junta.js').then(m => m.renderJunta()); }
-  if (tab === 'trade')       { import('./js/ui-trade.js').then(m => m.renderTrade()); }
-  if (tab === 'franquicies') { import('./js/ui-franquicies.js').then(m => m.renderFranquicies()); }
-  if (tab === 'professor')   { import('./js/ui-professor.js').then(m => m.renderProfessor()); }
-  if (tab === 'proveidors')  { import('./js/ui-proveidors.js').then(m => m.renderProveidors()); }
-  if (tab === 'laborals')    { import('./js/ui-laborals.js').then(m => m.renderLaborals()); }
-  if (tab === 'sales')       { import('./js/ui-sales.js').then(m => m.renderSales()); }
+   if (tab === 'borsa')       { import('./js/ui-borsa.js').then(m => m.renderBorsa()).catch(e => console.warn('Mòdul borsa no disponible:', e)); }
+  if (tab === 'junta')       { import('./js/ui-junta.js').then(m => m.renderJunta()).catch(e => console.warn('Mòdul junta no disponible:', e)); }
+  if (tab === 'trade')       { import('./js/ui-trade.js').then(m => m.renderTrade()).catch(e => console.warn('Mòdul trade no disponible:', e)); }
+  if (tab === 'franquicies') { import('./js/ui-franquicies.js').then(m => m.renderFranquicies()).catch(e => console.warn('Mòdul franquicies no disponible:', e)); }
+  if (tab === 'professor')   { import('./js/ui-professor.js').then(m => m.renderProfessor()).catch(e => console.warn('Mòdul professor no disponible:', e)); }
+  if (tab === 'proveidors')  { import('./js/ui-proveidors.js').then(m => m.renderProveidors()).catch(e => console.warn('Mòdul proveidors no disponible:', e)); }
+  if (tab === 'laborals')    { import('./js/ui-laborals.js').then(m => m.renderLaborals()).catch(e => console.warn('Mòdul laborals no disponible:', e)); }
+  if (tab === 'sales')       { import('./js/ui-sales.js').then(m => m.renderSales()).catch(e => { console.warn('Mòdul sales no disponible:', e); showToast('📦 Mòdul de vendes amb errors - revisa ui-sales.js'); }); }
 };
 
 // ==================== PROFILE ====================
