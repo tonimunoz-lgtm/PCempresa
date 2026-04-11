@@ -102,7 +102,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 
 /* Content area */
 .content{flex:1;overflow:hidden;position:relative}
-.tab-panel{position:absolute;inset:0;overflow-y:auto;opacity:0;pointer-events:none;transition:.25s}
+.tab-panel{position:absolute;inset:0;overflow-y:auto;opacity:0;pointer-events:none;transition:.25s;background:var(--bg)}
 .tab-panel.active{opacity:1;pointer-events:all}
 
 /* ====== DASHBOARD ====== */
@@ -2974,7 +2974,7 @@ window.requestLoan = async function() {
   const interest = Math.max(3.5, Math.min(8.5, 3.5 + ratioEndeut * 0.8 + (debtService > 0.3 ? 1.5 : 0)));
 
   if (ratioEndeut > 4)      { reason = "Endeutament excessiu. Ràtio deute/capital > 4."; }
-  else if (ratioSolv < 1)   { reason = "Solvència insuficient. L\"actiu no cobreix el passiu."; }
+  else if (ratioSolv < 1)   { reason = "Solvència insuficient. L"actiu no cobreix el passiu."; }
   else if (debtService > 0.5){ reason = "La cobertura del servei del deute és massa alta (>50% EBITDA)."; }
   else if (cash < 0)         { reason = "Tresoreria negativa. Necessitem situació de liquiditat positiva."; }
   else {
@@ -3042,22 +3042,40 @@ window.showTab = function(tab) {
   G.currentTab = tab;
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + tab)?.classList.add('active');
+  const panel = document.getElementById('tab-' + tab);
+  if (!panel) { console.warn('Tab panel not found:', tab); return; }
+  panel.classList.add('active');
   document.getElementById('nav-' + tab)?.classList.add('active');
-  if (tab === 'map')         { setTimeout(() => { renderMap(); renderRanking(); }, 100); }
-  if (tab === 'dashboard')   renderDashboard();
-  if (tab === 'finances')    renderFinances();
-  if (tab === 'hr')          renderHR();
-  if (tab === 'production')  renderProduction();
-  if (tab === 'marketing')   renderMarketing();
-  if (tab === 'borsa')       { import('./ui-borsa.js').then(m => m.renderBorsa()); }
-  if (tab === 'junta')       { import('./ui-junta.js').then(m => m.renderJunta()); }
-  if (tab === 'trade')       { import('./ui-trade.js').then(m => m.renderTrade()); }
-  if (tab === 'franquicies') { import('./ui-franquicies.js').then(m => m.renderFranquicies()); }
-  if (tab === 'professor')   { import('./ui-professor.js').then(m => m.renderProfessor()); }
-  if (tab === 'proveidors')  { import('./ui-proveidors.js').then(m => m.renderProveidors()); }
-  if (tab === 'laborals')    { import('./ui-laborals.js').then(m => m.renderLaborals()); }
-  if (tab === 'sales')       { import('./ui-sales.js').then(m => m.renderSales()); }
+
+  // Tabs inline (HTML estàtic, render directe)
+  if (tab === 'dashboard')  { renderDashboard(); return; }
+  if (tab === 'finances')   { renderFinances();  return; }
+  if (tab === 'hr')         { renderHR();        return; }
+  if (tab === 'production') { renderProduction(); return; }
+  if (tab === 'marketing')  { renderMarketing(); return; }
+  if (tab === 'map')        { setTimeout(() => { renderMap(); renderRanking(); }, 100); return; }
+  if (tab === 'setup')      { return; }
+
+  // Tabs externs (mòduls JS — injecten HTML al panel buit)
+  const EXTERN_TABS = {
+    sales:       () => import('./ui-sales.js').then(m => m.renderSales()),
+    borsa:       () => import('./ui-borsa.js').then(m => m.renderBorsa()),
+    junta:       () => import('./ui-junta.js').then(m => m.renderJunta()),
+    trade:       () => import('./ui-trade.js').then(m => m.renderTrade()),
+    franquicies: () => import('./ui-franquicies.js').then(m => m.renderFranquicies()),
+    professor:   () => import('./ui-professor.js').then(m => m.renderProfessor()),
+    proveidors:  () => import('./ui-proveidors.js').then(m => m.renderProveidors()),
+    laborals:    () => import('./ui-laborals.js').then(m => m.renderLaborals()),
+  };
+
+  if (EXTERN_TABS[tab]) {
+    // Mostrar spinner mentre carrega
+    panel.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text2);gap:12px"><div style="font-size:24px;animation:float 1.5s ease-in-out infinite">⏳</div><div>Carregant...</div></div>';
+    EXTERN_TABS[tab]().catch(err => {
+      console.error('Error carregant tab', tab, err);
+      panel.innerHTML = '<div style="padding:40px;text-align:center;color:var(--red)"><div style="font-size:40px;margin-bottom:10px">⚠️</div><div style="font-size:14px;font-weight:700">Error carregant el mòdul</div><div style="font-size:12px;margin-top:6px;color:var(--text2)">' + err.message + '</div><button onclick="showTab(\'' + tab + '\')" style="margin-top:14px;padding:8px 20px;background:var(--accent);border:none;border-radius:8px;color:#fff;cursor:pointer;font-family:var(--font);font-size:13px">Reintentar</button></div>';
+    });
+  }
 };
 
 // ==================== PROFILE ====================

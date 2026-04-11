@@ -1,5 +1,5 @@
 // Accés a l'estat global i funcions via window (exposats per index.html)
-const G = window.G;
+const getG = () => window.G;
 const saveGameData  = (...a) => window.saveGameData(...a);
 const showToast     = (...a) => window.showToast(...a);
 const showEventToast = (...a) => window.showEventToast(...a);
@@ -12,7 +12,9 @@ const getFRANCHISES = () => window.FRANCHISES_DATA || [];
 // ============================================================
 
 export function renderFranquicies() {
-  const gd = G.gameData;
+  const gd = getG()?.gameData;
+  if (!gd) return;
+  const gd = getG().gameData;
   const franchise = gd.franchise;
 
   document.getElementById('tab-franquicies').innerHTML = `
@@ -163,7 +165,7 @@ function renderFranchiseMarket(gd) {
 }
 
 window.joinFranchise = async function(franchiseId) {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   const fr = getFRANCHISES().find(f=>f.id===franchiseId);
   if (!fr) return;
   if ((gd.finances?.cash||0) < fr.entryFee) { showToast('❌ No tens prou capital'); return; }
@@ -179,7 +181,7 @@ window.joinFranchise = async function(franchiseId) {
 };
 
 window.createOwnFranchise = async function() {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   const royaltyWeekly = Math.round((gd.finances?.monthly_revenue||0)/4.33 * 0.07);
   if (!confirm(`Vols convertir ${gd.company.name} en una marca de franquícia? Necessitaràs un manual d'operacions i capacitat formativa.`)) return;
 
@@ -197,7 +199,7 @@ window.createOwnFranchise = async function() {
 };
 
 window.recruitFranchisee = async function() {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   const fr = gd.franchise;
   if (!fr) return;
   const trainingCost = fr.trainingCost || 3000;
@@ -215,7 +217,7 @@ window.recruitFranchisee = async function() {
 };
 
 window.exitFranchise = async function() {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   if (!gd.franchise) return;
   const penalty = 15000;
   if (!confirm(`Sortir de la franquícia comporta una penalització de ${fmt(penalty)}€. Continuar?`)) return;

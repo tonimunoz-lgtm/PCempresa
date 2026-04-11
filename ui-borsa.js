@@ -1,5 +1,5 @@
 // Accés a l'estat global i funcions via window (exposats per index.html)
-const G = window.G;
+const getG = () => window.G;
 const saveGameData  = (...a) => window.saveGameData(...a);
 const showToast     = (...a) => window.showToast(...a);
 const showEventToast = (...a) => window.showEventToast(...a);
@@ -16,8 +16,10 @@ let borsaPrices = {}; // preus live de la sessió
 let initialized = false;
 
 export function renderBorsa() {
+  const gd = getG()?.gameData;
+  if (!gd) { document.getElementById('tab-borsa').innerHTML = '<div style="padding:40px;text-align:center;color:var(--text2)">Carregant dades...</div>'; return; }
   if (!initialized) initBorsaPrices();
-  const gd = G.gameData;
+  const gd = getG().gameData;
   const cash = gd.finances?.cash || 0;
   const port = gd.portfolio || { stocks:{}, crypto:{} };
 
@@ -62,7 +64,7 @@ export function renderBorsa() {
       document.getElementById(`btab-${t==='portfolio'?'port':t}`).classList.toggle('active', t===tab);
     });
     if (tab==='portfolio') {
-      document.getElementById('borsa-port-panel').innerHTML = renderPortfolioPanel(G.gameData.portfolio||{stocks:{},crypto:{}}, G.gameData.finances?.cash||0);
+      document.getElementById('borsa-port-panel').innerHTML = renderPortfolioPanel(getG().gameData.portfolio||{stocks:{},crypto:{}}, getG().gameData.finances?.cash||0);
     }
   };
 }
@@ -282,7 +284,7 @@ function updatePortfolioTotal(port) {
 window.buyStock = async function(ticker, price, vol) {
   const qty = parseInt(document.getElementById('qty-s-'+ticker)?.value||10);
   const cost = qty * price;
-  const gd = G.gameData;
+  const gd = getG().gameData;
   if ((gd.finances?.cash||0) < cost) { showToast('❌ No tens prou tresoreria'); return; }
   if (!gd.portfolio) gd.portfolio = {stocks:{},crypto:{}};
   if (!gd.portfolio.stocks) gd.portfolio.stocks = {};
@@ -301,7 +303,7 @@ window.buyStock = async function(ticker, price, vol) {
 };
 
 window.sellStock = async function(ticker, price) {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   const holding = gd.portfolio?.stocks?.[ticker];
   if (!holding) return;
   const revenue = holding.shares * price;
@@ -315,7 +317,7 @@ window.sellStock = async function(ticker, price) {
 
 window.buyCrypto = async function(symbol, price, vol) {
   const euros = parseFloat(document.getElementById('qty-c-'+symbol)?.value||100);
-  const gd = G.gameData;
+  const gd = getG().gameData;
   if ((gd.finances?.cash||0) < euros) { showToast('❌ No tens prou tresoreria'); return; }
   const amount = euros / price;
   if (!gd.portfolio) gd.portfolio = {stocks:{},crypto:{}};
@@ -335,7 +337,7 @@ window.buyCrypto = async function(symbol, price, vol) {
 };
 
 window.sellCrypto = async function(symbol, price) {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   const holding = gd.portfolio?.crypto?.[symbol];
   if (!holding) return;
   const revenue = holding.amount * price;

@@ -1,5 +1,5 @@
 // Accés a l'estat global i funcions via window (exposats per index.html)
-const G = window.G;
+const getG = () => window.G;
 const saveGameData  = (...a) => window.saveGameData(...a);
 const showToast     = (...a) => window.showToast(...a);
 const showEventToast = (...a) => window.showEventToast(...a);
@@ -12,7 +12,9 @@ const getCOUNTRIES = () => window.COUNTRIES_DATA || [];
 // ============================================================
 
 export function renderTrade() {
-  const gd = G.gameData;
+  const gd = getG()?.gameData;
+  if (!gd) return;
+  const gd = getG().gameData;
   if (!gd.company) {
     document.getElementById('tab-trade').innerHTML = `
       <div style="padding:40px;text-align:center;color:var(--text2)">
@@ -240,7 +242,7 @@ function renderActiveTradePanel(trade) {
 
 // ---- Operacions ----
 window.startExport = async function(countryCode, weeklyValue, setupCost) {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   if ((gd.finances?.cash||0) < setupCost) { showToast(`❌ Necessites ${fmt(setupCost)}€ per establir-te`); return; }
   const c = getCOUNTRIES().find(c=>c.code===countryCode);
   gd.finances.cash -= setupCost;
@@ -253,7 +255,7 @@ window.startExport = async function(countryCode, weeklyValue, setupCost) {
 };
 
 window.startImport = async function(id, name, weeklyCost, saving) {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   if (!gd.trade) gd.trade = {imports:[],exports:[],incoterms:{}};
   gd.trade.imports.push({ id, name, weeklyCost, saving, startWeek:gd.week });
   await saveGameData();
@@ -262,7 +264,7 @@ window.startImport = async function(id, name, weeklyCost, saving) {
 };
 
 window.cancelTrade = async function(type, id) {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   if (!gd.trade) return;
   if (type==='exp') gd.trade.exports = gd.trade.exports.filter(e=>e.country!==id);
   else gd.trade.imports = gd.trade.imports.filter(i=>i.id!==id);

@@ -1,7 +1,7 @@
 // ============================================================
 //  ui-laborals.js  —  Relacions laborals, vagues i negociació
 // ============================================================
-const G = window.G;
+const getG = () => window.G;
 const saveGameData   = (...a) => window.saveGameData(...a);
 const showToast      = (...a) => window.showToast(...a);
 const showEventToast = (...a) => window.showEventToast(...a);
@@ -19,7 +19,9 @@ const RECLAMACIONS_POOL = [
 ];
 
 export function renderLaborals() {
-  const gd = G.gameData;
+  const gd = getG()?.gameData;
+  if (!gd) return;
+  const gd = getG().gameData;
   if (!gd?.company) {
     document.getElementById('tab-laborals').innerHTML = `
       <div style="padding:40px;text-align:center;color:var(--text2)">
@@ -222,7 +224,7 @@ function renderVagaActiva(vaga, gd) {
 
 // ---- Operacions ----
 window.acceptarReivindicacio = async function(id) {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   const r = RECLAMACIONS_POOL.find(r => r.id === id);
   if (!r) return;
   const costExtra = Math.round((gd.finances?.monthly_costs||0) * r.cost_perc);
@@ -241,7 +243,7 @@ window.acceptarReivindicacio = async function(id) {
 window.negociarReivindicacio = function(id) {
   const r = RECLAMACIONS_POOL.find(r=>r.id===id);
   if (!r) return;
-  const gd = G.gameData;
+  const gd = getG().gameData;
   if (!gd.laborRelations) gd.laborRelations = {satisfaccio:72,convenis:[],negociacio:null,vaga:null};
   gd.laborRelations.negociacio = {
     id: r.id, titol: r.titol, round: 1,
@@ -255,7 +257,7 @@ window.negociarReivindicacio = function(id) {
 
 window.rebutjarReivindicacio = async function(id) {
   const r = RECLAMACIONS_POOL.find(r=>r.id===id);
-  const gd = G.gameData;
+  const gd = getG().gameData;
   if (!gd.laborRelations) gd.laborRelations = {satisfaccio:72,convenis:[],negociacio:null,vaga:null};
   const sat = gd.laborRelations.satisfaccio || 72;
   const newSat = Math.max(0, sat - (r?.importancia==='alta'?15:r?.importancia==='mitja'?8:4));
@@ -271,7 +273,7 @@ window.rebutjarReivindicacio = async function(id) {
 };
 
 window.ferContraofertaLaboral = function() {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   const neg = gd.laborRelations?.negociacio;
   if (!neg) return;
   const r = RECLAMACIONS_POOL.find(r=>r.id===neg.id);
@@ -304,7 +306,7 @@ window.ferContraofertaLaboral = function() {
 window.enviarContraofertaLaboral = async function() {
   const val = parseFloat(document.getElementById('contra-val')?.value || 0);
   document.getElementById('contra-modal')?.remove();
-  const gd = G.gameData;
+  const gd = getG().gameData;
   const neg = gd.laborRelations?.negociacio;
   if (!neg) return;
   const r = RECLAMACIONS_POOL.find(r=>r.id===neg.id);
@@ -331,7 +333,7 @@ window.enviarContraofertaLaboral = async function() {
 };
 
 window.acceptarConveni = async function() {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   const neg = gd.laborRelations?.negociacio;
   if (!neg) return;
   const r = RECLAMACIONS_POOL.find(r=>r.id===neg.id);
@@ -339,7 +341,7 @@ window.acceptarConveni = async function() {
 };
 
 async function acceptarConveniInternal(neg, costPerc) {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   gd.laborRelations.convenis.push({ id:neg.id, titol:neg.titol, cost_perc:costPerc, sat_gain:12, week:gd.week, desc:neg.proposta_empresa||neg.proposta_sindicat });
   gd.laborRelations.satisfaccio = Math.min(100,(gd.laborRelations.satisfaccio||72)+12);
   gd.laborRelations.negociacio = null;
@@ -351,7 +353,7 @@ async function acceptarConveniInternal(neg, costPerc) {
 }
 
 window.trencareNegociacio = async function() {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   if (!gd.laborRelations) return;
   const neg = gd.laborRelations.negociacio;
   gd.laborRelations.negociacio = null;
@@ -380,7 +382,7 @@ function iniciarVaga(gd, neg) {
 }
 
 window.acceptarPerAtutarVaga = async function() {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   const vaga = gd.laborRelations?.vaga;
   if (!vaga) return;
   // Acceptar les reivindicacions que causaven la vaga
@@ -396,7 +398,7 @@ window.acceptarPerAtutarVaga = async function() {
 };
 
 window.ignorarVaga = async function() {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   const vaga = gd.laborRelations?.vaga;
   if (!vaga) return;
   vaga.dia_vaga = (vaga.dia_vaga||1) + 7; // passa una setmana
@@ -415,7 +417,7 @@ window.ignorarVaga = async function() {
 };
 
 window.serveisMinimsVaga = async function() {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   const vaga = gd.laborRelations?.vaga;
   if (!vaga) return;
   vaga.adherencia = Math.max(0.1, (vaga.adherencia||0.6) * 0.5);
@@ -430,7 +432,7 @@ window.openNovaConvocatoria = function() {
 };
 
 window.openPlaFormacio = async function() {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   const cost = Math.round((gd.employees?.length||1) * 500);
   if (!confirm(`Pla de formació per a tots els empleats: ${fmt(cost)}€. Puja moral +8%.`)) return;
   gd.finances.cash -= cost;
@@ -443,7 +445,7 @@ window.openPlaFormacio = async function() {
 };
 
 window.openBonusEspecial = async function() {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   const bonus = Math.round((gd.employees||[]).reduce((s,e)=>s+(e.salary||2000),0) * 0.5);
   if (!confirm(`Bonus extraordinari equivalent a mitja mensualitat: ${fmt(bonus)}€. Moral +15%.`)) return;
   gd.finances.cash -= bonus;

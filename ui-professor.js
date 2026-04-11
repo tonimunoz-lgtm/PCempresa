@@ -1,5 +1,5 @@
 // Accés a l estat global i funcions via window (exposats per index.html)
-const G = window.G;
+const getG = () => window.G;
 const saveGameData   = (...a) => window.saveGameData(...a);
 const showToast      = (...a) => window.showToast(...a);
 const showEventToast = (...a) => window.showEventToast(...a);
@@ -24,7 +24,8 @@ const _db = getFirestore(_fbApp);
 // ============================================================
 
 export function renderProfessor() {
-  if (!G.isProf) {
+  if (!getG()?.isProf) { document.getElementById('tab-professor').innerHTML = '<div style="padding:40px;text-align:center;color:var(--text2)">Accés restringit</div>'; return; }
+  if (!getG().isProf) {
     document.getElementById('tab-professor').innerHTML = `
       <div style="padding:40px;text-align:center;color:var(--text2)">
         <div style="font-size:48px;margin-bottom:12px">🔒</div>
@@ -34,7 +35,7 @@ export function renderProfessor() {
     return;
   }
 
-  const students = G.allStudents.filter(s => !s.isProf);
+  const students = getG().allStudents.filter(s => !s.isProf);
   const active   = students.filter(s => !!s.company);
   const inactive = students.filter(s => !s.company);
 
@@ -253,7 +254,7 @@ window.broadcastEvent = async function() {
   if (!ev) return;
 
   // Afectar tots els estudiants via Firestore
-  const students = G.allStudents.filter(s=>!s.isProf && s.company);
+  const students = getG().allStudents.filter(s=>!s.isProf && s.company);
   let count = 0;
   for (const s of students) {
     if (!s.uid) continue;
@@ -272,7 +273,7 @@ window.injectCash = async function() {
   const sel = document.getElementById('prof-student-select');
   if (!sel?.value) return;
   const uid = sel.value;
-  const student = G.allStudents.find(s=>s.uid===uid);
+  const student = getG().allStudents.find(s=>s.uid===uid);
   if (!student) return;
   const updated = {
     ...student,
@@ -287,7 +288,7 @@ window.triggerCrisis = async function() {
   const sel = document.getElementById('prof-student-select');
   if (!sel?.value) return;
   const uid = sel.value;
-  const student = G.allStudents.find(s=>s.uid===uid);
+  const student = getG().allStudents.find(s=>s.uid===uid);
   if (!student) return;
   const crisisEv = EVENT_POOL.find(e=>e.impact<=-0.12);
   const updated = {
@@ -300,7 +301,7 @@ window.triggerCrisis = async function() {
 };
 
 window.exportResults = function() {
-  const students = G.allStudents.filter(s=>!s.isProf);
+  const students = getG().allStudents.filter(s=>!s.isProf);
   const rows = [
     ['Nom','Email','Empresa','Sector','Tresoreria','Resultat/mes','Prestigi','Empleats','Setmana','Estat'].join(','),
     ...students.map(s=>{
@@ -318,7 +319,7 @@ window.exportResults = function() {
   const blob = new Blob(['\uFEFF'+rows], {type:'text/csv;charset=utf-8'});
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
-  a.href = url; a.download = `empresabat_resultats_s${G.allStudents[0]?.week||1}.csv`;
+  a.href = url; a.download = `empresabat_resultats_s${getG().allStudents[0]?.week||1}.csv`;
   a.click(); URL.revokeObjectURL(url);
   showToast('📄 CSV descarregat!');
 };

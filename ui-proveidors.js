@@ -1,7 +1,7 @@
 // ============================================================
 //  ui-proveidors.js  —  Gestió completa de proveïdors
 // ============================================================
-const G = window.G;
+const getG = () => window.G;
 const saveGameData   = (...a) => window.saveGameData(...a);
 const showToast      = (...a) => window.showToast(...a);
 const showEventToast = (...a) => window.showEventToast(...a);
@@ -61,7 +61,9 @@ const PROVEIDORS_MERCAT = {
 };
 
 export function renderProveidors() {
-  const gd = G.gameData;
+  const gd = getG()?.gameData;
+  if (!gd) return;
+  const gd = getG().gameData;
   if (!gd?.company) {
     document.getElementById('tab-proveidors').innerHTML = `
       <div style="padding:40px;text-align:center;color:var(--text2)">
@@ -102,7 +104,7 @@ export function renderProveidors() {
       document.getElementById(`prov-${t}-panel`).style.display = t===tab ? '' : 'none';
       document.getElementById(`ptab-${t}`).classList.toggle('active', t===tab);
     });
-    if (tab === 'mercat') document.getElementById('prov-mercat-panel').innerHTML = renderMercatProveidors(G.gameData.company?.sector||'default', G.gameData.proveidors||[]);
+    if (tab === 'mercat') document.getElementById('prov-mercat-panel').innerHTML = renderMercatProveidors(getG().gameData.company?.sector||'default', getG().gameData.proveidors||[]);
   };
 }
 
@@ -239,7 +241,7 @@ function renderRiscosProveidors(proveidors, costTotal) {
 
 // ---- Operacions ----
 window.openNegociacio = function(idx) {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   const p = gd.proveidors?.[idx];
   if (!p) return;
   const modal = document.createElement('div');
@@ -294,7 +296,7 @@ window.openNegociacio = function(idx) {
 };
 
 window.sendNegociacio = async function(idx) {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   const p = gd.proveidors?.[idx];
   const descSol = parseFloat(document.getElementById('neg-desc')?.value || 0);
   const termSol = parseInt(document.getElementById('neg-term')?.value || 0);
@@ -335,7 +337,7 @@ window.openAvaluacio = function(idx) {
 };
 
 window.cancelProveidorConfirm = async function(idx) {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   const p = gd.proveidors?.[idx];
   if (!p) return;
   if (p.criticitat === 'alta') {
@@ -350,7 +352,7 @@ window.cancelProveidorConfirm = async function(idx) {
 };
 
 window.contactarProveidor = async function(name, product, cost, qualitat, termini) {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   if (!gd.proveidors) gd.proveidors = [];
   // Simular procés de contacte (2-4 setmanes fins a activar)
   const nouProv = {

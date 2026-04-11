@@ -1,14 +1,16 @@
 // ============================================================
 //  ui-sales.js  —  Vendes per sector, reclamacions interactives
 // ============================================================
-const G = window.G;
+const getG = () => window.G;
 const saveGameData   = (...a) => window.saveGameData(...a);
 const showToast      = (...a) => window.showToast(...a);
 const showEventToast = (...a) => window.showEventToast(...a);
 const fmt = (...a) => window.fmt(...a);
 
 export function renderSales() {
-  const gd = G.gameData;
+  const gd = getG()?.gameData;
+  if (!gd) return;
+  const gd = getG().gameData;
   if (!gd?.company) {
     document.getElementById('tab-sales').innerHTML = `
       <div style="padding:40px;text-align:center;color:var(--text2)">
@@ -357,7 +359,7 @@ function renderAnalisiPanel(serveis, clients, gd) {
 
 // ---- Operacions ----
 window.updateServei = async function(idx, field, value) {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   if (!gd.serveis?.[idx]) return;
   gd.serveis[idx][field] = value;
   // Recalcular ingressos mensuals
@@ -366,7 +368,7 @@ window.updateServei = async function(idx, field, value) {
 };
 
 window.deleteServei = async function(idx) {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   if (!confirm('Eliminar aquest producte/servei del catàleg?')) return;
   gd.serveis.splice(idx, 1);
   gd.finances.monthly_revenue = (gd.serveis||[]).reduce((s, sv) => s + sv.preu * sv.unitats_mes, 0);
@@ -404,7 +406,7 @@ window.confirmAddServei = async function() {
   const preu    = parseFloat(document.getElementById('new-servei-preu')?.value);
   const unitats = parseInt(document.getElementById('new-servei-unitats')?.value);
   if (!name || isNaN(preu) || isNaN(unitats)) { showToast('⚠️ Omple tots els camps'); return; }
-  const gd = G.gameData;
+  const gd = getG().gameData;
   if (!gd.serveis) gd.serveis = [];
   gd.serveis.push({ id: 'sv_'+Date.now(), name, preu, unitats_mes: unitats });
   gd.finances.monthly_revenue = gd.serveis.reduce((s, sv) => s + sv.preu * sv.unitats_mes, 0);
@@ -415,7 +417,7 @@ window.confirmAddServei = async function() {
 };
 
 window.acceptClaim = async function(idx) {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   const cl = gd.claims[idx];
   if (!cl) return;
   if ((gd.finances?.cash||0) < cl.compensation) { showToast('❌ No tens prou tresoreria'); return; }
@@ -432,7 +434,7 @@ window.acceptClaim = async function(idx) {
 };
 
 window.counterOfferClaim = function(idx) {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   const cl = gd.claims[idx];
   if (!cl) return;
   const modal = document.createElement('div');
@@ -457,7 +459,7 @@ window.counterOfferClaim = function(idx) {
 };
 
 window.sendCounterOffer = async function(idx) {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   const cl = gd.claims[idx];
   const offer = parseInt(document.getElementById('counter-amount')?.value || 0);
   document.getElementById('counter-modal')?.remove();
@@ -484,7 +486,7 @@ window.sendCounterOffer = async function(idx) {
 };
 
 window.rejectClaim = async function(idx) {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   const cl = gd.claims[idx];
   if (!cl) return;
   cl.resolved = true; cl.accepted = false;
@@ -511,7 +513,7 @@ window.negotiateClient = function(idx) {
 };
 
 window.loseClient = async function(idx) {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   if (!confirm('Eliminar aquest client?')) return;
   gd.clients.splice(idx, 1);
   await saveGameData();
@@ -547,7 +549,7 @@ window.addNewClient = async function() {
   const type  = document.getElementById('nc-type')?.value;
   const value = parseInt(document.getElementById('nc-value')?.value);
   if (!name || isNaN(value)) { showToast('⚠️ Omple tots els camps'); return; }
-  const gd = G.gameData;
+  const gd = getG().gameData;
   if (!gd.clients) gd.clients = [];
   gd.clients.push({ id:'cl_'+Date.now(), icon:'🤝', name, type, monthly_value:value, satisfaction:70 });
   await saveGameData();

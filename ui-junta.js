@@ -1,5 +1,5 @@
 // Accés a l'estat global i funcions via window (exposats per index.html)
-const G = window.G;
+const getG = () => window.G;
 const saveGameData  = (...a) => window.saveGameData(...a);
 const showToast     = (...a) => window.showToast(...a);
 const showEventToast = (...a) => window.showEventToast(...a);
@@ -12,7 +12,9 @@ const fmtPct = (...a) => window.fmtPct(...a);
 // ============================================================
 
 export function renderJunta() {
-  const gd = G.gameData;
+  const gd = getG()?.gameData;
+  if (!gd) return;
+  const gd = getG().gameData;
   if (!gd.company) {
     document.getElementById('tab-junta').innerHTML = `
       <div style="padding:40px;text-align:center;color:var(--text2)">
@@ -199,7 +201,7 @@ function renderAgendaItems(gd, myPct) {
 }
 
 window.voteDecision = async function(id, option) {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   const shareholders = gd.shareholders || [];
   const myPct = Math.max(0, 1 - shareholders.reduce((s, sh) => s+sh.pct, 0));
 
@@ -249,7 +251,7 @@ window.voteDecision = async function(id, option) {
 };
 
 window.openAddShareholder = async function() {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   const investors = [
     {name:'Fons Inversió Vallès SA',    icon:'🏦', type:'fons',    pct:0.15, capital:50000, patience:4, risk:'mig',   style:'equilibrat', satisfaction:70},
     {name:'Business Angel Sr. Puig',    icon:'👔', type:'angel',   pct:0.10, capital:30000, patience:6, risk:'mig',   style:'estratègic', satisfaction:75},
@@ -290,7 +292,7 @@ window.openAddShareholder = async function() {
 };
 
 window.acceptInvestor = async function(inv) {
-  const gd = G.gameData;
+  const gd = getG().gameData;
   if (!gd.shareholders) gd.shareholders = [];
   gd.shareholders.push({...inv});
   gd.finances.cash += inv.capital;
