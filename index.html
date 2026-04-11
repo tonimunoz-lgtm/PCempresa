@@ -3076,14 +3076,14 @@ window.showTab = function(tab) {
   if (tab === 'production')  renderProduction();
   if (tab === 'marketing')   renderMarketing();
   if (tab === 'sales')       renderSales();
-  if (tab === 'borsa')       { import('./js/ui-borsa.js').then(m => m.renderBorsa()); }
-  if (tab === 'junta')       { import('./js/ui-junta.js').then(m => m.renderJunta()); }
-  if (tab === 'trade')       { import('./js/ui-trade.js').then(m => m.renderTrade()); }
-  if (tab === 'franquicies') { import('./js/ui-franquicies.js').then(m => m.renderFranquicies()); }
-  if (tab === 'professor')   { import('./js/ui-professor.js').then(m => m.renderProfessor()); }
-  if (tab === 'proveidors')  { import('./js/ui-proveidors.js').then(m => m.renderProveidors()); }
-  if (tab === 'laborals')    { import('./js/ui-laborals.js').then(m => m.renderLaborals()); }
-  if (tab === 'sales')       { import('./js/ui-sales.js').then(m => m.renderSales()); }
+  if (tab === 'borsa')       { import('./ui-borsa.js').then(m => m.renderBorsa()); }
+  if (tab === 'junta')       { import('./ui-junta.js').then(m => m.renderJunta()); }
+  if (tab === 'trade')       { import('./ui-trade.js').then(m => m.renderTrade()); }
+  if (tab === 'franquicies') { import('./ui-franquicies.js').then(m => m.renderFranquicies()); }
+  if (tab === 'professor')   { import('./ui-professor.js').then(m => m.renderProfessor()); }
+  if (tab === 'proveidors')  { import('./ui-proveidors.js').then(m => m.renderProveidors()); }
+  if (tab === 'laborals')    { import('./ui-laborals.js').then(m => m.renderLaborals()); }
+  if (tab === 'sales')       { import('./ui-sales.js').then(m => m.renderSales()); }
 };
 
 // ==================== PROFILE ====================
