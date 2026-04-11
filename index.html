@@ -330,6 +330,13 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .reach-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:3px;transition:.4s}
 
 /* ====== RESPONSIVE ====== */
+/* Animació vaga */
+@keyframes pulseBorder {
+  from { border-color: rgba(239,68,68,.4); }
+  to   { border-color: rgba(239,68,68,.9); }
+}
+.opacity-5 { opacity: 0.5; }
+
 @media(max-width:640px){
   .dash-top{grid-template-columns:1fr 1fr}
   .dash-mid{grid-template-columns:1fr}
@@ -677,6 +684,15 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
         <span class="nav-icon">🏪</span>
         <span class="nav-lbl">Franquíc.</span>
       </button>
+      <div class="nav-sep"></div>
+      <button class="nav-btn" onclick="showTab('proveidors')" id="nav-proveidors">
+        <span class="nav-icon">🏭</span>
+        <span class="nav-lbl">Proveïdors</span>
+      </button>
+      <button class="nav-btn" onclick="showTab('laborals')" id="nav-laborals">
+        <span class="nav-icon">⚖️</span>
+        <span class="nav-lbl">Laborals</span>
+      </button>
       <div class="nav-sep" id="prof-sep" style="display:none"></div>
       <button class="nav-btn" onclick="showTab('professor')" id="nav-professor" style="display:none">
         <span class="nav-icon">👩‍🏫</span>
@@ -742,6 +758,12 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
             <div class="section-title">🏢 Departaments</div>
             <div class="dept-grid" id="dept-grid"></div>
           </div>
+
+          <div class="section-card" style="margin-top:10px">
+            <div class="section-title">📬 Sol·licituds dels caps de departament <span>IA en temps real</span></div>
+            <div id="dept-requests-panel">
+              <div style="color:var(--text3);font-size:12px;text-align:center;padding:16px">Carregant...</div>
+            </div>
 
           <div class="section-card" id="annual-summary" style="display:none">
             <div class="section-title">📋 Resum anual <span id="annual-year"></span></div>
@@ -907,28 +929,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       </div>
 
       <!-- SALES -->
-      <div class="tab-panel" id="tab-sales">
-        <div style="padding:16px;max-width:1000px;margin:0 auto">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-            <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text)">📦 Vendes i Clients</h2>
-            <button class="week-advance-btn" onclick="openNewClient()">+ Nou client</button>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-            <div class="section-card">
-              <div class="section-title">📊 Resum vendes</div>
-              <div id="sales-summary" style="font-size:13px;color:var(--text2);line-height:2"></div>
-            </div>
-            <div class="section-card">
-              <div class="section-title">⚠️ Reclamacions pendents</div>
-              <div id="claims-list" style="display:flex;flex-direction:column;gap:8px"></div>
-            </div>
-          </div>
-          <div class="section-card" style="margin-top:12px">
-            <div class="section-title">🤝 Clients actius</div>
-            <div id="clients-list" style="display:flex;flex-direction:column;gap:8px;margin-top:4px"></div>
-          </div>
-        </div>
-      </div>
+      <div class="tab-panel" id="tab-sales"></div>
 
       <!-- MAP -->
       <div class="tab-panel" id="tab-map">
@@ -964,6 +965,12 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 
       <!-- MODE PROFESSOR -->
       <div class="tab-panel" id="tab-professor"></div>
+
+      <!-- PROVEÏDORS -->
+      <div class="tab-panel" id="tab-proveidors"></div>
+
+      <!-- RELACIONS LABORALS -->
+      <div class="tab-panel" id="tab-laborals"></div>
 
     </div><!-- /content -->
   </div><!-- /main-area -->
@@ -1204,14 +1211,15 @@ window.G = G;
 window._db = null; // s'assigna després de Firebase init
 
 function defaultGameData(uid, displayName) {
-  const now = new Date(2024, 0, 1);
+  const now = new Date(); // DATA REAL DEL SISTEMA
+  const year = now.getFullYear();
   return {
     uid,
     displayName,
     mode: null, // 'create' | 'hired'
     week: 1,
-    year: 2024,
-    month: 1,
+    year,
+    month: now.getMonth()+1,
     date: now.toISOString(),
     prestigi: 0,
     company: null,
@@ -1892,20 +1900,28 @@ function showHiredMode() {
   renderJobOffers();
 }
 
-function renderJobOffers() {
+async function renderJobOffers() {
   const prest = G.gameData.prestigi || 0;
-  let available = VALLES_EMPRESES.filter(e => {
+  const { EMPRESA_PROFILES } = await import('./js/data-empreses.js');
+
+  let available = EMPRESA_PROFILES.filter(e => {
     if (prest < 10) return e.size === 'small';
-    if (prest < 25) return e.size !== 'corp';
+    if (prest < 30) return e.size === 'small' || e.size === 'medium';
     return true;
   });
-  available = available.sort(() => Math.random() - 0.5).slice(0, 6);
+  available = available.sort(() => Math.random() - 0.5).slice(0, 5);
+
+  const rolesList = JOBS_BY_PRESTIGI.find(j => prest >= j.minPrest && prest < j.maxPrest) || JOBS_BY_PRESTIGI[0];
+
   document.getElementById('offers-grid').innerHTML = available.map(e => {
-    const sizeLabel = {small:'Petita',medium:'Mitjana',large:'Gran',corp:'Corporació'}[e.size];
+    const sizeLabel = {small:'Petita',medium:'Mitjana',large:'Gran'}[e.size] || 'Empresa';
     const sectorD = SECTORS.find(s => s.id === e.sector) || SECTORS[0];
-    const salary = e.size === 'small' ? 2800 : e.size === 'medium' ? 4200 : e.size === 'large' ? 6500 : 9000;
-    const roles = JOBS_BY_PRESTIGI.find(j => prest >= j.minPrest && prest < j.maxPrest) || JOBS_BY_PRESTIGI[0];
-    const role = roles.roles[Math.floor(Math.random()*roles.roles.length)];
+    const salary = {small:36000, medium:55000, large:78000}[e.size] || 40000;
+    const role = rolesList.roles[Math.floor(Math.random()*rolesList.roles.length)];
+    const empCount = e.employees_real || 20;
+    const fact = (e.facturacio_anual/1000000).toFixed(1);
+    const clients = e.clients_destacats?.length || 0;
+
     return `
       <div class="offer-card">
         <div class="offer-top">
@@ -1916,52 +1932,80 @@ function renderJobOffers() {
           </div>
           <div class="offer-size-badge ${e.size}">${sizeLabel}</div>
         </div>
-        <div class="offer-salary">💰 ${salary.toLocaleString('ca')}€/any</div>
-        <div class="offer-prestigi">Facturació: ~${(e.fact/1000000).toFixed(1)}M€ · ${e.emp} empleats</div>
+        <div class="offer-salary">💰 ${salary.toLocaleString('ca')}€/any · Fundada ${e.founded}</div>
+        <div class="offer-prestigi">Facturació: ~${fact}M€/any · Capital social: ${(e.capital_social/1000).toFixed(0)}k€</div>
         <div class="offer-details">
           <span class="offer-tag">📍 ${e.muni}</span>
-          <span class="offer-tag">👥 ${e.emp} persones</span>
-          <span class="offer-tag">🏭 ${sectorD.sector}</span>
+          <span class="offer-tag">👥 ${empCount} empleats</span>
+          <span class="offer-tag">🤝 ${clients} clients clau</span>
+          <span class="offer-tag">📋 ${e.legalForm.toUpperCase()}</span>
         </div>
-        <button class="offer-btn" onclick="acceptOffer(${JSON.stringify(e).replace(/"/g,'&quot;')}, '${role}', ${salary})">Acceptar oferta →</button>
+        <div style="font-size:11px;color:var(--text2);margin-top:8px;padding:8px;background:rgba(255,255,255,.03);border-radius:8px">
+          <strong style="color:var(--text)">Situació financera:</strong>
+          Capital: ${(e.capital_social/1000).toFixed(0)}k€ · Reserves: ${(e.reserves/1000).toFixed(0)}k€ ·
+          Deute llarg termini: ${(e.deutes_llarg/1000).toFixed(0)}k€
+        </div>
+        <button class="offer-btn" onclick="acceptOffer('${e.name.replace(/'/g,\"\\'\")}', '${role}', ${salary})">Acceptar oferta →</button>
       </div>`;
   }).join('');
 }
 
-window.acceptOffer = async function(company, role, salary) {
-  const sectorData = SECTORS.find(s => s.id === company.sector) || SECTORS[0];
-  G.gameData.mode = 'hired';
-  G.gameData.prestigi = (G.gameData.prestigi || 0) + 3;
-  G.gameData.company = {
-    name: company.name,
-    sector: company.sector,
-    sectorData,
-    legalForm: 'sa',
-    legalFormName: 'Societat Anònima',
-    nif: 'A' + Math.floor(10000000 + Math.random()*89999999),
-    municipality: company.muni,
-    myRole: role,
-    mySalary: salary,
-    totalEmployees: company.emp,
-    annualRevenue: company.fact,
-    size: company.size,
-    surface: company.size === 'small' ? 150 : company.size === 'medium' ? 500 : 2000,
-    monthlyRent: company.size === 'small' ? 1200 : company.size === 'medium' ? 4000 : 12000,
-    regime: 'lloguer',
-  };
-  G.gameData.finances.cash = company.fact * 0.1; // 10% facturació com a cash
-  G.gameData.finances.monthly_revenue = company.fact / 12;
-  G.gameData.finances.monthly_costs = (company.fact / 12) * 0.78;
-  G.gameData.employees = generateHiredEmployees(company);
-  G.gameData.notifications.push({
-    id: Date.now(), icon: '💼', title: 'Incorporació a l\'empresa!',
-    desc: `Has sigut contractat/da com a ${role} a ${company.name}. Sou: ${salary.toLocaleString('ca')}€/any`,
-    time: 'Ara', urgent: false, read: false,
-  });
+window.acceptOffer = async function(companyName, role, salary) {
+  const now = new Date();
+  // Carregar dades creïbles de l'empresa des de data-empreses.js
+  const { EMPRESA_PROFILES, generateHiredCompanyData } = await import('./js/data-empreses.js');
+  const profile = EMPRESA_PROFILES.find(p => p.name === companyName);
+
+  let newData;
+  if (profile) {
+    newData = generateHiredCompanyData(profile, G.uid, G.gameData.displayName);
+  } else {
+    // Empresa genèrica si no té perfil específic
+    newData = G.gameData;
+    newData.mode = 'hired';
+  }
+
+  // Conservar dades d'usuari
+  newData.uid = G.uid;
+  newData.displayName = G.gameData.displayName;
+  newData.isProf = G.gameData.isProf;
+  newData.week  = 1;
+  newData.year  = now.getFullYear();
+  newData.month = now.getMonth() + 1;
+  newData.startDate = now.toISOString();
+
+  if (newData.company) {
+    newData.company.myRole    = role;
+    newData.company.mySalary  = salary;
+    newData.company.nif       = 'B' + Math.floor(10000000 + Math.random()*89999999);
+    newData.company.iae       = getIAE(newData.company.sector);
+    newData.company.regime    = 'lloguer';
+  }
+
+  // Recalcular ingressos mensuals des dels serveis
+  if (newData.serveis?.length) {
+    newData.finances.monthly_revenue = newData.serveis.reduce((s, sv) => s + sv.preu * sv.unitats_mes, 0);
+    newData.finances.monthly_costs   = newData.finances.monthly_revenue * 0.68; // margen aproximat
+  }
+
+  newData.notifications = [
+    { id: Date.now(), icon: '💼', title: "Incorporació a " + companyName,
+      desc: "Has sigut contractat/da com a " + role + ". Sou: " + salary.toLocaleString('ca') + "€/any. Trobaràs l'empresa amb clients, empleats i finances reals. Analitza la situació.",
+      time: 'Ara', urgent: false, read: false },
+    { id: Date.now()+1, icon: '📊', title: "Revisa el balanç",
+      desc: "L'empresa ja porta temps funcionant. Revisa finances, clients i proveïdors per entendre la situació actual.",
+      time: 'Ara', urgent: false, read: false },
+  ];
+
+  G.gameData = newData;
+  window.G = G;
+
   await saveGameData();
   showActiveGame();
+  showTab('dashboard');
   renderDashboard(); renderFinances(); renderHR(); renderMarketing();
-  showEventToast('💼', 'Contractat/da!', `Inici com a ${role} a ${company.name}`, true);
+  import('./js/ui-sales.js').then(m => m.renderSales());
+  showEventToast('💼', 'Contractat/da!', "Inici com a " + role + " a " + companyName, true);
 };
 
 function generateHiredEmployees(company) {
@@ -2058,6 +2102,24 @@ function renderDashboard() {
       </div>
       <div class="notif-time">${n.time||''}</div>
     </div>`).join('') || '<div style="color:var(--text3);font-size:12px;text-align:center;padding:20px">Sense notificacions</div>';
+
+  // Il·lustració instal·lació
+  if (c) {
+    let facilEl = document.getElementById('facility-illustration-dash');
+    if (!facilEl) {
+      facilEl = document.createElement('div');
+      facilEl.id = 'facility-illustration-dash';
+      const dashWrap = document.querySelector('.dash-wrap');
+      if (dashWrap) dashWrap.insertBefore(facilEl, dashWrap.firstChild);
+    }
+    import('./js/ui-visuals.js').then(m => m.renderFacilityIllustration('facility-illustration-dash'));
+  }
+
+  // Sol·licituds de departaments (IA caps)
+  import('./js/engine2.js').then(m => {
+    m.generateDeptAIRequests(gd);
+    m.renderDeptRequests();
+  }).catch(()=>{});
 
   // Departments
   const depts = [
@@ -2738,6 +2800,9 @@ window.showTab = function(tab) {
   if (tab === 'trade')       { import('./js/ui-trade.js').then(m => m.renderTrade()); }
   if (tab === 'franquicies') { import('./js/ui-franquicies.js').then(m => m.renderFranquicies()); }
   if (tab === 'professor')   { import('./js/ui-professor.js').then(m => m.renderProfessor()); }
+  if (tab === 'proveidors')  { import('./js/ui-proveidors.js').then(m => m.renderProveidors()); }
+  if (tab === 'laborals')    { import('./js/ui-laborals.js').then(m => m.renderLaborals()); }
+  if (tab === 'sales')       { import('./js/ui-sales.js').then(m => m.renderSales()); }
 };
 
 // ==================== PROFILE ====================
