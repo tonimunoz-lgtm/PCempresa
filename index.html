@@ -102,8 +102,8 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 
 /* Content area */
 .content{flex:1;overflow:hidden;position:relative}
-.tab-panel{position:absolute;inset:0;overflow-y:auto;opacity:0;pointer-events:none;transition:.25s;background:var(--bg)}
-.tab-panel.active{opacity:1;pointer-events:all}
+.tab-panel{position:absolute;inset:0;overflow-y:auto;visibility:hidden;pointer-events:none;background:var(--bg);z-index:1}
+.tab-panel.active{visibility:visible;pointer-events:all;z-index:2}
 
 /* ====== DASHBOARD ====== */
 .dash-wrap{padding:16px;max-width:1200px;margin:0 auto;display:grid;gap:12px}
@@ -2927,12 +2927,20 @@ window.advanceWeek = async function() {
   const dateStr = gameDate.toLocaleDateString("ca-ES",{day:"numeric",month:"short",year:"numeric"});
   document.getElementById("week-display").textContent = "S"+gd.week+" · "+dateStr;
   updateTopStats();
-  renderDashboard(); renderFinances(); renderHR();
-  if (G.currentTab==="production") renderProduction();
-  if (G.currentTab==="marketing")  renderMarketing();
-  if (G.currentTab==="map") renderMap();
-  const extTabs = ["sales","borsa","junta","trade","franquicies","proveidors","laborals","professor"];
-  if (extTabs.includes(G.currentTab)) showTab(G.currentTab);
+  // Actualitzar només el tab actiu (sense reiniciar tabs externs amb spinner)
+  if (G.currentTab === "dashboard")  renderDashboard();
+  else if (G.currentTab === "finances")   renderFinances();
+  else if (G.currentTab === "hr")         renderHR();
+  else if (G.currentTab === "production") renderProduction();
+  else if (G.currentTab === "marketing")  renderMarketing();
+  else if (G.currentTab === "map")        renderMap();
+  else {
+    // Tabs externs: actualitzar suaument si estan visibles
+    // sense posar spinner (el contingut ja hi és)
+    refreshExternalTab(G.currentTab);
+  }
+  // Sempre actualitzar dashboard KPIs si no és el tab actiu
+  if (G.currentTab !== "dashboard") updateTopStats();
 
   showToast("⏩ "+dateStr+" · "+(weekResult>=0?"+":"")+Math.round(weekResult).toLocaleString("ca")+"€");
   await saveGameData();
@@ -3028,7 +3036,7 @@ window.requestLoan = async function() {
   const interest = Math.max(3.5, Math.min(8.5, 3.5 + ratioEndeut * 0.8 + (debtService > 0.3 ? 1.5 : 0)));
 
   if (ratioEndeut > 4)      { reason = "Endeutament excessiu. Ràtio deute/capital > 4."; }
-  else if (ratioSolv < 1)   { reason = "Solvència insuficient. L\"actiu no cobreix el passiu."; }
+  else if (ratioSolv < 1)   { reason = "Solvència insuficient. L"actiu no cobreix el passiu."; }
   else if (debtService > 0.5){ reason = "La cobertura del servei del deute és massa alta (>50% EBITDA)."; }
   else if (cash < 0)         { reason = "Tresoreria negativa. Necessitem situació de liquiditat positiva."; }
   else {
@@ -3092,6 +3100,24 @@ window.acceptLoan = async function(amount, interest, years) {
 };
 
 // ==================== NAV ====================
+// Mapa de funcions de render dels mòduls externs
+const EXTERN_RENDER = {
+  sales:       () => import('./ui-sales.js').then(m => m.renderSales()),
+  borsa:       () => import('./ui-borsa.js').then(m => m.renderBorsa()),
+  junta:       () => import('./ui-junta.js').then(m => m.renderJunta()),
+  trade:       () => import('./ui-trade.js').then(m => m.renderTrade()),
+  franquicies: () => import('./ui-franquicies.js').then(m => m.renderFranquicies()),
+  professor:   () => import('./ui-professor.js').then(m => m.renderProfessor()),
+  proveidors:  () => import('./ui-proveidors.js').then(m => m.renderProveidors()),
+  laborals:    () => import('./ui-laborals.js').then(m => m.renderLaborals()),
+};
+
+// Refresh suau sense spinner (per a quan el tab ja té contingut)
+function refreshExternalTab(tab) {
+  if (!EXTERN_RENDER[tab]) return;
+  EXTERN_RENDER[tab]().catch(err => console.warn('refresh', tab, err));
+}
+
 window.showTab = function(tab) {
   G.currentTab = tab;
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -3101,7 +3127,7 @@ window.showTab = function(tab) {
   panel.classList.add('active');
   document.getElementById('nav-' + tab)?.classList.add('active');
 
-  // Tabs inline (HTML estàtic, render directe)
+  // Tabs inline
   if (tab === 'dashboard')  { renderDashboard(); return; }
   if (tab === 'finances')   { renderFinances();  return; }
   if (tab === 'hr')         { renderHR();        return; }
@@ -3110,24 +3136,14 @@ window.showTab = function(tab) {
   if (tab === 'map')        { setTimeout(() => { renderMap(); renderRanking(); }, 100); return; }
   if (tab === 'setup')      { return; }
 
-  // Tabs externs (mòduls JS — injecten HTML al panel buit)
-  const EXTERN_TABS = {
-    sales:       () => import('./ui-sales.js').then(m => m.renderSales()),
-    borsa:       () => import('./ui-borsa.js').then(m => m.renderBorsa()),
-    junta:       () => import('./ui-junta.js').then(m => m.renderJunta()),
-    trade:       () => import('./ui-trade.js').then(m => m.renderTrade()),
-    franquicies: () => import('./ui-franquicies.js').then(m => m.renderFranquicies()),
-    professor:   () => import('./ui-professor.js').then(m => m.renderProfessor()),
-    proveidors:  () => import('./ui-proveidors.js').then(m => m.renderProveidors()),
-    laborals:    () => import('./ui-laborals.js').then(m => m.renderLaborals()),
-  };
-
-  if (EXTERN_TABS[tab]) {
-    // Mostrar spinner mentre carrega
-    panel.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text2);gap:12px"><div style="font-size:24px;animation:float 1.5s ease-in-out infinite">⏳</div><div>Carregant...</div></div>';
-    EXTERN_TABS[tab]().catch(err => {
-      console.error('Error carregant tab', tab, err);
-      panel.innerHTML = '<div style="padding:40px;text-align:center;color:var(--red)"><div style="font-size:40px;margin-bottom:10px">⚠️</div><div style="font-size:14px;font-weight:700">Error carregant el mòdul</div><div style="font-size:12px;margin-top:6px;color:var(--text2)">' + err.message + '</div><button onclick="showTab(\'' + tab + '\')" style="margin-top:14px;padding:8px 20px;background:var(--accent);border:none;border-radius:8px;color:#fff;cursor:pointer;font-family:var(--font);font-size:13px">Reintentar</button></div>';
+  // Tabs externs: mostrar spinner NOMÉS si el panel està buit
+  if (EXTERN_RENDER[tab]) {
+    if (!panel.innerHTML.trim() || panel.innerHTML.includes('Carregant...')) {
+      panel.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:200px;color:var(--text2);gap:12px"><div style="font-size:24px;animation:float 1.5s ease-in-out infinite">⏳</div><div style="font-size:14px">Carregant...</div></div>';
+    }
+    EXTERN_RENDER[tab]().catch(err => {
+      console.error('Error tab', tab, err);
+      panel.innerHTML = '<div style="padding:40px;text-align:center"><div style="font-size:36px;margin-bottom:10px">⚠️</div><div style="color:var(--red);font-weight:700;font-size:14px">' + err.message + '</div><button onclick="showTab('' + tab + '')" style="margin-top:12px;padding:8px 20px;background:var(--accent);border:none;border-radius:8px;color:#fff;cursor:pointer;font-family:var(--font)">Reintentar</button></div>';
     });
   }
 };
