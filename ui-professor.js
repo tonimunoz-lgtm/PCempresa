@@ -1,3 +1,4 @@
+(function() {
 // Accés a l estat global i funcions via window (exposats per index.html)
 const getG = () => window.G;
 const saveGameData   = (...a) => window.saveGameData(...a);
@@ -321,3 +322,4 @@ window.printLeaderboard = function() { window.print(); };
 window.advanceClassWeeks = function() {
   showToast('⏩ Funció avançada: requereix Cloud Functions. Properament disponible.');
 };
+})();

@@ -1,3 +1,4 @@
+(function() {
 // Accés a l'estat global i funcions via window (exposats per index.html)
 const getG = () => window.G;
 const saveGameData  = (...a) => window.saveGameData(...a);
@@ -305,3 +306,4 @@ window.acceptInvestor = async function(inv) {
 window.addCustomAgendaItem = function() {
   showToast('📋 Funcionalitat disponible en la pròxima versió');
 };
+})();

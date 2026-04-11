@@ -1,3 +1,4 @@
+(function() {
 // ============================================================
 //  ui-proveidors.js  —  Gestió completa de proveïdors
 // ============================================================
@@ -374,3 +375,4 @@ window.openBuscaProveidors = function() {
   document.getElementById('ptab-mercat').classList.add('active');
   document.getElementById('ptab-actius').classList.remove('active');
 };
+})();

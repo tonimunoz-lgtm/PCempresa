@@ -1,3 +1,4 @@
+(function() {
 // ============================================================
 //  ui-laborals.js  —  Relacions laborals, vagues i negociació
 // ============================================================
@@ -454,3 +455,4 @@ window.openBonusEspecial = async function() {
   showToast(`🎁 Bonus pagat! -${fmt(bonus)}€ · Moral +15%`);
   renderLaborals();
 };
+})();

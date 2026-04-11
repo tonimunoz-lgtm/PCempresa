@@ -1,3 +1,4 @@
+(function() {
 // ============================================================
 //  ui-sales.js  —  Vendes per sector, reclamacions interactives
 // ============================================================
@@ -556,3 +557,4 @@ window.addNewClient = async function() {
   showToast(`✅ ${name} afegit com a client`);
   renderSales();
 };
+})();

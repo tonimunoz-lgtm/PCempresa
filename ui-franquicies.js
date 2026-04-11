@@ -1,3 +1,4 @@
+(function() {
 // Accés a l'estat global i funcions via window (exposats per index.html)
 const getG = () => window.G;
 const saveGameData  = (...a) => window.saveGameData(...a);
@@ -228,3 +229,4 @@ window.exitFranchise = async function() {
   showToast('❌ Has sortit de la franquícia');
   renderFranquicies();
 };
+})();

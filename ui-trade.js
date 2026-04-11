@@ -1,3 +1,4 @@
+(function() {
 // Accés a l'estat global i funcions via window (exposats per index.html)
 const getG = () => window.G;
 const saveGameData  = (...a) => window.saveGameData(...a);
@@ -275,3 +276,4 @@ window.cancelTrade = async function(type, id) {
 window.showIncotermDetail = function(code) {
   showToast(`📋 ${code} — Consulta el panell d'Incoterms per a detalls complets`);
 };
+})();

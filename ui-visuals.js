@@ -1,3 +1,4 @@
+(function() {
 // ui-visuals.js — Il·lustracions SVG dinàmiques de les instal·lacions
 
 const G = window.G;
@@ -243,3 +244,4 @@ function getSectorElements(sector, w, h, growth, colors) {
         <text x="${w-60}" y="${baseY-16}" text-anchor="middle" font-size="20">${'📊'}</text>`;
   }
 }
+})();
