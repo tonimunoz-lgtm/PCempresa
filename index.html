@@ -102,8 +102,8 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 
 /* Content area */
 .content{flex:1;overflow:hidden;position:relative}
-.tab-panel{position:absolute;inset:0;overflow-y:auto;visibility:hidden;pointer-events:none;background:var(--bg);z-index:1}
-.tab-panel.active{visibility:visible;pointer-events:all;z-index:2}
+.tab-panel{position:absolute;inset:0;display:none;background:var(--bg)}
+.tab-panel.active{display:block;overflow-y:auto}
 
 /* ====== DASHBOARD ====== */
 .dash-wrap{padding:16px;max-width:1200px;margin:0 auto;display:grid;gap:12px}
