@@ -3620,15 +3620,18 @@ window.showTab = function(tab) {
   if (tab === 'map')        { setTimeout(() => { renderMap(); renderRanking(); }, 100); return; }
   if (tab === 'setup')      { return; }
 
-  // Tabs externs: mostrar spinner NOMÉS si el panel està buit
+  // Tabs externs
   if (EXTERN_RENDER[tab]) {
-    if (!panel.innerHTML.trim() || panel.innerHTML.includes('Carregant...')) {
-      panel.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:200px;color:var(--text2);gap:12px"><div style="font-size:24px;animation:float 1.5s ease-in-out infinite">⏳</div><div style="font-size:14px">Carregant...</div></div>';
-    }
-    EXTERN_RENDER[tab]().catch(err => {
-      console.error('Error tab', tab, err);
-      panel.innerHTML = '<div style="padding:40px;text-align:center"><div style="font-size:36px;margin-bottom:10px">⚠️</div><div style="color:var(--red);font-weight:700;font-size:14px">' + err.message + '</div><button onclick="showTab(this.dataset.tab)" data-tab="' + tab + '" style="margin-top:12px;padding:8px 20px;background:var(--accent);border:none;border-radius:8px;color:#fff;cursor:pointer;font-family:var(--font)">Reintentar</button></div>';
+    panel.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:200px;color:var(--text2);gap:12px"><div style="font-size:24px">⏳</div><div style="font-size:14px">Carregant...</div></div>';
+    console.log('[showTab] crida render per', tab, '— window.renderSales=', typeof window.renderSales, 'window.renderBorsa=', typeof window.renderBorsa);
+    EXTERN_RENDER[tab]().then(() => {
+      console.log('[showTab] render OK per', tab, '— innerHTML length:', panel.innerHTML.length);
+    }).catch(err => {
+      console.error('[showTab] Error', tab, err);
+      panel.innerHTML = '<div style="padding:40px;text-align:center;color:red;font-size:14px">' + err.message + '</div>';
     });
+  } else {
+    console.warn('[showTab] No EXTERN_RENDER per', tab);
   }
 };
 
