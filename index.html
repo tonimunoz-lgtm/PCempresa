@@ -2163,14 +2163,62 @@ function renderFinances() {
   const mktCost = gd.mktBudget || 0;
   const otherCosts = costs - salaries - rent - mktCost - loanPayments;
 
+  // Ingressos per servei/producte (clicable)
+  const serveis = gd.serveis || [];
+  const ingDesgloss = serveis.length > 0
+    ? serveis.map(sv => {
+        const fact = sv.preu * sv.unitats_mes;
+        return `<div class="bal-row" style="padding-left:16px;opacity:.85">
+          <div class="bal-row-label" style="font-size:11px">↳ ${sv.name} (${sv.unitats_mes} u × ${sv.preu}€)</div>
+          <div class="bal-row-val" style="color:var(--green);font-size:11px">+${fact.toLocaleString('ca')}€</div>
+        </div>`}).join('')
+    : '';
+  
+  const salariesBrutes = (gd.employees||[]).reduce((s,e) => s+(e.salary||0), 0);
+  const salariesSS     = Math.round(salariesBrutes * 0.30);
+  const provCosts      = (gd.proveidors||[]).reduce((s,p) => s+(p.cost_mes||0), 0);
+  const tradeImport    = (gd.trade?.imports||[]).reduce((s,i) => s+(i.weeklyCost||0)*4.33, 0);
+  const franchRoyalty  = gd.franchise?.mode==='franquiciat' ? Math.round(rev*(gd.franchise?.royaltyRate||0.06)) : 0;
+  
   document.getElementById('pyg-table').innerHTML = `
-    <div class="bal-row"><div class="bal-row-label">Ingressos d'explotació</div><div class="bal-row-val" style="color:var(--green)">+${rev.toLocaleString('ca')}€</div></div>
-    <div class="bal-row"><div class="bal-row-label">Nòmines (SS inclosa)</div><div class="bal-row-val" style="color:var(--red)">-${salaries.toFixed(0).toLocaleString('ca')}€</div></div>
+    <div class="bal-row" style="cursor:pointer" onclick="toggleFinDetail('ing-detail')">
+      <div class="bal-row-label" style="font-weight:700">▶ Ingressos d'explotació <span style="font-size:10px;color:var(--accent)">(desglossa)</span></div>
+      <div class="bal-row-val" style="color:var(--green);font-weight:700">+${rev.toLocaleString('ca')}€</div>
+    </div>
+    <div id="ing-detail" style="display:none">${ingDesgloss||'<div style="padding:4px 16px;font-size:11px;color:var(--text3)">Defineix productes/serveis a Vendes</div>'}</div>
+    
+    <div class="bal-row" style="cursor:pointer" onclick="toggleFinDetail('sal-detail')">
+      <div class="bal-row-label" style="font-weight:700">▶ Nòmines (SS inclosa) <span style="font-size:10px;color:var(--accent)">(desglossa)</span></div>
+      <div class="bal-row-val" style="color:var(--red)">-${(salariesBrutes+salariesSS).toLocaleString('ca')}€</div>
+    </div>
+    <div id="sal-detail" style="display:none">
+      <div class="bal-row" style="padding-left:16px;opacity:.85">
+        <div class="bal-row-label" style="font-size:11px">↳ Nòmines brutes (${(gd.employees||[]).length} empleats)</div>
+        <div class="bal-row-val" style="color:var(--red);font-size:11px">-${salariesBrutes.toLocaleString('ca')}€</div>
+      </div>
+      <div class="bal-row" style="padding-left:16px;opacity:.85">
+        <div class="bal-row-label" style="font-size:11px">↳ Seguretat Social empresa (~30%)</div>
+        <div class="bal-row-val" style="color:var(--red);font-size:11px">-${salariesSS.toLocaleString('ca')}€</div>
+      </div>
+    </div>
+    
     <div class="bal-row"><div class="bal-row-label">Lloguer instal·lacions</div><div class="bal-row-val" style="color:var(--red)">-${rent.toLocaleString('ca')}€</div></div>
+    ${provCosts > 0 ? `<div class="bal-row"><div class="bal-row-label">Cost proveïdors</div><div class="bal-row-val" style="color:var(--red)">-${provCosts.toLocaleString('ca')}€</div></div>` : ''}
     <div class="bal-row"><div class="bal-row-label">Màrqueting i publicitat</div><div class="bal-row-val" style="color:var(--red)">-${mktCost.toLocaleString('ca')}€</div></div>
-    <div class="bal-row"><div class="bal-row-label">Quota préstecs</div><div class="bal-row-val" style="color:var(--red)">-${loanPayments.toLocaleString('ca')}€</div></div>
-    <div class="bal-row"><div class="bal-row-label">Altres despeses</div><div class="bal-row-val" style="color:var(--red)">-${Math.max(0,otherCosts).toFixed(0)}€</div></div>
-    <div class="bal-row total"><div class="bal-row-label">Resultat mensual</div><div class="bal-row-val" style="color:${result>=0?'var(--green)':'var(--red)'}">${result>=0?'+':''}${result.toFixed(0)}€</div></div>`;
+    ${loanPayments > 0 ? `<div class="bal-row"><div class="bal-row-label">Quota préstecs / leasing</div><div class="bal-row-val" style="color:var(--red)">-${loanPayments.toLocaleString('ca')}€</div></div>` : ''}
+    ${tradeImport > 0 ? `<div class="bal-row"><div class="bal-row-label">Importacions internacionals</div><div class="bal-row-val" style="color:var(--red)">-${Math.round(tradeImport).toLocaleString('ca')}€</div></div>` : ''}
+    ${franchRoyalty > 0 ? `<div class="bal-row"><div class="bal-row-label">Royalties franquícia</div><div class="bal-row-val" style="color:var(--red)">-${franchRoyalty.toLocaleString('ca')}€</div></div>` : ''}
+    <div class="bal-row total"><div class="bal-row-label">Resultat mensual</div><div class="bal-row-val" style="color:${result>=0?'var(--green)':'var(--red)'};">${result>=0?'+':''}${Math.round(result).toLocaleString('ca')}€</div></div>`;
+  
+  // IS estimat
+  if (result > 0) {
+    const tax = gd.company?.legalForm === 'cooperativa' ? 0.20 : 0.25;
+    const pygEl = document.getElementById('pyg-table');
+    if (pygEl) {
+      pygEl.innerHTML += `<div class="bal-row" style="opacity:.7"><div class="bal-row-label" style="font-size:11px">* IS estimat anual (${tax*100}%)</div>
+        <div class="bal-row-val" style="font-size:11px;color:var(--text2)">-${Math.round(result*12*tax).toLocaleString('ca')}€/any</div></div>`;
+    }
+  }
 
   document.getElementById('treasury-info').innerHTML = `
     <div class="bal-row"><div class="bal-row-label">Tresoreria actual</div><div class="bal-row-val" style="color:var(--gold)">${(f.cash||0).toLocaleString('ca')}€</div></div>
@@ -2217,36 +2265,73 @@ function renderFinances() {
 
 // ==================== HR ====================
 function renderHR() {
-  const emps = G.gameData.employees || [];
-  const totalSalary = emps.reduce((s, e) => s + (e.salary || 0) * 1.3, 0);
+  const gd = G.gameData;
+  const emps = gd.employees || [];
+  const lr    = gd.laborRelations || { satisfaccio: 72 };
+  const totalBrut = emps.reduce((s, e) => s + (e.salary || 0), 0);
+  const totalSS   = Math.round(totalBrut * 0.30);  // ~30% SS empresa
+  const totalCost = totalBrut + totalSS;
   const moraleAvg = emps.length > 0 ? Math.round(emps.reduce((s, e) => s + (e.morale || 60), 0) / emps.length) : 0;
+  const satColor  = lr.satisfaccio >= 70 ? 'var(--green)' : lr.satisfaccio >= 50 ? 'var(--gold)' : 'var(--red)';
+
+  // Agrupar per nivell jeràrquic
+  const directius  = emps.filter(e => e.nivel === 'directiu');
+  const intermedis = emps.filter(e => e.nivel === 'intermedi');
+  const base       = emps.filter(e => !e.nivel || e.nivel === 'base');
+
+  function empCard(e) {
+    const moraleColor = e.morale >= 70 ? 'var(--green)' : e.morale >= 40 ? 'var(--gold)' : 'var(--red)';
+    const ssEmp  = Math.round((e.salary||0) * 0.30);
+    const costTotal = (e.salary||0) + ssEmp;
+    const vagaBadge = e.en_vaga ? '<span style="background:var(--red);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:10px;margin-left:6px">EN VAGA</span>' : '';
+    return `
+      <div class="emp-card" style="${e.en_vaga ? 'border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.04)' : ''}">
+        <div class="emp-avatar" style="background:${e.nivel==='directiu'?'linear-gradient(135deg,var(--gold),#d97706)':e.nivel==='intermedi'?'linear-gradient(135deg,var(--accent),var(--accent2))':'linear-gradient(135deg,#374151,#1f2937)'}">${e.avatar||e.emoji||'👤'}</div>
+        <div class="emp-info">
+          <div class="emp-name">${e.name}${vagaBadge}</div>
+          <div class="emp-role">${e.dept?.toUpperCase()||'—'} · ${e.role||e.name} · ${Math.round(e.seniority||0)} anys</div>
+          <div style="font-size:11px;margin-top:4px">
+            <span class="emp-salary">${(e.salary||0).toLocaleString('ca')}€</span>
+            <span style="color:var(--text3);margin-left:6px">+SS ${ssEmp.toLocaleString('ca')}€ = <strong style="color:var(--red)">${costTotal.toLocaleString('ca')}€/mes empresa</strong></span>
+          </div>
+          <div class="emp-morale" style="display:flex;align-items:center;gap:8px;margin-top:5px">
+            <div class="morale-bar"><div class="morale-fill" style="width:${e.morale||60}%;background:${moraleColor}"></div></div>
+            <span style="font-size:10px;color:${moraleColor}">${e.morale||60}%</span>
+          </div>
+        </div>
+        <div class="emp-actions" style="display:flex;flex-direction:column;gap:4px">
+          <button class="emp-btn raise" data-eid="${e.id}" onclick="raiseEmployee(this.dataset.eid)">💰 Pujada</button>
+          <button class="emp-btn fire"  data-eid="${e.id}" onclick="fireEmployee(this.dataset.eid)">❌ Acomiadar</button>
+        </div>
+      </div>`;
+  }
+
+  function section(title, icon, list) {
+    if (!list.length) return '';
+    return `<div style="margin-bottom:14px">
+      <div style="font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px;padding:0 4px;display:flex;align-items:center;gap:6px">
+        <span>${icon}</span>${title} <span style="color:var(--text3)">(${list.length})</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">${list.map(empCard).join('')}</div>
+    </div>`;
+  }
 
   document.getElementById('employees-list').innerHTML = emps.length === 0
     ? '<div style="text-align:center;color:var(--text2);padding:30px;font-size:14px">Sense empleats. Contracta el teu primer treballador!</div>'
-    : emps.map(e => {
-      const moraleColor = e.morale >= 70 ? 'var(--green)' : e.morale >= 40 ? 'var(--gold)' : 'var(--red)';
-      return `
-        <div class="emp-card">
-          <div class="emp-avatar">${e.avatar||'👤'}</div>
-          <div class="emp-info">
-            <div class="emp-name">${e.name}</div>
-            <div class="emp-role">${e.dept?.toUpperCase()||'—'} · ${e.role} · ${e.seniority||0} anys</div>
-            <div class="emp-salary">${e.salary?.toLocaleString('ca')||0}€ bruts/mes</div>
-            <div class="emp-morale">
-              <div class="morale-bar"><div class="morale-fill" style="width:${e.morale||60}%;background:${moraleColor}"></div></div>
-              <span style="font-size:10px;color:${moraleColor}">${e.morale||60}% ànim</span>
-            </div>
-          </div>
-          <div class="emp-actions">
-            <button class="emp-btn raise" onclick="raiseEmployee('${e.id}')">💰 Pujada</button>
-            <button class="emp-btn fire" onclick="fireEmployee('${e.id}')">❌ Acomiadar</button>
-          </div>
-        </div>`}).join('');
+    : section('Direcció i Alta Gerència','👔', directius) +
+      section('Càrrecs Intermedis','🏅', intermedis) +
+      section('Treballadors','👷', base);
 
   document.getElementById('salary-summary').innerHTML = `
-    Empleats: <strong style="color:var(--text)">${emps.length}</strong> · 
-    Cost mensual total (SS inclosa): <strong style="color:var(--red)">${totalSalary.toFixed(0)}€</strong> · 
-    Mora mitjana: <strong style="color:${moraleAvg>=70?'var(--green)':moraleAvg>=40?'var(--gold)':'var(--red)'}">${moraleAvg}%</strong>`;
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+      <div class="ratio-box"><div class="ratio-val" style="font-size:16px">${emps.length}</div><div class="ratio-label">Empleats</div></div>
+      <div class="ratio-box"><div class="ratio-val" style="font-size:16px;color:var(--red)">${totalCost.toLocaleString('ca')}€</div><div class="ratio-label">Cost total/mes empresa</div></div>
+      <div class="ratio-box"><div class="ratio-val" style="font-size:16px;color:${satColor}">${lr.satisfaccio||72}%</div><div class="ratio-label">Satisfacció laboral</div></div>
+    </div>
+    <div style="margin-top:10px;font-size:11px;color:var(--text2);background:rgba(255,255,255,.03);border-radius:8px;padding:10px">
+      💡 <strong style="color:var(--text)">Seguretat Social empresa:</strong> Per cada €1 de nòmina bruta, l'empresa paga ~0,30€ addicionals en cotitzacions (SS, FOGASA, atur). 
+      Nòmines brutes: <strong style="color:var(--text)">${totalBrut.toLocaleString('ca')}€</strong> + SS: <strong style="color:var(--red)">${totalSS.toLocaleString('ca')}€</strong> = Cost total: <strong style="color:var(--red)">${totalCost.toLocaleString('ca')}€</strong>
+    </div>`;
 }
 
 window.fireEmployee = async function(id) {
@@ -2634,128 +2719,213 @@ window.toggleRanking = function() {
 
 // ==================== WEEK ADVANCE ====================
 window.advanceWeek = async function() {
-  if (!G.gameData.mode) { showToast('⚠️ Crea o incorpora\'t a una empresa primer!'); return; }
+  if (!G.gameData.mode) { showToast("⚠️ Crea o incorpora't a una empresa primer!"); return; }
   const gd = G.gameData;
   gd.week++;
-  // Month/year progression
-  const weekInYear = ((gd.week - 1) % 52) + 1;
-  gd.month = Math.ceil(weekInYear / 4.33);
-  if (gd.week > 1 && (gd.week - 1) % 52 === 0) {
-    gd.year++;
-    endOfYear();
-  }
 
-  // Revenue simulation
-  const emps = gd.employees || [];
-  const salesEmps = emps.filter(e => e.dept === 'vendes').length;
-  const machines = gd.machines || [];
-  const capacity = machines.reduce((s, m) => s + m.capacity, 0);
-  const mktChannels = gd.marketing?.channels || {};
-  const mktSpend = Object.values(mktChannels).reduce((s, v) => s + v, 0);
-  const sponsors = gd.marketing?.sponsors || [];
+  // ── Data real de joc ──
+  const startDate = gd.startDate ? new Date(gd.startDate) : new Date();
+  const gameDate  = new Date(startDate.getTime() + (gd.week - 1) * 7 * 86400000);
+  gd.year  = gameDate.getFullYear();
+  gd.month = gameDate.getMonth() + 1;
+  const isNewYear = gd.week > 1 && gameDate.getMonth() === 0 && gameDate.getDate() <= 7;
+  if (isNewYear) endOfYear();
+
+  // ── Ingressos des de serveis reals ──
+  const serveis  = gd.serveis || [];
+  const clients  = gd.clients || [];
   const prestigi = gd.prestigi || 0;
+  let revMensual = serveis.reduce((s, sv) => s + sv.preu * sv.unitats_mes, 0);
+  revMensual += clients.reduce((s, cl) => s + (cl.monthly_value || 0), 0);
+  if (revMensual === 0) revMensual = gd.finances?.monthly_revenue || 0;
 
-  // Base revenue calculation
-  let baseRev = capacity * 0.8 * 5; // 5€ per unit
-  baseRev += salesEmps * 3500; // Each sales person generates 3500/week
-  baseRev += mktSpend * 2.5; // Marketing ROI
-  baseRev += sponsors.length * 800;
-  baseRev += prestigi * 50;
-  baseRev = Math.max(baseRev, 0);
+  const weekVariation = 0.92 + Math.random() * 0.16 + prestigi * 0.001;
+  let weekRev = (revMensual / 4.33) * weekVariation;
 
-  // Costs
-  const salaries = emps.reduce((s, e) => s + e.salary * 1.3, 0) / 4.33;
-  const rent = (gd.company?.monthlyRent || 0) / 4.33;
+  // Vaga redueix ingressos
+  const vaga = gd.laborRelations?.vaga;
+  if (vaga?.activa) weekRev *= (1 - (vaga.adherencia || 0.5));
+
+  // Events actius
+  let revMult = 1;
+  (gd.events || []).forEach(ev => { if ((ev.weeksLeft||0) > 0) revMult += (ev.impact || 0); });
+  gd.events = (gd.events || []).map(ev => ({...ev, weeksLeft: (ev.weeksLeft||0) - 1})).filter(ev => ev.weeksLeft > 0);
+  weekRev = Math.max(0, weekRev * revMult);
+
+  // Exportacions i franquícia
+  weekRev += (gd.trade?.exports || []).reduce((s, e) => s + (e.weeklyValue || 0), 0);
+  if (gd.franchise?.mode === 'franquiciador') weekRev += (gd.franchise.royaltyWeekly || 0);
+
+  // ── Costos setmanals ──
+  const emps = gd.employees || [];
+  const salariesSetm = emps.filter(e => !e.en_vaga)
+    .reduce((s, e) => s + (e.salary || 0) * 1.30, 0) / 4.33;
+  const rent        = (gd.company?.monthlyRent || 0) / 4.33;
+  const machines    = gd.machines || [];
   const maintenance = machines.reduce((s, m) => s + (m.maintenance || 0), 0) / 4.33;
-  const loanPayments = (gd.finances.loans || []).reduce((s, l) => s + l.monthlyPayment / 4.33, 0);
-  const totalCosts = salaries + rent + maintenance + loanPayments + mktSpend / 4.33;
+  const loanPays    = (gd.finances.loans || []).reduce((s, l) => s + (l.monthlyPayment || 0) / 4.33, 0);
+  const mktSpend    = Object.values(gd.marketing?.channels || {}).reduce((s, v) => s + v, 0) / 4.33;
+  const provCosts   = (gd.proveidors || []).reduce((s, p) => s + (p.cost_mes || 0), 0) / 4.33;
+  const impCosts    = (gd.trade?.imports || []).reduce((s, i) => s + (i.weeklyCost || 0), 0);
+  const franchCost  = gd.franchise?.mode === 'franquiciat' ? weekRev * (gd.franchise.royaltyRate || 0.06) : 0;
 
-  // Apply active events
-  let revenueMultiplier = 1;
-  (gd.events || []).forEach(ev => {
-    if (ev.weeksLeft > 0) revenueMultiplier += ev.impact;
-  });
-  // Reduce weeks left
-  gd.events = (gd.events || []).map(ev => ({...ev, weeksLeft: ev.weeksLeft - 1})).filter(ev => ev.weeksLeft > 0);
-
-  const weekRev = baseRev * revenueMultiplier;
+  const totalCosts = salariesSetm + rent + maintenance + loanPays + mktSpend + provCosts + impCosts + franchCost;
   const weekResult = weekRev - totalCosts;
+
+  // ── Actualitzar finances ──
+  if (!gd.finances.actiu)  gd.finances.actiu  = {immobilitzat:0, existencies:0, tresoreria:0, clients:0};
+  if (!gd.finances.passiu) gd.finances.passiu = {capital:0, reserves:0, deutes_llarg:0, deutes_curt:0, proveidors:0};
 
   gd.finances.cash = (gd.finances.cash || 0) + weekResult;
   gd.finances.monthly_revenue = weekRev * 4.33;
-  gd.finances.monthly_costs = totalCosts * 4.33;
-  gd.finances.annual_revenue = (gd.finances.annual_revenue || 0) + weekRev;
-  gd.finances.annual_costs = (gd.finances.annual_costs || 0) + totalCosts;
-  gd.finances.actiu.tresoreria = gd.finances.cash;
+  gd.finances.monthly_costs   = totalCosts * 4.33;
+  gd.finances.annual_revenue  = (gd.finances.annual_revenue || 0) + weekRev;
+  gd.finances.annual_costs    = (gd.finances.annual_costs || 0) + totalCosts;
+  gd.finances.actiu.tresoreria  = gd.finances.cash;
+  gd.finances.actiu.clients     = Math.round(revMensual * 0.45);
+  gd.finances.passiu.proveidors = Math.round(provCosts * 4.33 * 0.30);
 
-  // Revenue history
   if (!gd.finances.revenue_history) gd.finances.revenue_history = [];
-  gd.finances.revenue_history.push({week: gd.week, rev: weekRev, costs: totalCosts, result: weekResult});
+  gd.finances.revenue_history.push({week:gd.week, rev:weekRev, costs:totalCosts, result:weekResult});
   if (gd.finances.revenue_history.length > 52) gd.finances.revenue_history.shift();
 
-  // Morale drift
+  // ── Empleats ──
   emps.forEach(e => {
-    if (gd.finances.cash < 0) e.morale = Math.max(0, (e.morale||60) - 5);
-    else e.morale = Math.min(100, (e.morale||60) + 1);
-    e.seniority = (e.seniority || 0) + 1/52;
+    e.morale = gd.finances.cash < 0 ? Math.max(0,(e.morale||60)-4) : Math.min(100,(e.morale||60)+0.8);
+    e.seniority = (e.seniority||0) + 1/52;
   });
 
-  // Client acquisition (simplified)
-  if (Math.random() < 0.15 + prestigi * 0.01) {
-    const clientTypes = ['🏢 Empresa industrial','🏪 Comerç local','🏥 Centre mèdic','🏫 Centre educatiu','🏨 Hotel'];
-    const newClient = {
-      id:'cl_'+Date.now(), icon:'🤝',
-      name: clientTypes[Math.floor(Math.random()*clientTypes.length)],
-      type: Math.random() > 0.5 ? 'B2B' : 'B2C',
-      monthly_value: Math.round(500 + Math.random() * 5000),
-      satisfaction: 70 + Math.floor(Math.random()*25),
+  // ── Accionistes ──
+  (gd.shareholders||[]).forEach(sh => {
+    sh.satisfaction = weekResult > 0 ? Math.min(100,sh.satisfaction+0.8) : Math.max(0,sh.satisfaction-2);
+  });
+
+  // ── Relacions laborals ──
+  if (gd.laborRelations) {
+    gd.laborRelations.satisfaccio = weekResult > 0
+      ? Math.min(100,(gd.laborRelations.satisfaccio||72)+0.3)
+      : Math.max(0,(gd.laborRelations.satisfaccio||72)-0.8);
+    if ((gd.laborRelations.satisfaccio||72) < 25 && !gd.laborRelations.vaga?.activa && Math.random() < 0.12) {
+      gd.laborRelations.vaga = {activa:true, dia_vaga:1, adherencia:0.45+Math.random()*0.35, motiu:"Condicions laborals insatisfactòries"};
+      gd.notifications.push({id:Date.now(), icon:"🔴", title:"VAGA ESPONTÀNIA!", desc:"La insatisfacció laboral ha derivat en una vaga. Atén les reivindicacions!", time:"S"+gd.week, urgent:true});
+      showEventToast("🔴","VAGA!","Els treballadors han decretat vaga espontàniament.",false);
+    }
+    if (gd.laborRelations.vaga?.activa) gd.laborRelations.vaga.dia_vaga = (gd.laborRelations.vaga.dia_vaga||1)+7;
+  }
+
+  // ── Captació clients ──
+  const mktBoost = Object.values(gd.marketing?.channels||{}).reduce((s,v)=>s+v,0) > 3000;
+  if (Math.random() < 0.12 + prestigi*0.004 + (mktBoost?0.05:0)) {
+    const sector = gd.company?.sector || "default";
+    const clientMap = {
+      alimentacio:["Cadena hostaleria","Restaurant local","Hotel boutique"],
+      tecnologia: ["Startup IA","Administració pública","Empresa industrial"],
+      salut:      ["Clínica dental","Centre mèdic","Residència gent gran"],
+      construccio:["Promotora immobiliària","Ajuntament","Cooperativa habitatge"],
+      logistica:  ["E-commerce","Fabricant industrial","Distribuïdora nacional"],
+      default:    ["Empresa B2B","Client corporatiu","Particular"]
     };
-    if (!gd.clients) gd.clients = [];
-    gd.clients.push(newClient);
-    showEventToast('🤝', 'Nou client!', `${newClient.name} vol contractar els teus serveis!`, true);
-    gd.notifications.push({id:Date.now(), icon:'🤝', title:'Nou client!', desc:`${newClient.name} s'incorpora com a client`, time:`S${gd.week}`, urgent:false});
+    const types = clientMap[sector]||clientMap.default;
+    const cl = {
+      id:"cl_"+Date.now(), icon:"🤝",
+      name: types[Math.floor(Math.random()*types.length)] + " " + Math.floor(Math.random()*99+1),
+      type: Math.random()>0.35?"B2B":"B2C",
+      monthly_value: Math.round((revMensual*0.05)*(0.5+Math.random())),
+      satisfaction: 72+Math.floor(Math.random()*22),
+    };
+    if (!gd.clients) gd.clients=[];
+    gd.clients.push(cl);
+    showEventToast("🤝","Nou client!",cl.name+" vol contractar els teus serveis!",true);
+    gd.notifications.push({id:Date.now(),icon:"🤝",title:"Nou client!",desc:cl.name,time:"S"+gd.week,urgent:false});
   }
 
-  // Random claims
-  if (gd.clients?.length > 0 && Math.random() < 0.08) {
+  // ── Pèrdua clients ──
+  if (gd.clients) {
+    gd.clients = gd.clients.filter(cl => {
+      cl.satisfaction = Math.max(0,(cl.satisfaction||70)+(weekResult>=0?0.5:-2));
+      if (cl.satisfaction < 20 && Math.random() < 0.35) {
+        showEventToast("💔","Client perdut!",cl.name+" ha cancel·lat el contracte.",false);
+        return false;
+      }
+      return true;
+    });
+  }
+
+  // ── Reclamació ──
+  if ((gd.clients||[]).length > 0 && Math.random() < 0.06) {
     const cl = gd.clients[Math.floor(Math.random()*gd.clients.length)];
-    const issue = ['Retard en el lliurament','Defecte en el producte','Error en la facturació','Mala atenció al client'][Math.floor(Math.random()*4)];
-    if (!gd.claims) gd.claims = [];
-    gd.claims.push({id:'claim_'+Date.now(), client:cl.name, issue, compensation:Math.round(200+Math.random()*1000)});
-    gd.notifications.push({id:Date.now(), icon:'⚠️', title:'Reclamació!', desc:`${cl.name}: ${issue}`, time:`S${gd.week}`, urgent:true});
-    showEventToast('⚠️', 'Reclamació!', `${cl.name}: ${issue}`, false);
+    const issues = ["Retard en el lliurament","Defecte en el producte","Error en la facturació","Mala atenció al client","Producte no conforme"];
+    const issue  = issues[Math.floor(Math.random()*issues.length)];
+    if (!gd.claims) gd.claims=[];
+    gd.claims.push({id:"claim_"+Date.now(),client:cl.name,issue,compensation:Math.round(300+Math.random()*2000),clientSat:cl.satisfaction||65});
+    gd.notifications.push({id:Date.now(),icon:"⚠️",title:"Reclamació!",desc:cl.name+": "+issue,time:"S"+gd.week,urgent:true});
+    showEventToast("⚠️","Reclamació!",cl.name+": "+issue,false);
   }
 
-  // Random events
-  if (Math.random() < 0.12) {
+  // ── Events aleatoris ──
+  if (Math.random() < 0.10) {
     const ev = EVENT_POOL[Math.floor(Math.random()*EVENT_POOL.length)];
-    if (Math.random() < ev.probability * 5) {
-      const activeEv = {...ev, id:'ev_'+Date.now(), weeksLeft: ev.duration || 1};
-      gd.events.push(activeEv);
-      const impact = ev.impact >= 0 ? `+${(ev.impact*100).toFixed(0)}%` : `${(ev.impact*100).toFixed(0)}%`;
-      gd.notifications.push({id:Date.now(), icon:ev.icon, title:ev.title, desc:ev.desc + ` (Impacte: ${impact})`, time:`S${gd.week}`, urgent:ev.impact<0});
-      showEventToast(ev.icon, ev.title, ev.desc, ev.impact >= 0);
+    if (Math.random() < (ev.probability||0.05)*5) {
+      gd.events.push({...ev, id:"ev_"+Date.now(), weeksLeft:ev.duration||2});
+      const impact = (ev.impact>=0?"+":"")+(ev.impact*100).toFixed(0)+"%";
+      gd.notifications.push({id:Date.now(),icon:ev.icon,title:ev.title,desc:ev.desc+" (Impacte: "+impact+")",time:"S"+gd.week,urgent:ev.impact<0});
+      showEventToast(ev.icon,ev.title,ev.desc,ev.impact>=0);
     }
   }
 
-  // Prestigi update
-  if (weekResult > 0) gd.prestigi = Math.min(100, (gd.prestigi||0) + 0.1);
-  else if (weekResult < -5000) gd.prestigi = Math.max(0, (gd.prestigi||0) - 0.2);
-
-  // Insolvency check
-  if (gd.finances.cash < -50000) {
-    gd.notifications.push({id:Date.now(), icon:'🚨', title:'ALERTA: Concurs de creditors', desc:'La tresoreria és críticament negativa. Risc de suspensió de pagaments.', time:`S${gd.week}`, urgent:true});
-    showEventToast('🚨', 'Alerta financera!', 'Tresoreria crítica. Risc de suspensió de pagaments!', false);
+  // ── Junta trimestral ──
+  if (gd.week%13===0 && (gd.shareholders||[]).length>0) {
+    const avgSat = Math.round(gd.shareholders.reduce((s,sh)=>s+sh.satisfaction,0)/gd.shareholders.length);
+    gd.notifications.push({id:Date.now(),icon:"🏛️",title:"Junta d'accionistes",desc:"Satisfacció: "+avgSat+"%. Revisa el panell Junta.",time:"S"+gd.week,urgent:avgSat<50});
   }
 
-  document.getElementById('week-display').textContent = `Setmana ${gd.week} · ${gd.year}`;
-  updateTopStats();
-  renderDashboard(); renderFinances(); renderHR(); renderProduction(); renderMarketing(); renderSales();
-  if (G.currentTab === 'map') renderMap();
+  // ── Demandes IA caps departament (cada 4 setmanes) ──
+  if (gd.week%4===0) generateDeptRequests(gd);
 
-  showToast(`⏩ Setmana ${gd.week} · Resultat: ${weekResult >= 0 ? '+' : ''}${weekResult.toFixed(0)}€`);
+  // ── Prestigi ──
+  if (weekResult>500) gd.prestigi=Math.min(100,prestigi+0.12);
+  else if (weekResult>0) gd.prestigi=Math.min(100,prestigi+0.04);
+  else if (weekResult<-3000) gd.prestigi=Math.max(0,prestigi-0.2);
+
+  // ── Alerta insolvència ──
+  if (gd.finances.cash < -100000 && !gd._insolvWarned) {
+    gd._insolvWarned = true;
+    gd.notifications.push({id:Date.now(),icon:"🚨",title:"ALERTA: Concurs de creditors",desc:"Tresoreria críticament negativa!",time:"S"+gd.week,urgent:true});
+    showEventToast("🚨","Alerta financera!","Tresoreria crítica. Risc concurs!",false);
+  } else if (gd.finances.cash>=0) gd._insolvWarned=false;
+
+  // ── UI ──
+  const dateStr = gameDate.toLocaleDateString("ca-ES",{day:"numeric",month:"short",year:"numeric"});
+  document.getElementById("week-display").textContent = "S"+gd.week+" · "+dateStr;
+  updateTopStats();
+  renderDashboard(); renderFinances(); renderHR();
+  if (G.currentTab==="production") renderProduction();
+  if (G.currentTab==="marketing")  renderMarketing();
+  if (G.currentTab==="map") renderMap();
+  const extTabs = ["sales","borsa","junta","trade","franquicies","proveidors","laborals","professor"];
+  if (extTabs.includes(G.currentTab)) showTab(G.currentTab);
+
+  showToast("⏩ "+dateStr+" · "+(weekResult>=0?"+":"")+Math.round(weekResult).toLocaleString("ca")+"€");
   await saveGameData();
 };
+
+function generateDeptRequests(gd) {
+  const emps=gd.employees||[], machines=gd.machines||[];
+  const cash=gd.finances?.cash||0, rev=gd.finances?.monthly_revenue||0;
+  const requests=[];
+  const comercials=emps.filter(e=>e.dept==="vendes").length;
+  if (comercials<2&&Math.random()<0.5) requests.push({icon:"📊",dept:"Vendes",emissor:"Cap Comercial",msg:"Necessitem "+Math.max(1,3-comercials)+" comercial(s) més per assolir els objectius. La competència ens guanya terreny.",urgent:comercials===0});
+  const cap=machines.reduce((s,m)=>s+m.capacity,0)*0.8;
+  if (cap<rev/20&&Math.random()<0.4) requests.push({icon:"🏭",dept:"Producció",emissor:"Director Operacions",msg:"La capacitat productiva és insuficient per atendre la demanda. Proposo nova maquinària o ampliar torn.",urgent:cap<rev/40});
+  const avgMorale=emps.length>0?emps.reduce((s,e)=>s+(e.morale||60),0)/emps.length:70;
+  if (avgMorale<55&&Math.random()<0.6) requests.push({icon:"👥",dept:"RRHH",emissor:"Director RRHH",msg:"La moral de l'equip és crítica ("+Math.round(avgMorale)+"%). Proposo bonificacions o millora de condicions laborals.",urgent:avgMorale<40});
+  if (cash<rev&&cash>0&&Math.random()<0.35) requests.push({icon:"💰",dept:"Finances",emissor:"Director Financer (CFO)",msg:"La tresoreria és ajustada. Recomanaria una línia de crèdit o optimitzar cobrament de clients.",urgent:false});
+  const mkt=Object.values(gd.marketing?.channels||{}).reduce((s,v)=>s+v,0);
+  if (mkt<rev*0.03&&Math.random()<0.4) requests.push({icon:"📣",dept:"Màrqueting",emissor:"Director Marketing",msg:"El pressupost de màrqueting és baix (<3% vendes). Proposo incrementar-lo per captar nous clients.",urgent:false});
+  if (!gd.notifications) gd.notifications=[];
+  requests.forEach(r=>gd.notifications.push({id:Date.now()+Math.random(),icon:r.icon,title:"["+r.dept+"] "+r.emissor,desc:r.msg,time:"S"+gd.week,urgent:r.urgent,read:false}));
+}
+
 
 function endOfYear() {
   const gd = G.gameData;
@@ -2770,25 +2940,126 @@ function endOfYear() {
 }
 
 // ==================== LOAN ====================
+window.toggleFinDetail = function(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const isOpen = el.style.display !== 'none';
+  el.style.display = isOpen ? 'none' : '';
+  // Canviar el triangle
+  const row = el.previousElementSibling;
+  if (row) {
+    const lbl = row.querySelector('.bal-row-label');
+    if (lbl) lbl.innerHTML = lbl.innerHTML.replace(isOpen ? '▼' : '▶', isOpen ? '▶' : '▼');
+  }
+};
+
 window.requestLoan = async function() {
   if (!G.gameData.company) { showToast('⚠️ Crea una empresa primer'); return; }
-  const amount = parseFloat(document.getElementById('loan-amount').value || 0);
-  const years = parseInt(document.getElementById('loan-years').value || 7);
+  const amount = parseFloat(document.getElementById('loan-amount')?.value || 0);
+  const years  = parseInt(document.getElementById('loan-years')?.value || 7);
   if (amount < 5000) { showToast('⚠️ Import mínim: 5.000€'); return; }
-  const interest = 5.5;
-  const monthlyPayment = Math.round(amount * (interest/100/12) / (1 - Math.pow(1+interest/100/12, -years*12)));
-  const approved = Math.random() > 0.25; // 75% approval
+
+  const gd = G.gameData;
+  const f  = gd.finances;
+
+  // ── Anàlisi bancari real ──
+  const cash        = f.cash || 0;
+  const totalActiu  = (f.actiu?.immobilitzat||0)+(f.actiu?.existencies||0)+cash+(f.actiu?.clients||0);
+  const totalDeute  = (f.passiu?.deutes_llarg||0)+(f.passiu?.deutes_curt||0);
+  const capital     = (f.passiu?.capital||0)+(f.passiu?.reserves||0);
+  const rev         = f.monthly_revenue || 0;
+  const costs       = f.monthly_costs  || 0;
+  const ebitda      = (rev - costs) * 12;  // anual
+  const loanPaysMes = (f.loans||[]).reduce((s,l)=>s+(l.monthlyPayment||0),0);
+
+  // Ràtios que analitza el banc
+  const ratioEndeut  = capital > 0 ? totalDeute / capital : 99;        // <2 OK
+  const ratioSolv    = totalDeute > 0 ? totalActiu / totalDeute : 99;  // >1.5 OK  
+  const debtService  = ebitda > 0 ? (loanPaysMes*12 + amount*0.06) / ebitda : 99; // <0.35 OK
+  const garantia     = totalActiu - totalDeute;                         // >import demanat OK
+
+  const resultEl = document.getElementById('loan-result');
+
+  // Mostrar anàlisi mentre espera (simulem processament)
+  resultEl.innerHTML = `<div style="color:var(--text2);font-size:12px;padding:12px;background:rgba(255,255,255,.03);border-radius:8px;margin-top:8px">
+    🏦 <strong style="color:var(--text)">Anàlisi bancari en curs...</strong>
+    <div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px">
+      <div>Ràtio endeutament: <strong style="color:${ratioEndeut<2?'var(--green)':'var(--red)'}">${ratioEndeut.toFixed(2)}</strong> (ok <2)</div>
+      <div>Solvència: <strong style="color:${ratioSolv>1.5?'var(--green)':'var(--red)'}">${ratioSolv.toFixed(2)}</strong> (ok >1.5)</div>
+      <div>Cobertura deute: <strong style="color:${debtService<0.35?'var(--green)':'var(--red)'}">${(debtService*100).toFixed(0)}%</strong> (ok <35%)</div>
+      <div>Garantia neta: <strong style="color:${garantia>amount?'var(--green)':'var(--gold)'}">${garantia.toLocaleString('ca')}€</strong></div>
+    </div>
+  </div>`;
+
+  // Simular temps de processament
+  await new Promise(r => setTimeout(r, 1800));
+
+  // Decisió bancària basada en ràtios
+  let approved = false, counterOffer = 0, reason = '';
+  const interest = Math.max(3.5, Math.min(8.5, 3.5 + ratioEndeut * 0.8 + (debtService > 0.3 ? 1.5 : 0)));
+
+  if (ratioEndeut > 4)      { reason = 'Endeutament excessiu. Ràtio deute/capital > 4.'; }
+  else if (ratioSolv < 1)   { reason = 'Solvència insuficient. L'actiu no cobreix el passiu.'; }
+  else if (debtService > 0.5){ reason = 'La cobertura del servei del deute és massa alta (>50% EBITDA).'; }
+  else if (cash < 0)         { reason = 'Tresoreria negativa. Necessitem situació de liquiditat positiva.'; }
+  else {
+    approved = true;
+    // Contraoferta si l'import és molt alt
+    if (amount > garantia * 0.8 || debtService > 0.3) {
+      counterOffer = Math.round(Math.min(amount * 0.6, garantia * 0.6));
+    }
+  }
+
+  const monthlyPayment = (offerAmt) => Math.round(offerAmt * (interest/100/12) / (1 - Math.pow(1+interest/100/12, -(years*12))));
+
   if (!approved) {
-    document.getElementById('loan-result').innerHTML = `<span style="color:var(--red)">❌ Sol·licitud denegada. Millora el teu historial de crèdit o aporta avals.</span>`;
+    resultEl.innerHTML = `
+      <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:14px;margin-top:8px">
+        <div style="font-weight:800;color:var(--red);margin-bottom:8px">❌ Sol·licitud denegada</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:12px"><strong>Motiu:</strong> ${reason}</div>
+        <div style="font-size:11px;color:var(--text3)">Consell: Redueix el deute existent, augmenta el capital o aporta avals addicionals.</div>
+      </div>`;
     return;
   }
+
+  if (counterOffer > 0 && counterOffer < amount) {
+    resultEl.innerHTML = `
+      <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:14px;margin-top:8px">
+        <div style="font-weight:800;color:var(--gold);margin-bottom:8px">🔄 Contraoferta del banc</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:12px">
+          Has demanat <strong>${amount.toLocaleString('ca')}€</strong> però el banc ofereix <strong style="color:var(--gold)">${counterOffer.toLocaleString('ca')}€</strong>
+          al <strong>${interest.toFixed(2)}%</strong> TIN · Quota: <strong>${monthlyPayment(counterOffer).toLocaleString('ca')}€/mes</strong>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-primary" style="flex:1;font-size:12px" onclick="acceptLoan(${counterOffer},${interest},${years})">✅ Acceptar ${counterOffer.toLocaleString('ca')}€</button>
+          <button class="btn-danger"  style="flex:1;font-size:12px" onclick="document.getElementById('loan-result').innerHTML=''">❌ Rebutjar</button>
+        </div>
+      </div>`;
+    return;
+  }
+
+  // Aprovat complet
+  await acceptLoan(amount, interest, years);
+};
+
+window.acceptLoan = async function(amount, interest, years) {
+  const monthlyPayment = Math.round(amount * (interest/100/12) / (1 - Math.pow(1+interest/100/12, -(years*12))));
   G.gameData.finances.cash += amount;
-  G.gameData.finances.passiu.deutes_llarg = (G.gameData.finances.passiu.deutes_llarg || 0) + amount;
+  G.gameData.finances.passiu.deutes_llarg = (G.gameData.finances.passiu.deutes_llarg||0) + amount;
   G.gameData.finances.loans = G.gameData.finances.loans || [];
-  G.gameData.finances.loans.push({id:'loan_'+Date.now(), amount, remaining:amount, interest, years, monthlyPayment, startWeek:G.gameData.week});
+  G.gameData.finances.loans.push({
+    id: 'loan_'+Date.now(), entitat: 'Banc Sabadell',
+    amount, remaining: amount, interest, years, monthlyPayment,
+    startWeek: G.gameData.week
+  });
   await saveGameData();
   renderFinances(); renderDashboard(); renderActiveCompany();
-  document.getElementById('loan-result').innerHTML = `<span style="color:var(--green)">✅ Préstec de ${amount.toLocaleString('ca')}€ aprovat! Quota mensual: ${monthlyPayment.toLocaleString('ca')}€</span>`;
+  const el = document.getElementById('loan-result');
+  if (el) el.innerHTML = `<div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);border-radius:10px;padding:12px;margin-top:8px">
+    <strong style="color:var(--green)">✅ Préstec aprovat!</strong>
+    <div style="font-size:12px;color:var(--text2);margin-top:6px">${amount.toLocaleString('ca')}€ al ${interest.toFixed(2)}% TIN · Quota: ${monthlyPayment.toLocaleString('ca')}€/mes · ${years} anys</div>
+  </div>`;
+  showToast('✅ Préstec aprovat: ' + amount.toLocaleString('ca') + '€');
 };
 
 // ==================== NAV ====================
