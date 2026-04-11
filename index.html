@@ -1,543 +1,2527 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="ca">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
-<meta name="theme-color" content="#ff6b00"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="PizzaClicker"/>
-<meta name="description" content="El juego clicker más delicioso de la galaxia. ¡Conquista el multiverso a golpe de pizza!"/>
-<title>PizzaClicker 🍕 — El Imperio de la Pizza</title>
-<!-- PWA Manifest -->
-<link rel="manifest" href="manifest.json"/>
-<!-- Favicon -->
-<link rel="icon" type="image/x-icon" href="favicon.ico"/>
-<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png"/>
-<link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png"/>
-<!-- Apple Touch Icons -->
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png"/>
-<link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152x152.png"/>
-<link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144x144.png"/>
-<link rel="apple-touch-icon" sizes="128x128" href="icons/icon-128x128.png"/>
-<!-- Open Graph -->
-<meta property="og:title" content="PizzaClicker — El Imperio de la Pizza"/>
-<meta property="og:description" content="El juego clicker multijugador más delicioso de la galaxia"/>
-<meta property="og:image" content="icons/icon-512x512.png"/>
-<meta property="og:type" content="website"/>
-<link rel="stylesheet" href="css/style.css"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EmpresaBat — Simulador Empresarial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #06080f;
+  --bg2: #0d1120;
+  --bg3: #141928;
+  --border: rgba(100,140,255,0.12);
+  --border2: rgba(100,140,255,0.22);
+  --accent: #4f7fff;
+  --accent2: #7c3aed;
+  --gold: #f59e0b;
+  --green: #10b981;
+  --red: #ef4444;
+  --text: #e8ecf8;
+  --text2: #8b95b8;
+  --text3: #4a5272;
+  --card: rgba(14,20,45,0.9);
+  --radius: 12px;
+  --font: 'Space Grotesk', sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font)}
+
+/* Noise overlay */
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity:.4}
+
+/* Grid pattern */
+.grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(79,127,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(79,127,255,.03) 1px,transparent 1px);
+  background-size:40px 40px}
+
+/* Glow blobs */
+.blob{position:fixed;border-radius:50%;filter:blur(100px);pointer-events:none;z-index:0;opacity:.12}
+.blob1{width:500px;height:500px;background:#4f7fff;top:-150px;left:-150px;animation:blobDrift 12s ease-in-out infinite alternate}
+.blob2{width:400px;height:400px;background:#7c3aed;bottom:-100px;right:-100px;animation:blobDrift 15s ease-in-out infinite alternate-reverse}
+.blob3{width:300px;height:300px;background:#10b981;top:40%;left:40%;animation:blobDrift 10s ease-in-out infinite alternate}
+@keyframes blobDrift{to{transform:translate(50px,30px)}}
+
+/* ====== AUTH ====== */
+#auth-screen{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:16px}
+.auth-wrap{position:relative;z-index:2;width:100%;max-width:440px}
+.auth-logo{text-align:center;margin-bottom:32px}
+.auth-logo-icon{font-size:56px;display:block;margin-bottom:12px;animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.auth-logo h1{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;letter-spacing:-1px;color:var(--text);margin-bottom:4px}
+.auth-logo h1 span{color:var(--accent)}
+.auth-logo p{color:var(--text2);font-size:13px;letter-spacing:1px}
+.auth-card{background:var(--card);border:1px solid var(--border2);border-radius:20px;padding:32px;backdrop-filter:blur(20px);
+  box-shadow:0 0 60px rgba(79,127,255,.08),inset 0 1px 0 rgba(255,255,255,.04)}
+.auth-tabs{display:flex;gap:4px;background:rgba(255,255,255,.04);border-radius:10px;padding:4px;margin-bottom:24px}
+.auth-tab{flex:1;padding:10px;border:none;background:transparent;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;border-radius:7px;transition:.2s;font-family:var(--font)}
+.auth-tab.active{background:var(--accent);color:#fff;box-shadow:0 4px 12px rgba(79,127,255,.4)}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px}
+.form-input{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:8px;padding:12px 14px;color:var(--text);font-size:14px;font-family:var(--font);outline:none;transition:.2s}
+.form-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,127,255,.12)}
+.form-input::placeholder{color:var(--text3)}
+.auth-btn{width:100%;padding:13px;background:var(--accent);border:none;border-radius:10px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);transition:.2s;margin-top:6px;letter-spacing:.3px}
+.auth-btn:hover{background:#3d6dee;transform:translateY(-1px);box-shadow:0 8px 24px rgba(79,127,255,.4)}
+.auth-err{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:10px 14px;color:#fca5a5;font-size:13px;margin-bottom:12px}
+.auth-footer{text-align:center;color:var(--text3);font-size:12px;margin-top:20px}
+
+/* ====== GAME LAYOUT ====== */
+#game-screen{display:none;flex-direction:column;height:100vh;height:100dvh;position:relative;z-index:1}
+.topbar{display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(6,8,15,.8);border-bottom:1px solid var(--border);backdrop-filter:blur(20px);flex-shrink:0;z-index:10}
+.topbar-brand{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.topbar-brand-icon{font-size:22px}
+.topbar-brand-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.5px}
+.topbar-brand-name span{color:var(--accent)}
+.topbar-stats{display:flex;gap:8px;flex:1;justify-content:center;flex-wrap:wrap}
+.tstat{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;white-space:nowrap}
+.tstat-v{color:var(--gold);font-family:'JetBrains Mono',monospace}
+.tstat.green .tstat-v{color:var(--green)}
+.tstat.red .tstat-v{color:var(--red)}
+.topbar-right{display:flex;gap:8px;align-items:center;flex-shrink:0}
+.profile-btn{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.06);border:1px solid var(--border2);border-radius:20px;padding:6px 12px;color:var(--text);font-size:13px;font-weight:600;cursor:pointer;transition:.2s;font-family:var(--font)}
+.profile-btn:hover{background:rgba(255,255,255,.1)}
+.week-advance-btn{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:20px;padding:7px 16px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:.2s;white-space:nowrap;letter-spacing:.3px}
+.week-advance-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(79,127,255,.4)}
+
+.main-area{flex:1;overflow:hidden;display:flex;position:relative}
+
+/* Sidebar */
+.sidebar{width:62px;background:rgba(6,8,15,.9);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px;flex-shrink:0;z-index:9}
+.nav-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 8px;border:none;background:transparent;color:var(--text2);cursor:pointer;border-radius:10px;transition:.2s;width:50px;position:relative;font-family:var(--font)}
+.nav-btn:hover{background:rgba(255,255,255,.06);color:var(--text)}
+.nav-btn.active{background:rgba(79,127,255,.15);color:var(--accent)}
+.nav-btn.active::before{content:'';position:absolute;left:-12px;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--accent);border-radius:0 3px 3px 0}
+.nav-icon{font-size:22px}
+.nav-lbl{font-size:8.5px;font-weight:600;letter-spacing:.3px;text-align:center;line-height:1.2}
+.nav-sep{width:30px;height:1px;background:var(--border);margin:4px 0}
+.nav-notif{position:absolute;top:6px;right:6px;width:8px;height:8px;background:var(--red);border-radius:50%;border:2px solid var(--bg)}
+
+/* Content area */
+.content{flex:1;overflow:hidden;position:relative}
+.tab-panel{position:absolute;inset:0;overflow-y:auto;opacity:0;pointer-events:none;transition:.25s}
+.tab-panel.active{opacity:1;pointer-events:all}
+
+/* ====== DASHBOARD ====== */
+.dash-wrap{padding:16px;max-width:1200px;margin:0 auto;display:grid;gap:12px}
+.dash-top{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;position:relative;overflow:hidden}
+.kpi-card::before{content:'';position:absolute;inset:0;opacity:.04;background:linear-gradient(135deg,var(--accent),transparent)}
+.kpi-label{font-size:10px;font-weight:600;color:var(--text2);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px}
+.kpi-val{font-size:24px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--text);line-height:1}
+.kpi-val.positive{color:var(--green)}
+.kpi-val.negative{color:var(--red)}
+.kpi-change{font-size:11px;margin-top:4px;font-weight:600}
+.kpi-change.up{color:var(--green)}.kpi-change.down{color:var(--red)}
+.kpi-icon{position:absolute;right:14px;top:14px;font-size:28px;opacity:.25}
+
+.dash-mid{display:grid;grid-template-columns:2fr 1fr;gap:10px}
+.section-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.section-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section-title span{color:var(--text2);font-size:11px;font-weight:500}
+
+/* Timeline chart placeholder */
+.chart-area{height:120px;position:relative;overflow:hidden}
+.chart-bars{display:flex;align-items:flex-end;gap:3px;height:100%}
+.chart-bar{flex:1;border-radius:3px 3px 0 0;background:var(--accent);opacity:.6;transition:.3s;min-height:4px}
+.chart-bar:hover{opacity:1}
+.chart-bar.negative{background:var(--red)}
+
+/* Notifications */
+.notif-list{display:flex;flex-direction:column;gap:8px;max-height:200px;overflow-y:auto}
+.notif-item{display:flex;align-items:flex-start;gap:10px;padding:10px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:.2s}
+.notif-item:hover{background:rgba(255,255,255,.06);border-color:var(--border2)}
+.notif-item.urgent{border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.06)}
+.notif-icon{font-size:18px;flex-shrink:0}
+.notif-body{flex:1;min-width:0}
+.notif-title{font-size:12px;font-weight:700;color:var(--text)}
+.notif-desc{font-size:11px;color:var(--text2);margin-top:2px;line-height:1.4}
+.notif-time{font-size:10px;color:var(--text3);white-space:nowrap}
+
+/* Dept indicators */
+.dept-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.dept-card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;cursor:pointer;transition:.2s}
+.dept-card:hover{background:rgba(79,127,255,.08);border-color:var(--border2)}
+.dept-icon{font-size:24px;margin-bottom:6px}
+.dept-name{font-size:11px;font-weight:600;color:var(--text2)}
+.dept-status{font-size:10px;margin-top:3px;font-weight:600}
+.dept-status.ok{color:var(--green)}.dept-status.warn{color:var(--gold)}.dept-status.bad{color:var(--red)}
+
+/* ====== COMPANY SETUP ====== */
+#tab-setup{display:flex;align-items:center;justify-content:center;min-height:100%}
+.setup-wrap{width:100%;max-width:700px;padding:24px 16px}
+.setup-title{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--text);margin-bottom:6px;letter-spacing:-1px}
+.setup-subtitle{color:var(--text2);font-size:14px;margin-bottom:28px}
+
+.setup-choice{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px}
+.choice-card{background:var(--card);border:2px solid var(--border);border-radius:18px;padding:28px 24px;cursor:pointer;transition:.3s;text-align:center;position:relative;overflow:hidden}
+.choice-card:hover{border-color:var(--border2);background:rgba(14,20,45,.95);transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.choice-card.selected{border-color:var(--accent);box-shadow:0 0 30px rgba(79,127,255,.15)}
+.choice-icon{font-size:48px;margin-bottom:16px;display:block}
+.choice-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text);margin-bottom:8px}
+.choice-desc{font-size:12px;color:var(--text2);line-height:1.6}
+.choice-badge{position:absolute;top:12px;right:12px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;letter-spacing:.5px}
+
+/* ====== COMPANY CREATION WIZARD ====== */
+.wizard-steps{display:flex;gap:0;margin-bottom:28px;position:relative}
+.wizard-steps::before{content:'';position:absolute;top:18px;left:18px;right:18px;height:2px;background:var(--border);z-index:0}
+.w-step{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;z-index:1}
+.w-step-dot{width:36px;height:36px;border-radius:50%;background:var(--bg3);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--text2);transition:.3s}
+.w-step.done .w-step-dot{background:var(--green);border-color:var(--green);color:#fff}
+.w-step.active .w-step-dot{background:var(--accent);border-color:var(--accent);color:#fff}
+.w-step-label{font-size:9px;font-weight:600;color:var(--text3);letter-spacing:.5px;text-align:center;text-transform:uppercase}
+.w-step.active .w-step-label{color:var(--accent)}
+
+.wizard-panel{background:var(--card);border:1px solid var(--border2);border-radius:18px;padding:28px}
+.wizard-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);margin-bottom:6px}
+.wizard-subtitle{font-size:13px;color:var(--text2);margin-bottom:24px;line-height:1.6}
+
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-group2{margin-bottom:16px}
+.form-group2 label{display:block;font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px}
+.form-select{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:8px;padding:11px 14px;color:var(--text);font-size:14px;font-family:var(--font);outline:none;cursor:pointer;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%238b95b8'%3E%3Cpath d='M5 7l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-size:16px}
+.form-select option{background:#1a2035;color:var(--text)}
+
+.info-box{background:rgba(79,127,255,.08);border:1px solid rgba(79,127,255,.2);border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:12px;color:rgba(147,187,255,.9);line-height:1.7}
+.info-box strong{color:var(--accent);font-weight:700}
+.warn-box{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:12px;color:rgba(251,211,141,.9);line-height:1.7}
+
+.wizard-nav{display:flex;gap:10px;margin-top:24px}
+.btn-prev{flex:0 0 100px;padding:12px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;color:var(--text2);font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font);transition:.2s}
+.btn-next{flex:1;padding:12px;background:var(--accent);border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);transition:.2s}
+.btn-next:hover{background:#3d6dee;transform:translateY(-1px)}
+.btn-prev:hover{background:rgba(255,255,255,.1)}
+
+/* Plan de negoci */
+.plan-section{margin-bottom:20px}
+.plan-section-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.plan-score{display:flex;gap:3px;margin-top:6px}
+.plan-star{font-size:14px;color:var(--text3);cursor:pointer;transition:.1s}
+.plan-star.active{color:var(--gold)}
+.plan-textarea{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:8px;padding:11px 14px;color:var(--text);font-size:13px;font-family:var(--font);outline:none;resize:vertical;min-height:70px;line-height:1.5}
+.plan-textarea::placeholder{color:var(--text3)}
+.plan-meter{height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;margin-top:8px}
+.plan-meter-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--red),var(--gold),var(--green));transition:.4s}
+
+/* Bank negotiation */
+.bank-card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:14px}
+.bank-officer{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.officer-avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#1e40af,#4338ca);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+.officer-name{font-weight:700;color:var(--text)}
+.officer-title{font-size:11px;color:var(--text2);margin-top:2px}
+.officer-speech{font-size:13px;color:var(--text2);line-height:1.6;font-style:italic;background:rgba(255,255,255,.03);border-left:3px solid var(--accent);padding:12px 14px;border-radius:0 8px 8px 0}
+.approval-bar{height:10px;background:rgba(255,255,255,.08);border-radius:5px;overflow:hidden;margin:12px 0 6px}
+.approval-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--red),var(--gold),var(--green));transition:.4s}
+
+/* ====== FINANCES ====== */
+.fin-wrap{padding:16px;max-width:1000px;margin:0 auto}
+.fin-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.period-badge{background:rgba(79,127,255,.15);border:1px solid rgba(79,127,255,.3);border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;color:var(--accent);font-family:'JetBrains Mono',monospace}
+
+.bal-sheet{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.bal-side{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px}
+.bal-side-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--text);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.bal-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px}
+.bal-row:last-child{border-bottom:none}
+.bal-row-label{color:var(--text2)}
+.bal-row-val{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;color:var(--text)}
+.bal-row.total{font-weight:700;border-top:2px solid var(--border2);margin-top:6px;padding-top:10px}
+.bal-row.total .bal-row-label{color:var(--text)}
+.bal-row.total .bal-row-val{color:var(--gold);font-size:13px}
+
+/* ====== HR ====== */
+.hr-wrap{padding:16px;max-width:1000px;margin:0 auto}
+.emp-grid{display:grid;gap:10px}
+.emp-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;align-items:center;gap:14px;transition:.2s}
+.emp-card:hover{border-color:var(--border2)}
+.emp-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.emp-info{flex:1}
+.emp-name{font-weight:700;color:var(--text);font-size:14px}
+.emp-role{font-size:11px;color:var(--text2);margin-top:2px}
+.emp-salary{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold)}
+.emp-morale{display:flex;align-items:center;gap:6px;margin-top:5px}
+.morale-bar{flex:1;height:4px;background:rgba(255,255,255,.08);border-radius:2px;max-width:80px}
+.morale-fill{height:100%;border-radius:2px;transition:.3s}
+.emp-actions{display:flex;gap:6px}
+.emp-btn{padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);border:1px solid;transition:.2s}
+.emp-btn.fire{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:#f87171}
+.emp-btn.raise{background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.3);color:#34d399}
+.emp-btn.promote{background:rgba(79,127,255,.1);border-color:rgba(79,127,255,.3);color:#93bbff}
+
+/* ====== MAP ====== */
+.map-wrap{display:flex;flex-direction:column;height:100%}
+.map-header{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.map-header h2{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--text)}
+.map-viewport{flex:1;position:relative;overflow:hidden;cursor:grab;background:var(--bg)}
+.map-viewport:active{cursor:grabbing}
+#map-canvas{position:absolute;top:0;left:0}
+
+/* Ranking drawer */
+.ranking-drawer{position:absolute;bottom:0;left:0;right:0;background:rgba(10,14,30,.97);border-top:1px solid var(--border2);border-radius:18px 18px 0 0;transform:translateY(calc(100% - 52px));transition:.35s;max-height:60vh;display:flex;flex-direction:column;z-index:20;backdrop-filter:blur(20px)}
+.ranking-drawer.open{transform:translateY(0)}
+.rank-handle{display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:52px;cursor:pointer;flex-shrink:0;border-radius:18px 18px 0 0}
+.rank-handle:hover{background:rgba(255,255,255,.03)}
+.rank-handle-title{font-size:13px;font-weight:700;color:var(--gold)}
+.rank-handle-arrow{font-size:14px;color:var(--text2);transition:.3s}
+.ranking-drawer.open .rank-handle-arrow{transform:rotate(180deg)}
+.rank-body{overflow-y:auto;padding:0 14px 16px;flex:1}
+.rank-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;cursor:pointer;transition:.2s;margin-bottom:4px;font-size:12px}
+.rank-row:hover{background:rgba(255,255,255,.05)}
+.rank-row.me{background:rgba(79,127,255,.1);border:1px solid rgba(79,127,255,.2)}
+.rank-num{color:var(--text3);font-size:10px;width:22px;font-weight:600}
+.rank-name{flex:1;font-weight:700;color:var(--text)}
+.rank-info{color:var(--text2);font-size:11px}
+.rank-val{color:var(--gold);font-weight:700;font-family:'JetBrains Mono',monospace}
+
+/* ====== EVENTS TOAST ====== */
+#events-container{position:fixed;top:70px;right:16px;z-index:300;display:flex;flex-direction:column;gap:8px;max-width:320px;pointer-events:none}
+.event-toast{background:rgba(10,14,30,.97);border:1px solid var(--border2);border-radius:14px;padding:14px;display:flex;gap:12px;pointer-events:all;cursor:pointer;animation:slideIn .35s cubic-bezier(.34,1.56,.64,1);backdrop-filter:blur(20px)}
+@keyframes slideIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+.event-icon{font-size:26px;flex-shrink:0}
+.event-body{flex:1}
+.event-title{font-weight:700;font-size:13px;color:var(--text);margin-bottom:2px}
+.event-desc{font-size:11px;color:var(--text2);line-height:1.4}
+.event-impact{font-weight:700;font-size:13px;margin-top:5px}
+.event-impact.pos{color:var(--green)}.event-impact.neg{color:var(--red)}
+
+/* ====== MODAL ====== */
+.modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-card{background:#0a0e1e;border:1px solid var(--border2);border-radius:20px;padding:28px;width:420px;max-width:95vw;max-height:88vh;overflow-y:auto;box-shadow:0 0 80px rgba(79,127,255,.12);animation:popIn .35s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-header{display:flex;align-items:center;gap:14px;margin-bottom:22px;position:relative}
+.modal-close{position:absolute;top:0;right:0;background:rgba(255,255,255,.08);border:none;color:var(--text);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:14px;transition:.2s}
+.modal-close:hover{background:rgba(255,255,255,.15)}
+
+/* ====== PRODUCTION ====== */
+.prod-wrap{padding:16px;max-width:1000px;margin:0 auto}
+.prod-facility{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:14px}
+.facility-header{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.facility-icon{font-size:40px}
+.facility-name{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text)}
+.facility-status{font-size:11px;color:var(--green);font-weight:600;margin-top:2px}
+.capacity-bar{height:12px;background:rgba(255,255,255,.08);border-radius:6px;overflow:hidden;margin:10px 0}
+.capacity-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--accent),var(--green));transition:.4s}
+.machine-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.machine-card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.machine-icon{font-size:30px;margin-bottom:8px}
+.machine-name{font-size:12px;font-weight:700;color:var(--text)}
+.machine-detail{font-size:10px;color:var(--text2);margin-top:3px}
+.machine-health{display:flex;align-items:center;gap:6px;margin-top:8px;justify-content:center}
+.health-dot{width:8px;height:8px;border-radius:50%}
+
+/* ====== MARKETING ====== */
+.mkt-wrap{padding:16px;max-width:1000px;margin:0 auto}
+.mkt-channels{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.channel-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:.2s}
+.channel-card:hover{border-color:var(--border2)}
+.channel-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.channel-icon{font-size:28px}
+.channel-name{font-size:14px;font-weight:700;color:var(--text)}
+.channel-cost{font-size:11px;color:var(--text2);margin-top:2px}
+.channel-slider-wrap{display:flex;align-items:center;gap:10px}
+.channel-slider{flex:1;-webkit-appearance:none;height:6px;border-radius:3px;background:rgba(255,255,255,.08);outline:none;cursor:pointer}
+.channel-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 0 8px rgba(79,127,255,.4)}
+.channel-val{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold);min-width:50px;text-align:right}
+.reach-meter{margin-top:8px;height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.reach-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:3px;transition:.4s}
+
+/* ====== RESPONSIVE ====== */
+@media(max-width:640px){
+  .dash-top{grid-template-columns:1fr 1fr}
+  .dash-mid{grid-template-columns:1fr}
+  .setup-choice{grid-template-columns:1fr}
+  .bal-sheet{grid-template-columns:1fr}
+  .machine-grid{grid-template-columns:1fr 1fr}
+  .mkt-channels{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+  .topbar-stats{display:none}
+}
+@media(min-width:1024px){
+  .sidebar{width:72px}
+  .nav-btn{width:60px}
+  .dash-top{grid-template-columns:repeat(4,1fr)}
+}
+
+/* ====== SCROLLBAR ====== */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+::selection{background:rgba(79,127,255,.3)}
+
+/* Loading overlay */
+#loading-overlay{position:fixed;inset:0;z-index:500;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.loading-logo{font-size:48px;animation:float 2s ease-in-out infinite}
+.loading-text{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text)}
+.loading-sub{font-size:13px;color:var(--text2)}
+.loading-bar{width:200px;height:3px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+.loading-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));animation:load 1.5s ease-in-out infinite}
+@keyframes load{0%{width:0;margin-left:0}50%{width:100%;margin-left:0}100%{width:0;margin-left:100%}}
+
+/* Hired mode / job offers */
+.offers-grid{display:grid;gap:12px}
+.offer-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;transition:.2s;cursor:pointer}
+.offer-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.offer-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.offer-company{font-weight:700;font-size:16px;color:var(--text)}
+.offer-size-badge{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.5px}
+.offer-size-badge.small{background:rgba(16,185,129,.15);color:#34d399}
+.offer-size-badge.medium{background:rgba(79,127,255,.15);color:#93bbff}
+.offer-size-badge.large{background:rgba(245,158,11,.15);color:#fbbf24}
+.offer-size-badge.corp{background:rgba(239,68,68,.15);color:#f87171}
+.offer-sector{font-size:12px;color:var(--text2);margin-bottom:6px}
+.offer-salary{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--gold);font-weight:500}
+.offer-prestigi{font-size:11px;color:var(--text2)}
+.offer-details{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.offer-tag{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--text2)}
+.offer-btn{width:100%;margin-top:14px;padding:10px;background:var(--accent);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);transition:.2s}
+.offer-btn:hover{background:#3d6dee}
+
+/* Annual report */
+.report-wrap{padding:20px;max-width:800px;margin:0 auto}
+.report-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:16px}
+.report-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.report-kpi{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.report-kpi-val{font-size:22px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--gold)}
+.report-kpi-label{font-size:10px;color:var(--text2);margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:.6px}
+
+/* Toasts */
+.toast-list{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:400;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+.toast{background:rgba(14,20,45,.97);border:1px solid var(--border2);border-radius:40px;padding:10px 20px;font-size:13px;font-weight:600;color:var(--text);backdrop-filter:blur(20px);animation:toastIn .3s ease;white-space:nowrap}
+@keyframes toastIn{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* week counter */
+.week-display{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text2);background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:20px;padding:5px 12px}
+
+/* Sector icons */
+.sector-icon-big{font-size:80px;text-align:center;margin:10px 0}
+.company-status-banner{display:flex;align-items:center;gap:12px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:12px;padding:14px;margin-bottom:16px}
+.company-status-banner.warn{background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.2)}
+.company-status-banner.bad{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.2)}
+</style>
 </head>
 <body>
+<div class="grid-bg"></div>
+<div class="blob blob1"></div>
+<div class="blob blob2"></div>
+<div class="blob blob3"></div>
 
-<!-- Background -->
-<div class="bg-glow bg1"></div>
-<div class="bg-glow bg2"></div>
-<div class="bg-pattern"></div>
-<div id="theme-particles"></div>
+<!-- Loading -->
+<div id="loading-overlay">
+  <div class="loading-logo">🏢</div>
+  <div class="loading-text">EmpresaBat</div>
+  <div class="loading-sub">Carregant simulador...</div>
+  <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+</div>
 
-<!-- ===================== AUTH SCREEN ===================== -->
-<div id="auth-screen">
-  <div class="auth-particles" id="auth-particles"></div>
-  <div class="flame-bg fb1"></div>
-  <div class="flame-bg fb2"></div>
-  <div class="flame-bg fb3"></div>
-  <div class="auth-card">
+<!-- AUTH -->
+<div id="auth-screen" style="display:none">
+  <div class="auth-wrap">
     <div class="auth-logo">
-      <span class="auth-logo-emoji">🍕</span>
-      <h1>PIZZA<span>CLICKER</span></h1>
-      <p>El Imperio de la Pizza</p>
+      <span class="auth-logo-icon">🏢</span>
+      <h1>Empresa<span>Bat</span></h1>
+      <p>SIMULADOR EMPRESARIAL · BATXILLERAT</p>
     </div>
-    <div class="auth-tabs">
-      <button class="auth-tab active" id="tab-login">Entrar</button>
-      <button class="auth-tab" id="tab-register">Registro</button>
-      <button class="auth-tab" id="tab-reset">Recuperar</button>
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchAuthTab('login')">Accedir</button>
+        <button class="auth-tab" onclick="switchAuthTab('register')">Registrar-se</button>
+      </div>
+      <div id="auth-err" class="auth-err" style="display:none"></div>
+      <div id="login-form">
+        <div class="form-group">
+          <label>Correu electrònic</label>
+          <input class="form-input" type="email" id="login-email" placeholder="alumne@escola.cat">
+        </div>
+        <div class="form-group">
+          <label>Contrasenya</label>
+          <input class="form-input" type="password" id="login-pass" placeholder="••••••••">
+        </div>
+        <button class="auth-btn" onclick="doLogin()">Entrar al simulador →</button>
+      </div>
+      <div id="register-form" style="display:none">
+        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group">
+            <label>Nom</label>
+            <input class="form-input" type="text" id="reg-name" placeholder="Joan">
+          </div>
+          <div class="form-group">
+            <label>Cognoms</label>
+            <input class="form-input" type="text" id="reg-surname" placeholder="Garcia">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Correu electrònic</label>
+          <input class="form-input" type="email" id="reg-email" placeholder="joan@escola.cat">
+        </div>
+        <div class="form-group">
+          <label>Contrasenya (mínim 6 caràcters)</label>
+          <input class="form-input" type="password" id="reg-pass" placeholder="••••••••">
+        </div>
+        <button class="auth-btn" onclick="doRegister()">Crear compte →</button>
+      </div>
+      <div class="auth-footer">🔒 Dades protegides · Ús educatiu exclusivament</div>
     </div>
-    <div id="field-username" class="form-group" style="display:none">
-      <label>Nombre de Pizzero</label>
-      <input type="text" id="inp-username" class="form-input" placeholder="Tu apodo legendario..."/>
-    </div>
-    <div class="form-group">
-      <label>Email</label>
-      <input type="email" id="inp-email" class="form-input" placeholder="tu@pizzeria.com" onkeydown="if(event.key==='Enter')authSubmit()"/>
-    </div>
-    <div id="field-password" class="form-group">
-      <label>Contraseña</label>
-      <input type="password" id="inp-password" class="form-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')authSubmit()"/>
-    </div>
-    <div id="auth-msg"></div>
-    <button class="auth-btn" id="auth-btn">🔥 ¡Entrar al Horno!</button>
-    <p class="auth-footer">Guarda tu progreso en PizzaCity 🌍</p>
   </div>
 </div>
 
-<!-- ===================== GAME SCREEN ===================== -->
+<!-- GAME -->
 <div id="game-screen">
-
-  <!-- Top nav -->
-  <nav class="top-nav">
-    <div class="nav-brand">
-      <span class="nav-brand-emoji">🍕</span>
-      <span class="nav-brand-name">PIZZA<em>CLICKER</em></span>
+  <div class="topbar">
+    <div class="topbar-brand">
+      <span class="topbar-brand-icon">🏢</span>
+      <span class="topbar-brand-name">Empresa<span>Bat</span></span>
     </div>
-    <div class="nav-center" id="nav-center">
-      <button class="mute-btn" id="mute-btn" onclick="toggleMute()" title="Música on/off">🔊</button>
-      <div class="nav-stat" id="nav-pizzas"><span class="ns-icon">🍕</span><span class="ns-val">0 🍕</span></div>
-      <div class="nav-stat pps" id="nav-pps" style="display:none"><span class="ns-icon">⚡</span><span class="ns-val">0/s</span></div>
+    <div class="topbar-stats">
+      <div class="tstat">📅 <span id="stat-date" class="tstat-v">—</span></div>
+      <div class="tstat">💰 <span id="stat-cash" class="tstat-v">—</span></div>
+      <div class="tstat green">📈 <span id="stat-result" class="tstat-v">—</span></div>
+      <div class="tstat">⭐ <span id="stat-prestigi" class="tstat-v">—</span></div>
+      <div class="tstat">👥 <span id="stat-emp" class="tstat-v">—</span></div>
     </div>
-    <button class="profile-btn" >
-      <span>🍕</span>
-      <span id="nav-username">-</span>
-      <span class="plv" id="nav-level">Nv.1</span>
-    </button>
-  </nav>
-
-  <!-- XP bar -->
-  <div class="xp-bar-wrap">
-    <span class="xp-info" id="xp-info">Nv.1 · Aprendiz de Pizzero</span>
-    <div class="xp-track"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
-    <span class="xp-info" id="xp-num">0 XP</span>
+    <div class="topbar-right">
+      <div class="week-display" id="week-display">Setmana 1</div>
+      <button class="week-advance-btn" onclick="advanceWeek()">⏩ Avançar setmana</button>
+      <button class="profile-btn" onclick="openProfile()">👤 <span id="profile-name">—</span></button>
+    </div>
   </div>
 
-  <!-- Main area -->
-  <div class="main-area" id="main-area">
+  <div class="main-area">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <button class="nav-btn active" onclick="showTab('dashboard')" id="nav-dashboard">
+        <span class="nav-icon">📊</span>
+        <span class="nav-lbl">Resum</span>
+      </button>
+      <button class="nav-btn" onclick="showTab('setup')" id="nav-setup">
+        <span class="nav-icon">🏗️</span>
+        <span class="nav-lbl">Empresa</span>
+      </button>
+      <button class="nav-btn" onclick="showTab('finances')" id="nav-finances">
+        <span class="nav-icon">💰</span>
+        <span class="nav-lbl">Finances</span>
+      </button>
+      <button class="nav-btn" onclick="showTab('hr')" id="nav-hr">
+        <span class="nav-icon">👥</span>
+        <span class="nav-lbl">RRHH</span>
+      </button>
+      <div class="nav-sep"></div>
+      <button class="nav-btn" onclick="showTab('production')" id="nav-production">
+        <span class="nav-icon">🏭</span>
+        <span class="nav-lbl">Producció</span>
+      </button>
+      <button class="nav-btn" onclick="showTab('marketing')" id="nav-marketing">
+        <span class="nav-icon">📣</span>
+        <span class="nav-lbl">Màrqueting</span>
+      </button>
+      <button class="nav-btn" onclick="showTab('sales')" id="nav-sales">
+        <span class="nav-icon">📦</span>
+        <span class="nav-lbl">Vendes</span>
+      </button>
+      <div class="nav-sep"></div>
+      <button class="nav-btn" onclick="showTab('map')" id="nav-map">
+        <span class="nav-icon">🗺️</span>
+        <span class="nav-lbl">Mapa</span>
+      </button>
+    </div>
 
-    <!-- CLICKER TAB -->
-    <div class="tab-panel active" id="tab-clicker">
-      <div class="clicker-panel">
-        <!-- Stats row -->
-        <div class="stats-row">
-          <div class="stat-box"><div class="sv" id="s-pizzas">0</div><div class="sl">Pizzas</div></div>
-          <div class="stat-box"><div class="sv" id="s-ppc">1</div><div class="sl">Por click</div></div>
-          <div class="stat-box"><div class="sv" id="s-pps">0</div><div class="sl">Por seg</div></div>
-          <div class="stat-box"><div class="sv" id="s-total">0</div><div class="sl">Total</div></div>
-        </div>
+    <!-- Content -->
+    <div class="content">
 
-        <!-- Level info -->
-        <div class="level-section">
-          <div class="level-info">
-            <span class="level-badge" id="level-badge">Nv.1</span>
-            <span class="level-title" id="level-title-text">Aprendiz de Pizzero</span>
-            <span class="combo-badge" id="combo-badge">🔥 COMBO x1.0</span>
+      <!-- DASHBOARD -->
+      <div class="tab-panel active" id="tab-dashboard">
+        <div class="dash-wrap">
+          <div id="company-banner" class="company-status-banner" style="display:none">
+            <span id="banner-icon" style="font-size:24px">✅</span>
+            <div>
+              <div id="banner-title" style="font-weight:700;font-size:14px;color:var(--text)">—</div>
+              <div id="banner-desc" style="font-size:12px;color:var(--text2)">—</div>
+            </div>
           </div>
-          <div class="xp-bar-small">
-            <div class="xp-bar-small-fill" id="xp-bar-small-fill" style="width:0%"></div>
-            <span class="xp-text" id="xp-text-small">0 XP</span>
-          </div>
-        </div>
 
-        <!-- THE OVEN -->
-        <div class="oven-container">
-          <div class="oven-glow" id="oven-glow"></div>
-          <!-- Oven level badge -->
-          <div class="oven-level-badge" id="oven-level-badge">🪵 Horno de Leña</div>
-          <div class="oven-wrapper" id="oven-wrapper">
-            <div class="oven-body" id="oven-body">
-              <!-- Main arch -->
-              <div class="oven-arch" id="oven-arch"></div>
-              <!-- Decorative tier elements (unlocked by level) -->
-              <div class="oven-decorations" id="oven-decorations"></div>
-              <!-- Mouth -->
-              <div class="oven-mouth" id="oven-mouth">
-                <div class="oven-interior"></div>
-                <div class="oven-fire" id="oven-fire"></div>
+          <div class="dash-top">
+            <div class="kpi-card">
+              <div class="kpi-icon">💰</div>
+              <div class="kpi-label">Tresoreria</div>
+              <div class="kpi-val" id="kpi-cash">—</div>
+              <div class="kpi-change up" id="kpi-cash-ch">—</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-icon">📈</div>
+              <div class="kpi-label">Ingressos (mes)</div>
+              <div class="kpi-val positive" id="kpi-rev">—</div>
+              <div class="kpi-change up" id="kpi-rev-ch">—</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-icon">📉</div>
+              <div class="kpi-label">Despeses (mes)</div>
+              <div class="kpi-val negative" id="kpi-costs">—</div>
+              <div class="kpi-change" id="kpi-costs-ch">—</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-icon">⭐</div>
+              <div class="kpi-label">Prestigi empresa</div>
+              <div class="kpi-val" id="kpi-prest">—</div>
+              <div class="kpi-change" id="kpi-prest-ch">—</div>
+            </div>
+          </div>
+
+          <div class="dash-mid">
+            <div class="section-card">
+              <div class="section-title">📈 Evolució ingressos <span>últimes 8 setmanes</span></div>
+              <div class="chart-area">
+                <div class="chart-bars" id="chart-bars"></div>
               </div>
-              <!-- Base -->
-              <div class="oven-base" id="oven-base"></div>
-              <!-- Chimney -->
-              <div class="oven-chimney" id="oven-chimney">
-                <div class="oven-chimney-top"></div>
-                <div class="smoke-puff sp1"></div>
-                <div class="smoke-puff sp2"></div>
+            </div>
+            <div class="section-card">
+              <div class="section-title">🔔 Notificacions</div>
+              <div class="notif-list" id="notif-list"></div>
+            </div>
+          </div>
+
+          <div class="section-card">
+            <div class="section-title">🏢 Departaments</div>
+            <div class="dept-grid" id="dept-grid"></div>
+          </div>
+
+          <div class="section-card" id="annual-summary" style="display:none">
+            <div class="section-title">📋 Resum anual <span id="annual-year"></span></div>
+            <div class="report-kpis" id="annual-kpis"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETUP / COMPANY CREATION -->
+      <div class="tab-panel" id="tab-setup">
+        <div id="setup-init" style="padding:24px;max-width:700px;margin:0 auto">
+          <h2 class="setup-title">Benvingut al Simulador Empresarial</h2>
+          <p class="setup-subtitle">Escull com vols iniciar la teva carrera empresarial. Cada camí té els seus reptes i oportunitats.</p>
+          <div class="setup-choice">
+            <div class="choice-card" onclick="startMode('create')">
+              <div class="choice-badge">MÉS COMPLEX</div>
+              <span class="choice-icon">🚀</span>
+              <div class="choice-title">Crear la meva empresa</div>
+              <div class="choice-desc">Crea una empresa des de zero. Escull la forma jurídica, busca finançament, troba locals, contracta personal i construeix el teu negoci pas a pas.</div>
+            </div>
+            <div class="choice-card" onclick="startMode('hired')">
+              <div class="choice-icon">💼</div>
+              <div class="choice-title">Ser contractat/da</div>
+              <div class="choice-desc">Rep ofertes de feina d'empreses reals del Vallès. Gestiona una empresa existent. El teu prestigi determinarà quines ofertes rebràs.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- COMPANY CREATION WIZARD -->
+        <div id="wizard-area" style="display:none;padding:24px;max-width:700px;margin:0 auto">
+          <div class="wizard-steps" id="wizard-steps"></div>
+          <div class="wizard-panel" id="wizard-panel"></div>
+        </div>
+
+        <!-- HIRED MODE -->
+        <div id="hired-area" style="display:none;padding:24px;max-width:700px;margin:0 auto">
+          <h2 class="setup-title" style="margin-bottom:6px">Ofertes de treball rebudes</h2>
+          <p class="setup-subtitle">Prestigi actual: ⭐ <span id="hired-prestigi">0</span> — Les empreses t'ofereixen llocs segons la teva reputació com a gestor/a.</p>
+          <div class="offers-grid" id="offers-grid"></div>
+        </div>
+
+        <!-- ACTIVE COMPANY VIEW -->
+        <div id="active-company" style="display:none;padding:24px;max-width:700px;margin:0 auto">
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px">
+            <div class="sector-icon-big" id="company-main-icon" style="font-size:56px;margin:0"></div>
+            <div>
+              <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--text)" id="company-main-name">—</div>
+              <div style="font-size:13px;color:var(--text2);margin-top:4px" id="company-main-info">—</div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="section-card">
+              <div class="section-title">📋 Dades legals</div>
+              <div id="company-legal-info" style="font-size:12px;color:var(--text2);line-height:2"></div>
+            </div>
+            <div class="section-card">
+              <div class="section-title">📊 Indicadors clau</div>
+              <div id="company-kpi-info" style="font-size:12px;color:var(--text2);line-height:2"></div>
+            </div>
+          </div>
+          <div class="section-card" style="margin-top:12px" id="loan-section">
+            <div class="section-title">🏦 Préstecs actius</div>
+            <div id="loans-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FINANCES -->
+      <div class="tab-panel" id="tab-finances">
+        <div class="fin-wrap">
+          <div class="fin-header">
+            <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text)">💰 Finances</h2>
+            <div class="period-badge" id="fin-period">—</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+            <div class="section-card">
+              <div class="section-title">📊 Compte de Pèrdues i Guanys</div>
+              <div id="pyg-table"></div>
+            </div>
+            <div class="section-card">
+              <div class="section-title">💎 Tresoreria setmanal</div>
+              <div id="treasury-info"></div>
+            </div>
+          </div>
+          <div class="bal-sheet" id="balance-sheet">
+            <div class="bal-side">
+              <div class="bal-side-title">ACTIU</div>
+              <div id="actiu-rows"></div>
+            </div>
+            <div class="bal-side">
+              <div class="bal-side-title">PASSIU + PATRIMONI NET</div>
+              <div id="passiu-rows"></div>
+            </div>
+          </div>
+          <div class="section-card" style="margin-top:14px">
+            <div class="section-title">📐 Ràtios financeres</div>
+            <div id="ratios-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px"></div>
+          </div>
+          <div class="section-card" style="margin-top:14px">
+            <div class="section-title">🏦 Sol·licitar préstec</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;align-items:end">
+              <div>
+                <div class="form-group2"><label>Import (€)</label>
+                  <input class="form-input" type="number" id="loan-amount" placeholder="50000" style="background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;color:var(--text);font-size:14px;font-family:var(--font);outline:none;width:100%"></div>
               </div>
-              <!-- Floor stones -->
-              <div class="oven-stones" id="oven-stones"></div>
-              <!-- Label -->
-              <div class="oven-label" id="oven-label">FORNO NAPOLETANO</div>
+              <div>
+                <div class="form-group2"><label>Termini (anys)</label>
+                  <select class="form-select" id="loan-years">
+                    <option>3</option><option>5</option><option selected>7</option><option>10</option><option>15</option>
+                  </select></div>
+              </div>
+              <button class="btn-next" onclick="requestLoan()" style="height:44px;margin-bottom:16px">Sol·licitar préstec</button>
             </div>
-            <!-- Pizza paddle -->
-            <div class="pizza-paddle" id="pizza-paddle">
-              <div class="paddle-handle"></div>
-              <div class="pizza-on-paddle">🍕</div>
-            </div>
-            <!-- Floaters -->
-            <div class="floaters-wrap" id="floaters-wrap"></div>
-          </div>
-          <div class="click-hint" id="click-hint">¡Haz click en el horno para hacer pizzas!</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SHOP TAB -->
-    <div class="tab-panel" id="tab-shop">
-      <div class="shop-wrapper">
-        <div class="shop-header">
-          <h2 class="shop-title">🏪 Tienda de Mejoras</h2>
-          <div class="shop-budget" id="shop-budget">0 🍕</div>
-        </div>
-        <div class="cat-bar" id="cat-bar"></div>
-        <div class="upgrades-list" id="upgrades-list"></div>
-      </div>
-    </div>
-
-    <!-- CITY TAB -->
-    <div class="tab-panel" id="tab-city">
-      <div class="city-wrapper">
-        <div class="city-hdr">
-          <div class="city-hdr-left">
-            <h2>🌆 PizzaCity</h2>
-            <p>El corazón del imperio pizzero mundial</p>
-          </div>
-          <div class="city-legend-inline">
-            <div class="leg-sm"><div class="leg-dot-sm" style="background:#aaa"></div>Nv.1</div>
-            <div class="leg-sm"><div class="leg-dot-sm" style="background:#00ff88"></div>Nv.4</div>
-            <div class="leg-sm"><div class="leg-dot-sm" style="background:#ffcc00"></div>Nv.7</div>
-            <div class="leg-sm"><div class="leg-dot-sm" style="background:#ff6b00"></div>Nv.10</div>
-            <div class="leg-sm"><div class="leg-dot-sm" style="background:#ff00ff"></div>Elite</div>
-          </div>
-        </div>
-        <!-- Map fills all remaining space -->
-        <div id="city-map-scroll"></div>
-        <!-- Ranking drawer anchored to bottom of city-wrapper -->
-        <div class="ranking-drawer" id="ranking-drawer">
-          <div class="ranking-drawer-handle" id="ranking-handle">
-            <div class="ranking-drawer-title">
-              🏆 Ranking PizzaCity
-              <span id="ranking-count" style="color:rgba(255,255,255,.35);font-size:11px;font-weight:600"></span>
-            </div>
-            <div class="ranking-drawer-arrow">▲</div>
-          </div>
-          <div class="ranking-drawer-body">
-            <div id="ranking-list"></div>
+            <div id="loan-result" style="font-size:12px;color:var(--text2);margin-top:8px"></div>
           </div>
         </div>
       </div>
-    </div>
 
+      <!-- HR -->
+      <div class="tab-panel" id="tab-hr">
+        <div class="hr-wrap">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text)">👥 Recursos Humans</h2>
+            <button class="week-advance-btn" onclick="openHireModal()">+ Contractar persona</button>
+          </div>
+          <div id="employees-list" class="emp-grid"></div>
+          <div class="section-card" style="margin-top:14px">
+            <div class="section-title">📋 Resum nòmines</div>
+            <div id="salary-summary" style="font-size:13px;color:var(--text2);line-height:2"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRODUCTION -->
+      <div class="tab-panel" id="tab-production">
+        <div class="prod-wrap">
+          <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);margin-bottom:16px">🏭 Producció</h2>
+          <div id="prod-facility-view"></div>
+          <div class="section-card" style="margin-top:14px">
+            <div class="section-title">⚙️ Maquinària disponible per comprar</div>
+            <div class="machine-grid" id="machines-shop"></div>
+          </div>
+          <div class="section-card" style="margin-top:14px">
+            <div class="section-title">📦 Proveïdors</div>
+            <div id="suppliers-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MARKETING -->
+      <div class="tab-panel" id="tab-marketing">
+        <div class="mkt-wrap">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text)">📣 Màrqueting</h2>
+            <div class="tstat">Pressupost disponible: <span class="tstat-v" id="mkt-budget">—</span></div>
+          </div>
+          <div class="mkt-channels" id="mkt-channels"></div>
+          <div class="section-card" style="margin-top:14px">
+            <div class="section-title">🏟️ Patrocinis i acords especials</div>
+            <div id="sponsors-list" style="display:grid;gap:8px;margin-top:4px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SALES -->
+      <div class="tab-panel" id="tab-sales">
+        <div style="padding:16px;max-width:1000px;margin:0 auto">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text)">📦 Vendes i Clients</h2>
+            <button class="week-advance-btn" onclick="openNewClient()">+ Nou client</button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="section-card">
+              <div class="section-title">📊 Resum vendes</div>
+              <div id="sales-summary" style="font-size:13px;color:var(--text2);line-height:2"></div>
+            </div>
+            <div class="section-card">
+              <div class="section-title">⚠️ Reclamacions pendents</div>
+              <div id="claims-list" style="display:flex;flex-direction:column;gap:8px"></div>
+            </div>
+          </div>
+          <div class="section-card" style="margin-top:12px">
+            <div class="section-title">🤝 Clients actius</div>
+            <div id="clients-list" style="display:flex;flex-direction:column;gap:8px;margin-top:4px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAP -->
+      <div class="tab-panel" id="tab-map">
+        <div class="map-wrap">
+          <div class="map-header">
+            <h2>🗺️ Mapa del Vallès — Empreses actives</h2>
+            <div style="font-size:12px;color:var(--text2)" id="map-info">—</div>
+          </div>
+          <div class="map-viewport" id="map-viewport">
+            <canvas id="map-canvas"></canvas>
+          </div>
+          <div class="ranking-drawer" id="ranking-drawer">
+            <div class="rank-handle" onclick="toggleRanking()">
+              <div class="rank-handle-title">🏆 Rànquing Empreses</div>
+              <div class="rank-handle-arrow">▲</div>
+            </div>
+            <div class="rank-body" id="rank-body"></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
   </div><!-- /main-area -->
-
-  <!-- Bottom nav -->
-  <nav class="bottom-nav">
-    <button class="bnav-btn active" ><span class="bi">🔥</span><span class="bl">Horno</span></button>
-    <button class="bnav-btn" ><span class="bi">🏪</span><span class="bl">Tienda</span></button>
-    <button class="bnav-btn" ><span class="bi">🌆</span><span class="bl">PizzaCity</span></button>
-  </nav>
-</div>
-
-<!-- ===================== PROFILE MODAL ===================== -->
-<div class="modal-overlay" id="profile-modal" style="display:none" >
-  <div class="modal-card">
-    <div class="modal-header">
-      <div class="modal-avatar">🍕</div>
-      <div>
-        <div class="modal-uname" id="mod-uname">-</div>
-        <div class="modal-email" id="mod-email">-</div>
-        <div class="modal-title-lv" id="mod-title-lv">-</div>
-      </div>
-      <button class="modal-close" >✕</button>
-    </div>
-    <div class="modal-tabs">
-      <button class="modal-tab active" >📊 Stats</button>
-      <button class="modal-tab" >🔒 Seguridad</button>
-    </div>
-    <div id="modal-stats">
-      <div class="stat-grid-m" id="mod-stat-grid"></div>
-      <div class="next-unlock-box" id="mod-next-unlock"></div>
-      <div class="modal-msg" id="mod-msg" style="display:none"></div>
-      <button class="modal-btn" >☁️ Guardar partida en la nube</button>
-    </div>
-    <div id="modal-security" style="display:none">
-      <p style="color:rgba(255,200,100,.75);font-size:13px;margin-bottom:14px;font-weight:700">Cambiar contraseña</p>
-      <input type="password" class="sec-input" id="new-pass" placeholder="Nueva contraseña (mín. 6 caracteres)"/>
-      <input type="password" class="sec-input" id="confirm-pass" placeholder="Confirmar nueva contraseña"/>
-      <div class="modal-msg" id="sec-msg" style="display:none"></div>
-      <button class="modal-btn" >🔑 Cambiar contraseña</button>
-    </div>
-    <button class="logout-btn" >🚪 Cerrar sesión</button>
-  </div>
-</div>
+</div><!-- /game-screen -->
 
 <!-- Events container -->
 <div id="events-container"></div>
+<div class="toast-list" id="toast-list"></div>
 
-<!-- PvP Attack Banner (shown on login if pending attacks) -->
-<div id="pvp-banner" style="display:none">
-  <div class="pvp-banner-card">
-    <div class="pvp-banner-header">
-      <span class="pvp-banner-icon" id="pvp-banner-icon">⚔️</span>
+<!-- Profile Modal -->
+<div class="modal-overlay" id="profile-modal" style="display:none" onclick="if(event.target===this)closeProfile()">
+  <div class="modal-card">
+    <div class="modal-header">
+      <span style="font-size:40px">👤</span>
       <div>
-        <div class="pvp-banner-title" id="pvp-banner-title">¡Tu pizzería fue atacada!</div>
-        <div class="pvp-banner-sub" id="pvp-banner-sub">Mientras estabas offline...</div>
+        <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text)" id="modal-username">—</div>
+        <div style="font-size:12px;color:var(--text2)" id="modal-email">—</div>
       </div>
-      <button class="pvp-banner-close" id="pvp-banner-close">✕</button>
+      <button class="modal-close" onclick="closeProfile()">✕</button>
     </div>
-    <div class="pvp-banner-body" id="pvp-banner-body"></div>
-    <div class="pvp-banner-footer">
-      <button class="pvp-banner-btn" id="pvp-banner-next">Ver siguiente ▶</button>
-      <button class="pvp-banner-btn secondary" id="pvp-banner-dismiss">Cerrar todo</button>
-    </div>
+    <div id="profile-stats" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:18px"></div>
+    <button class="btn-next" onclick="doLogout()" style="background:rgba(239,68,68,.2);border:1px solid rgba(239,68,68,.3);color:#f87171">Tancar sessió</button>
   </div>
 </div>
 
-<!-- Inbox button (shown when there are unread notifications) -->
-<div id="inbox-btn" style="display:none" onclick="openInbox()">
-  <span>⚔️</span>
-  <span id="inbox-count">0</span>
-</div>
-
-<!-- Inbox modal -->
-<div id="inbox-modal" style="display:none">
-  <div class="inbox-card">
-    <div class="inbox-header">
-      <span style="font-size:20px">⚔️</span>
-      <span class="inbox-title">Bandeja de Ataques</span>
-      <button class="modal-close" onclick="closeInbox()">✕</button>
+<!-- Hire Modal -->
+<div class="modal-overlay" id="hire-modal" style="display:none" onclick="if(event.target===this)closeHireModal()">
+  <div class="modal-card">
+    <div class="modal-header">
+      <span style="font-size:36px">👥</span>
+      <div><div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text)">Contractar persona</div></div>
+      <button class="modal-close" onclick="closeHireModal()">✕</button>
     </div>
-    <div id="inbox-list" class="inbox-list"></div>
-    <button class="modal-btn" onclick="markAllRead()">✅ Marcar todo como leído</button>
+    <div id="hire-candidates" style="display:flex;flex-direction:column;gap:10px"></div>
   </div>
 </div>
 
-<!-- Level up overlay -->
-<div id="levelup-overlay" >
-  <div class="lu-card">
-    <div class="lu-stars">✨✨✨</div>
-    <div class="lu-badge" id="lu-badge">NIVEL 2</div>
-    <div class="lu-title" id="lu-title">Pizzero Novato</div>
-    <div class="lu-unlock-box">
-      <div class="lu-ul-lbl">🔓 Desbloqueado:</div>
-      <div class="lu-ul-val" id="lu-unlock-val">-</div>
-    </div>
-    <button class="lu-btn" id="lu-btn">¡Genial! 🍕</button>
-  </div>
-</div>
-
-<!-- ===================== SCRIPTS ===================== -->
-<script src="js/data.js"></script>
-<script src="js/game.js"></script>
-<script src="js/ui.js"></script>
-
-<!-- Firebase SDK (module) -->
+<!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, updatePassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const app = initializeApp({
+const firebaseConfig = {
   apiKey: "AIzaSyCkhLFKvgo-iPlHmHau-nxIysdnqp5ZdmI",
   authDomain: "clicker-ea94f.firebaseapp.com",
   projectId: "clicker-ea94f",
   storageBucket: "clicker-ea94f.firebasestorage.app",
   messagingSenderId: "873459350629",
   appId: "1:873459350629:web:813bb901d6e928c8e8da8c"
-});
+};
+
+const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db   = getFirestore(app);
+const db = getFirestore(app);
 
-// Expose Firestore helpers to non-module scripts
-window._db            = db;
-window._db_collection = collection;
-window._db_getDocs    = getDocs;
+// ==================== DATA STRUCTURES ====================
+const SECTORS = [
+  {id:'alimentacio',name:'Alimentació',icon:'🍎',sector:'Producció'},
+  {id:'tecnologia',name:'Tecnologia',icon:'💻',sector:'Serveis'},
+  {id:'construccio',name:'Construcció',icon:'🏗️',sector:'Construcció'},
+  {id:'comerç',name:'Comerç',icon:'🛍️',sector:'Comerç'},
+  {id:'logistica',name:'Logística i Transport',icon:'🚛',sector:'Serveis'},
+  {id:'turisme',name:'Turisme i Hostaleria',icon:'🏨',sector:'Serveis'},
+  {id:'salut',name:'Salut i Benestar',icon:'💊',sector:'Serveis'},
+  {id:'educacio',name:'Educació',icon:'📚',sector:'Serveis'},
+  {id:'moda',name:'Moda i Tèxtil',icon:'👔',sector:'Producció'},
+  {id:'quimica',name:'Química i Farmàcia',icon:'⚗️',sector:'Producció'},
+];
 
-// Auth state
-let authMode = 'login';
-window._currentUserId   = null;
-window._currentUsername = '';
-window._currentEmail    = '';
+const FORMES_JURIDIQUES = [
+  {id:'autonomia',name:'Autònom/a',capital:0,socis:'1',responsabilitat:'Il·limitada',impostos:'IRPF',cost_const:200,desc:'La forma més senzilla. Tributació per IRPF. Responsabilitat personal il·limitada.'},
+  {id:'sl',name:'Societat Limitada (SL)',capital:3000,socis:'1 o més',responsabilitat:'Limitada al capital',impostos:'IS 25%',cost_const:2500,desc:'Capital mínim 3.000€. Responsabilitat limitada. La forma més habitual per PIMES.'},
+  {id:'sa',name:'Societat Anònima (SA)',capital:60000,socis:'1 o més',responsabilitat:'Limitada al capital',impostos:'IS 25%',cost_const:5000,desc:'Capital mínim 60.000€. Apte per empreses grans. Permet cotitzar en borsa.'},
+  {id:'slne',name:'SL Nova Empresa (SLNE)',capital:3000,socis:'1-5',responsabilitat:'Limitada al capital',impostos:'IS 25%',cost_const:1500,desc:'Constitució ràpida via CIRCE. Capital entre 3.000 i 120.202€.'},
+  {id:'cooperativa',name:'Cooperativa',capital:3000,socis:'3 o més',responsabilitat:'Limitada',impostos:'IS 20%',cost_const:1800,desc:'Els treballadors són socis. Avantatges fiscals. Democràcia interna.'},
+];
 
-// ---- Auth tab switch ----
-window.switchAuthTab = function(mode) {
-  authMode = mode;
-  document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active', ['login','register','reset'][i]===mode));
-  document.getElementById('field-username').style.display = mode==='register'?'block':'none';
-  document.getElementById('field-password').style.display = mode==='reset'?'none':'block';
-  const btn = document.getElementById('auth-btn');
-  btn.textContent = mode==='login'?'🔥 ¡Entrar al Horno!': mode==='register'?'🍕 ¡Crear mi Pizzería!':'📧 Enviar Email de Recuperación';
-  document.getElementById('auth-msg').innerHTML='';
+const VALLES_EMPRESES = [
+  {name:'Aigüa Mineral Montseny SAU',sector:'alimentacio',size:'large',loc:[41.74,2.38],muni:'Granollers',emp:280,fact:8200000},
+  {name:'Metal·listeria Gallifa SL',sector:'construccio',size:'medium',loc:[41.62,2.15],muni:'Rubí',emp:45,fact:1800000},
+  {name:'Logística Rapid SL',sector:'logistica',size:'medium',loc:[41.70,2.01],muni:'Terrassa',emp:120,fact:4500000},
+  {name:'Supermercat Vallès SA',sector:'comerç',size:'large',loc:[41.61,2.08],muni:'Sabadell',emp:340,fact:12000000},
+  {name:'TecnoSoft Vallès SL',sector:'tecnologia',size:'small',loc:[41.73,2.22],muni:'Granollers',emp:22,fact:890000},
+  {name:'Formatgeria Cal Pep SCL',sector:'alimentacio',size:'small',loc:[41.82,2.44],muni:'Vic',emp:12,fact:380000},
+  {name:'Constructora Llobregat SL',sector:'construccio',size:'large',loc:[41.63,2.04],muni:'Terrassa',emp:180,fact:9500000},
+  {name:'Comerç El Molí SL',sector:'comerç',size:'small',loc:[41.68,2.19],muni:'Granollers',emp:8,fact:220000},
+  {name:'Farmàcia Vallès SA',sector:'salut',size:'medium',loc:[41.70,2.09],muni:'Sabadell',emp:65,fact:3200000},
+  {name:'Hotel Spa Can Santoi SL',sector:'turisme',size:'medium',loc:[41.78,2.35],muni:'La Garriga',emp:55,fact:2100000},
+  {name:'Electrònica Cerdanyola SA',sector:'tecnologia',size:'large',loc:[41.49,2.14],muni:'Cerdanyola',emp:220,fact:7800000},
+  {name:'Tèxtils Roca SL',sector:'moda',size:'medium',loc:[41.63,2.11],muni:'Sabadell',emp:80,fact:2800000},
+  {name:'Acadèmia Idiomes Vallès SCP',sector:'educacio',size:'small',loc:[41.72,2.21],muni:'Granollers',emp:15,fact:450000},
+  {name:'Transports Garcia SL',sector:'logistica',size:'small',loc:[41.65,2.17],muni:'Mollet',emp:18,fact:620000},
+  {name:'Panaderia Artesana Ribes',sector:'alimentacio',size:'small',loc:[41.67,2.12],muni:'Mollet',emp:6,fact:180000},
+  {name:'Clínica Dental Ponent SL',sector:'salut',size:'small',loc:[41.56,2.10],muni:'Sant Cugat',emp:10,fact:360000},
+  {name:'Impressió Digital 3D SL',sector:'tecnologia',size:'medium',loc:[41.60,2.07],muni:'Terrassa',emp:35,fact:1200000},
+  {name:'Bodega Alella DO SL',sector:'alimentacio',size:'medium',loc:[41.49,2.30],muni:'Alella',emp:28,fact:1500000},
+  {name:'Maquinària Agrícola Valles SL',sector:'construccio',size:'medium',loc:[41.76,2.28],muni:'Cardedeu',emp:40,fact:1700000},
+  {name:'Gestoría Assessors Vallès SLP',sector:'tecnologia',size:'small',loc:[41.61,2.09],muni:'Sabadell',emp:9,fact:280000},
+];
+
+const MACHINES = [
+  {id:'basic',name:'Màquina bàsica',icon:'⚙️',price:15000,capacity:100,maintenance:200,desc:'Producció estàndard'},
+  {id:'advanced',name:'Màquina CNC',icon:'🤖',price:45000,capacity:350,maintenance:500,desc:'Alta precisió'},
+  {id:'auto',name:'Línia automàtica',icon:'🏭',price:120000,capacity:1000,maintenance:1200,desc:'Producció massiva'},
+  {id:'robot',name:'Braç robòtic',icon:'🦾',price:80000,capacity:600,maintenance:800,desc:'Flexible i eficient'},
+];
+
+const MARKETING_CHANNELS = [
+  {id:'rrss',name:'Xarxes socials',icon:'📱',cost_per:50,reach_mult:1.5,desc:'Instagram, Facebook, TikTok'},
+  {id:'google',name:'Google Ads',icon:'🔍',cost_per:100,reach_mult:2.2,desc:'Anuncis en cercadors'},
+  {id:'tv_local',name:'TV local',icon:'📺',cost_per:500,reach_mult:3.0,desc:'Canal 4 Vallès, Onda Cero'},
+  {id:'radio',name:'Ràdio i premsa',icon:'📻',cost_per:200,reach_mult:1.8,desc:'RAC1, La Vanguardia'},
+  {id:'fira',name:'Fires i events',icon:'🎪',cost_per:1500,reach_mult:4.5,desc:'Fira Granollers, Alimentaria'},
+  {id:'email',name:'Email màrqueting',icon:'📧',cost_per:30,reach_mult:0.8,desc:'Newsletter clients'},
+];
+
+const SPONSORS = [
+  {id:'futbol',name:'CF Granollers (patrocini samarreta)',icon:'⚽',cost:8000,benefit:'Visibilitat regional (+15% prestigi)',prestigi_req:20},
+  {id:'bàsquet',name:'Joventut Badalona (panell)',icon:'🏀',cost:12000,benefit:'Visibilitat provincial (+20% prestigi)',prestigi_req:35},
+  {id:'marathon',name:'Marató de Granollers',icon:'🏃',cost:3000,benefit:'Imatge saludable (+10% prestigi)',prestigi_req:10},
+  {id:'concert',name:'Patrocini Música Blanca',icon:'🎵',cost:5000,benefit:'Joves (+12% vendes)',prestigi_req:15},
+];
+
+const EVENT_POOL = [
+  {type:'economic',icon:'📉',title:'Crisi financera',desc:'La Reserva Federal puja tipus d\'interès. Cauen les vendes.',impact:-0.12,duration:4,probability:0.04},
+  {type:'economic',icon:'💹',title:'Boom econòmic',desc:'El PIB creix un 3%. Augmenta el poder adquisitiu.',impact:0.10,duration:6,probability:0.05},
+  {type:'climate',icon:'🌊',title:'Inundacions al Vallès',desc:'Pluges torrencials. Disrupcions en la cadena de subministrament.',impact:-0.08,duration:2,probability:0.03},
+  {type:'climate',icon:'☀️',title:'Sequera prolongada',desc:'Restriccions d\'aigua. Afecta la producció.',impact:-0.06,duration:3,probability:0.04},
+  {type:'political',icon:'⚖️',title:'Nova normativa laboral',desc:'Augment del salari mínim interprofessional.',impact:-0.05,duration:0,probability:0.06},
+  {type:'political',icon:'🇪🇺',title:'Ajudes europees',desc:'El NGEU finança la transició digital. Subvenció disponible.',impact:0.08,duration:0,probability:0.04},
+  {type:'health',icon:'😷',title:'Brot epidèmic',desc:'Absentisme laboral alt. Reducció de la producció.',impact:-0.15,duration:3,probability:0.02},
+  {type:'social',icon:'🔴',title:'Vaga sectorial',desc:'Els treballadors del sector estan en vaga.',impact:-0.10,duration:1,probability:0.03},
+  {type:'tech',icon:'💡',title:'Innovació tecnològica',desc:'Nou procés productiu disponible. Reducció costos.',impact:0.06,duration:0,probability:0.05},
+  {type:'competitor',icon:'⚔️',title:'Nova competència',desc:'Una empresa multinacional entra al mercat.',impact:-0.08,duration:8,probability:0.04},
+  {type:'opportunity',icon:'🤝',title:'Acord comercial',desc:'Client gran vol un acord de llarg termini.',impact:0.15,duration:12,probability:0.04},
+  {type:'supply',icon:'🚢',title:'Problemes de subministrament',desc:'Escassetat de matèries primeres per la guerra.',impact:-0.09,duration:5,probability:0.03},
+];
+
+const JOBS_BY_PRESTIGI = [
+  {minPrest:0,maxPrest:10,roles:['Cap de vendes','Responsable RRHH','Gerent','Director Operacions']},
+  {minPrest:10,maxPrest:25,roles:['Director Comercial','Director Financer','Gerent General']},
+  {minPrest:25,maxPrest:50,roles:['CEO','Director Estratègia','Conseller Delegat']},
+  {minPrest:50,maxPrest:999,roles:['CEO Corporatiu','President Executiu','Conseller Delegat']},
+];
+
+// ==================== STATE ====================
+let G = {
+  user: null,
+  uid: null,
+  gameData: null,
+  currentTab: 'dashboard',
+  rankingOpen: false,
+  otherPlayers: [],
+  activeEvents: [],
+  initialized: false,
 };
 
-// ---- Auth submit ----
-window.authSubmit = async function() {
-  const email    = document.getElementById('inp-email').value.trim();
-  const password = document.getElementById('inp-password').value;
-  const username = document.getElementById('inp-username').value.trim();
-  const btn      = document.getElementById('auth-btn');
-  const msgEl    = document.getElementById('auth-msg');
-  msgEl.innerHTML = ''; btn.disabled=true; btn.textContent='⏳ Cargando...';
-  try {
-    if (authMode === 'login') {
-      await signInWithEmailAndPassword(auth, email, password);
-    } else if (authMode === 'register') {
-      if (!username) throw new Error('El nombre de pizzero es obligatorio');
-      const cred = await createUserWithEmailAndPassword(auth, email, password);
-      const cx = Math.floor(Math.random()*14)+1, cy = Math.floor(Math.random()*10)+1;
-      await setDoc(doc(db,'users',cred.user.uid), {username, email, createdAt:Date.now(), gameState:null, cityPos:{x:cx,y:cy}});
-      await setDoc(doc(db,'city',cred.user.uid),  {userId:cred.user.uid, username, x:cx, y:cy, level:1, reputation:0, pizzasSold:0, upgrades:[], lastActive:Date.now()});
-    } else {
-      await sendPasswordResetEmail(auth, email);
-      msgEl.innerHTML='<div class="auth-success">✅ Email enviado. Revisa tu bandeja de entrada.</div>';
-    }
-  } catch(e) {
-    let m = e.message||'Error desconocido';
-    if (m.includes('user-not-found'))          m='Usuario no encontrado';
-    else if (m.includes('invalid-credential') || m.includes('wrong-password')) m='Email o contraseña incorrectos';
-    else if (m.includes('email-already-in-use')) m='Este email ya está registrado';
-    else if (m.includes('weak-password'))        m='Contraseña muy débil (mínimo 6 caracteres)';
-    msgEl.innerHTML=`<div class="auth-error">⚠️ ${m}</div>`;
-  }
-  btn.disabled=false; switchAuthTab(authMode);
-};
-
-// ---- Firebase game save ----
-window.saveGameToFirebase = async function() {
-  if (!window._currentUserId) return;
-  const save = {pizzas:G.pizzas, total:G.total, level:G.level, xp:G.xp, upgrades:G.upgrades, rep:G.rep};
-  await updateDoc(doc(db,'users',window._currentUserId), {gameState:save});
-  await updateDoc(doc(db,'city', window._currentUserId), {
-    level:G.level, reputation:G.rep, pizzasSold:G.total,
-    upgrades:Object.keys(G.upgrades).filter(k=>G.upgrades[k]>0),
-    lastActive:Date.now()
-  });
-};
-
-// ---- Change password ----
-window._changePassword = async function(newPass) {
-  await updatePassword(auth.currentUser, newPass);
-};
-
-// ---- Logout ----
-window.logoutUser = async function() {
-  await window.saveGameToFirebase().catch(()=>{});
-  await signOut(auth);
-  // Reset state
-  Object.assign(G, {pizzas:0,total:0,ppc:1,pps:0,rep:0,level:1,xp:0,upgrades:{},combo:0,lastClick:0,multiplier:1,secLevel:0,policeCorr:0,detectiveLv:0});
-  window._currentUserId=''; window._currentUsername=''; window._currentEmail='';
-  closeProfile();
-  document.getElementById('game-screen').style.display='none';
-  document.getElementById('auth-screen').style.display='flex';
-};
-
-// ---- Wire up ALL event listeners inside module ----
-document.addEventListener('DOMContentLoaded', () => {});
-
-// Auth tabs
-document.getElementById('tab-login').addEventListener('click',    () => switchAuthTab('login'));
-document.getElementById('tab-register').addEventListener('click', () => switchAuthTab('register'));
-document.getElementById('tab-reset').addEventListener('click',    () => switchAuthTab('reset'));
-document.getElementById('auth-btn').addEventListener('click',     authSubmit);
-document.getElementById('inp-email').addEventListener('keydown',    e => { if(e.key==='Enter') authSubmit(); });
-document.getElementById('inp-password').addEventListener('keydown', e => { if(e.key==='Enter') authSubmit(); });
-
-// Game buttons — profile, logout, save, change password, level up
-document.getElementById('profile-modal').addEventListener('click', e => { if(e.target===document.getElementById('profile-modal')) closeProfile(); });
-document.getElementById('levelup-overlay').addEventListener('click', e => { if(e.target===document.getElementById('levelup-overlay')) closeLevelUp(); });
-
-// Bottom nav
-document.querySelectorAll('.bnav-btn').forEach((btn, i) => {
-  const tabs = ['clicker','shop','city'];
-  btn.addEventListener('click', () => switchTab(tabs[i], btn));
-});
-
-// Oven click
-document.getElementById('oven-wrapper').addEventListener('click', handleOvenClick);
-
-// Profile button
-document.getElementById('profile-modal').querySelector('.modal-close').addEventListener('click', closeProfile);
-document.querySelectorAll('.modal-tab').forEach((btn, i) => {
-  btn.addEventListener('click', () => switchModalTab(i===0?'stats':'security', btn));
-});
-document.querySelector('.logout-btn').addEventListener('click', logoutUser);
-document.querySelector('#modal-stats .modal-btn').addEventListener('click', saveGameUI);
-document.querySelector('#modal-security .modal-btn').addEventListener('click', changePasswordUI);
-document.getElementById('lu-btn') && document.getElementById('lu-btn').addEventListener('click', closeLevelUp);
-document.querySelector('.profile-btn').addEventListener('click', openProfile);
-
-// ---- Auth state listener ----
-onAuthStateChanged(auth, async user => {
-  if (user) {
-    window._currentUserId = user.uid;
-    window._currentEmail  = user.email;
-    try {
-      const snap = await getDoc(doc(db,'users',user.uid));
-      if (snap.exists()) {
-        const data = snap.data();
-        window._currentUsername = data.username || user.email;
-        if (data.gameState) loadGameState(data.gameState);
-      }
-    } catch(e) { console.log('Offline, using local state'); }
-    startGame();
-  } else {
-    document.getElementById('auth-screen').style.display='flex';
-    document.getElementById('game-screen').style.display='none';
-  }
-});
-
-// ---- Start game ----
-function startGame() {
-  document.getElementById('auth-screen').style.display='none';
-  document.getElementById('game-screen').style.display='flex';
-  document.getElementById('nav-username').textContent = window._currentUsername;
-  buildOvenFlames();
-  buildOvenStones();
-  buildAuthParticles();
-  renderShop();
-  updateUI();
-  // Oven visuals based on current level
-  if (window.updateOvenVisuals) updateOvenVisuals();
-  // World theme based on current level
-  if (window.updateWorldTheme) updateWorldTheme();
-  // Load PvP notifications (attacks received while offline)
-  setTimeout(() => {
-    if (window.loadPvpNotifications) loadPvpNotifications();
-    if (window.loadMapEffects) loadMapEffects();
-  }, 1500);
-  startPassiveLoop();
-  startEventLoop();
-  startAutoSave();
-  // Wire up banner buttons
-  document.getElementById('pvp-banner-close').addEventListener('click', closePvpBanner);
-  document.getElementById('pvp-banner-dismiss').addEventListener('click', closePvpBanner);
-  // Update oven visuals when level changes (hook into addXP)
-  const _orig = addXP;
-  window._addXPWrapped = function(amount) {
-    const prevLv = G.level;
-    _orig(amount);
-    if (G.level !== prevLv && window.updateOvenVisuals) updateOvenVisuals();
+function defaultGameData(uid, displayName) {
+  const now = new Date(2024, 0, 1);
+  return {
+    uid,
+    displayName,
+    mode: null, // 'create' | 'hired'
+    week: 1,
+    year: 2024,
+    month: 1,
+    date: now.toISOString(),
+    prestigi: 0,
+    company: null,
+    finances: {
+      cash: 0,
+      monthly_revenue: 0,
+      monthly_costs: 0,
+      annual_revenue: 0,
+      annual_costs: 0,
+      loans: [],
+      revenue_history: [],
+      actiu: { immobilitzat: 0, existencies: 10000, tresoreria: 0, clients: 0 },
+      passiu: { capital: 0, reserves: 0, deutes_llarg: 0, deutes_curt: 0, proveidors: 0 },
+    },
+    employees: [],
+    machines: [],
+    marketing: { channels: {}, sponsors: [] },
+    clients: [],
+    claims: [],
+    notifications: [],
+    events: [],
+    mktBudget: 0,
+    lastSaved: Date.now(),
   };
 }
 
-function buildOvenFlames() {
-  const fire = document.getElementById('oven-fire');
-  fire.innerHTML='';
-  for(let i=0;i<8;i++){
-    const f=document.createElement('div');
-    f.className='fire-tongue';
-    f.style.cssText=`left:${i*12.5}%;height:${28+Math.random()*30}px;animation-delay:${Math.random()*0.5}s;animation-duration:${0.28+Math.random()*0.35}s`;
-    fire.appendChild(f);
+// ==================== FIREBASE ====================
+window.doLogin = async function() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  if (!email || !pass) { showAuthErr('Introdueix correu i contrasenya.'); return; }
+  try {
+    const btn = document.querySelector('#login-form .auth-btn');
+    btn.disabled = true; btn.textContent = 'Entrant...';
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch(e) {
+    showAuthErr('Error: ' + e.message);
+    document.querySelector('#login-form .auth-btn').disabled = false;
+    document.querySelector('#login-form .auth-btn').textContent = 'Entrar al simulador →';
   }
+};
+
+window.doRegister = async function() {
+  const name = document.getElementById('reg-name').value.trim();
+  const surname = document.getElementById('reg-surname').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-pass').value;
+  if (!name || !surname || !email || !pass) { showAuthErr('Omple tots els camps.'); return; }
+  if (pass.length < 6) { showAuthErr('La contrasenya ha de tenir mínim 6 caràcters.'); return; }
+  try {
+    const btn = document.querySelector('#register-form .auth-btn');
+    btn.disabled = true; btn.textContent = 'Creant compte...';
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    const gd = defaultGameData(cred.user.uid, name + ' ' + surname);
+    await setDoc(doc(db, 'games', cred.user.uid), gd);
+  } catch(e) {
+    showAuthErr('Error: ' + e.message);
+    document.querySelector('#register-form .auth-btn').disabled = false;
+    document.querySelector('#register-form .auth-btn').textContent = 'Crear compte →';
+  }
+};
+
+window.doLogout = async function() {
+  await signOut(auth);
+  closeProfile();
+};
+
+function showAuthErr(msg) {
+  const el = document.getElementById('auth-err');
+  el.textContent = msg;
+  el.style.display = 'block';
 }
 
-function buildOvenStones() {
-  const stones = document.getElementById('oven-stones');
-  stones.innerHTML='';
-  [38,42,36,40,34].forEach(w => {
-    const s=document.createElement('div');
-    s.className='stone';
-    s.style.width=w+'px';
-    stones.appendChild(s);
+window.switchAuthTab = function(t) {
+  document.getElementById('auth-err').style.display = 'none';
+  document.getElementById('login-form').style.display = t==='login' ? '' : 'none';
+  document.getElementById('register-form').style.display = t==='register' ? '' : 'none';
+  document.querySelectorAll('.auth-tab').forEach((b,i) => b.classList.toggle('active', (t==='login'?0:1)===i));
+};
+
+onAuthStateChanged(auth, async (user) => {
+  document.getElementById('loading-overlay').style.display = 'none';
+  if (user) {
+    G.user = user;
+    G.uid = user.uid;
+    document.getElementById('auth-screen').style.display = 'none';
+    document.getElementById('game-screen').style.display = 'flex';
+    await loadGameData();
+    startRealtimeListeners();
+  } else {
+    document.getElementById('auth-screen').style.display = 'flex';
+    document.getElementById('game-screen').style.display = 'none';
+  }
+});
+
+async function loadGameData() {
+  const ref = doc(db, 'games', G.uid);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) {
+    G.gameData = defaultGameData(G.uid, G.user.email.split('@')[0]);
+    await setDoc(ref, G.gameData);
+  } else {
+    G.gameData = snap.data();
+  }
+  initUI();
+}
+
+async function saveGameData() {
+  if (!G.gameData) return;
+  G.gameData.lastSaved = Date.now();
+  try {
+    await setDoc(doc(db, 'games', G.uid), G.gameData);
+    showToast('💾 Guardat automàticament');
+  } catch(e) { console.warn('Save err:', e); }
+}
+
+function startRealtimeListeners() {
+  // Listen other players for map
+  const q = query(collection(db, 'games'), limit(20));
+  onSnapshot(q, (snap) => {
+    G.otherPlayers = [];
+    snap.forEach(d => {
+      if (d.id !== G.uid && d.data().company) {
+        G.otherPlayers.push(d.data());
+      }
+    });
+    if (G.currentTab === 'map') renderMap();
+    renderRanking();
   });
 }
 
-function buildAuthParticles() {
-  const c = document.getElementById('auth-particles');
-  c.innerHTML='';
-  for(let i=0;i<18;i++){
-    const d=document.createElement('div');
-    d.className='auth-particle';
-    d.textContent='🍕';
-    d.style.cssText=`left:${Math.random()*100}%;font-size:${12+Math.random()*18}px;animation-delay:${Math.random()*5}s;animation-duration:${3+Math.random()*4}s`;
-    c.appendChild(d);
+// ==================== UI INIT ====================
+function initUI() {
+  const gd = G.gameData;
+  document.getElementById('profile-name').textContent = gd.displayName || 'Jugador';
+  updateTopStats();
+  if (!gd.mode) {
+    showSetupInit();
+  } else {
+    showActiveGame();
   }
+  renderDashboard();
+  renderFinances();
+  renderHR();
+  renderProduction();
+  renderMarketing();
+  renderSales();
+  G.initialized = true;
 }
+
+function showSetupInit() {
+  document.getElementById('setup-init').style.display = '';
+  document.getElementById('wizard-area').style.display = 'none';
+  document.getElementById('hired-area').style.display = 'none';
+  document.getElementById('active-company').style.display = 'none';
+}
+
+function showActiveGame() {
+  document.getElementById('setup-init').style.display = 'none';
+  document.getElementById('wizard-area').style.display = 'none';
+  document.getElementById('hired-area').style.display = 'none';
+  document.getElementById('active-company').style.display = '';
+  renderActiveCompany();
+}
+
+// ==================== MODE SELECTION ====================
+window.startMode = function(mode) {
+  if (mode === 'create') {
+    showWizard();
+  } else {
+    showHiredMode();
+  }
+};
+
+// ==================== WIZARD ====================
+let wizardData = {};
+let wizardStep = 0;
+const WIZARD_STEPS = [
+  {label:'Idea', render: renderStep_Idea},
+  {label:'Forma Jurídica', render: renderStep_Legal},
+  {label:'Pla de Negoci', render: renderStep_Plan},
+  {label:'Finançament', render: renderStep_Finance},
+  {label:'Constitució', render: renderStep_Const},
+  {label:'Instal·lacions', render: renderStep_Location},
+  {label:'Personal', render: renderStep_Staff},
+];
+
+function showWizard() {
+  wizardData = {};
+  wizardStep = 0;
+  document.getElementById('setup-init').style.display = 'none';
+  document.getElementById('wizard-area').style.display = '';
+  document.getElementById('hired-area').style.display = 'none';
+  renderWizardSteps();
+  renderWizardStep();
+}
+
+function renderWizardSteps() {
+  document.getElementById('wizard-steps').innerHTML = WIZARD_STEPS.map((s,i) => `
+    <div class="w-step ${i < wizardStep ? 'done' : i === wizardStep ? 'active' : ''}">
+      <div class="w-step-dot">${i < wizardStep ? '✓' : i+1}</div>
+      <div class="w-step-label">${s.label}</div>
+    </div>
+  `).join('');
+}
+
+function renderWizardStep() {
+  WIZARD_STEPS[wizardStep].render();
+}
+
+window.wizardNext = function() {
+  if (!validateStep()) return;
+  if (wizardStep < WIZARD_STEPS.length - 1) {
+    wizardStep++;
+    renderWizardSteps();
+    renderWizardStep();
+  } else {
+    finishWizard();
+  }
+};
+
+window.wizardPrev = function() {
+  if (wizardStep > 0) {
+    wizardStep--;
+    renderWizardSteps();
+    renderWizardStep();
+  } else {
+    showSetupInit();
+  }
+};
+
+function validateStep() {
+  if (wizardStep === 0) {
+    wizardData.companyName = document.getElementById('wiz-name')?.value.trim();
+    wizardData.sector = document.getElementById('wiz-sector')?.value;
+    if (!wizardData.companyName || !wizardData.sector) { showToast('⚠️ Omple tots els camps'); return false; }
+  }
+  if (wizardStep === 1) {
+    wizardData.legalForm = document.getElementById('wiz-legal')?.value;
+  }
+  if (wizardStep === 3) {
+    wizardData.ownCapital = parseFloat(document.getElementById('wiz-own-capital')?.value || 0);
+    wizardData.loanAmount = parseFloat(document.getElementById('wiz-loan-amount')?.value || 0);
+    const forma = FORMES_JURIDIQUES.find(f => f.id === wizardData.legalForm);
+    if (forma && wizardData.ownCapital < forma.capital) {
+      showToast(`⚠️ El capital mínim per ${forma.name} és ${forma.capital.toLocaleString('ca')}€`);
+      return false;
+    }
+  }
+  if (wizardStep === 4) {
+    wizardData.registrationDone = true;
+  }
+  return true;
+}
+
+function renderStep_Idea() {
+  const sectors = SECTORS.map(s => `<option value="${s.id}">${s.icon} ${s.name}</option>`).join('');
+  document.getElementById('wizard-panel').innerHTML = `
+    <div class="wizard-title">La teva idea de negoci</div>
+    <div class="wizard-subtitle">Defineix el nom i el sector de la teva futura empresa.</div>
+    <div class="form-group2"><label>Nom de l'empresa</label>
+      <input class="form-input" id="wiz-name" placeholder="Ex: Tecnologies Vallès SL" value="${wizardData.companyName||''}"></div>
+    <div class="form-group2"><label>Sector d'activitat</label>
+      <select class="form-select" id="wiz-sector">${sectors}</select></div>
+    <div class="form-group2"><label>Descripció breu del negoci</label>
+      <textarea class="plan-textarea" id="wiz-desc" placeholder="Descriu en 2-3 frases a que es dedicarà l'empresa...">${wizardData.desc||''}</textarea></div>
+    <div class="info-box">💡 <strong>Consell:</strong> Tria un sector que coneguis. El teu coneixement del mercat serà clau per elaborar un bon pla de negoci i convèncer el banc.</div>
+    <div class="wizard-nav">
+      <button class="btn-prev" onclick="wizardPrev()">← Enrere</button>
+      <button class="btn-next" onclick="wizardNext()">Continuar →</button>
+    </div>`;
+}
+
+function renderStep_Legal() {
+  const legalHtml = FORMES_JURIDIQUES.map(f => `
+    <div class="offer-card" onclick="selectLegal('${f.id}')" id="legal-${f.id}" style="padding:14px;margin-bottom:8px;${wizardData.legalForm===f.id?'border-color:var(--accent);background:rgba(79,127,255,.1)':''}">
+      <div style="display:flex;justify-content:space-between;align-items:start">
+        <div style="font-weight:700;font-size:15px;color:var(--text)">${f.name}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--gold)">Capital mínim: ${f.capital.toLocaleString('ca')}€</div>
+      </div>
+      <div style="font-size:12px;color:var(--text2);margin:6px 0">${f.desc}</div>
+      <div style="display:flex;gap:12px;font-size:11px;color:var(--text3)">
+        <span>👥 Socis: ${f.socis}</span>
+        <span>⚖️ Resp: ${f.responsabilitat}</span>
+        <span>📋 Impost: ${f.impostos}</span>
+        <span>💰 Cost const: ${f.cost_const.toLocaleString('ca')}€</span>
+      </div>
+    </div>`).join('');
+  document.getElementById('wizard-panel').innerHTML = `
+    <div class="wizard-title">Forma Jurídica</div>
+    <div class="wizard-subtitle">Escull com constituiràs l'empresa. Cada forma té implicacions legals, fiscals i de responsabilitat diferents.</div>
+    ${legalHtml}
+    <div class="info-box">⚖️ <strong>Responsabilitat:</strong> Les formes societàries (SL, SA) protegeixen el teu patrimoni personal. L'autònom no — respondràs amb tots els teus béns.</div>
+    <div class="wizard-nav">
+      <button class="btn-prev" onclick="wizardPrev()">← Enrere</button>
+      <button class="btn-next" onclick="wizardNext()">Continuar →</button>
+    </div>`;
+  if (!wizardData.legalForm) { wizardData.legalForm = 'sl'; document.getElementById('legal-sl').style.borderColor = 'var(--accent)'; document.getElementById('legal-sl').style.background = 'rgba(79,127,255,.1)'; }
+}
+
+window.selectLegal = function(id) {
+  FORMES_JURIDIQUES.forEach(f => {
+    const el = document.getElementById('legal-' + f.id);
+    if (el) { el.style.borderColor = ''; el.style.background = ''; }
+  });
+  wizardData.legalForm = id;
+  const sel = document.getElementById('legal-' + id);
+  if (sel) { sel.style.borderColor = 'var(--accent)'; sel.style.background = 'rgba(79,127,255,.1)'; }
+};
+
+function renderStep_Plan() {
+  document.getElementById('wizard-panel').innerHTML = `
+    <div class="wizard-title">Pla de Negoci</div>
+    <div class="wizard-subtitle">El banc i els inversors demanaran un pla de negoci sòlid. La qualitat del teu pla determinarà les condicions del crèdit.</div>
+    ${renderPlanSection('mercat','Anàlisi de mercat','Qui és el teu client objectiu? Quin és el mercat potencial? Hi ha demanda suficient?')}
+    ${renderPlanSection('competencia','Competència','Qui competeix amb tu? Quins avantatges competitius tens?')}
+    ${renderPlanSection('producte','Producte/Servei','Què vens exactament? Per què és millor que el de la competència?')}
+    ${renderPlanSection('marketing','Estratègia comercial','Com arribaràs als clients? Quins canals de venda faràs servir?')}
+    ${renderPlanSection('finances','Projecció financera','Quins ingressos esperes? Quan seràs rendible?')}
+    <div class="warn-box">⚠️ Un pla de negoci poc elaborat reduirà les possibilitats d'aprovació del crèdit bancari i augmentarà el tipus d'interès.</div>
+    <div id="plan-quality-display" style="text-align:center;font-size:14px;font-weight:700;color:var(--gold);margin-top:10px">Qualitat del pla: calculant...</div>
+    <div class="wizard-nav">
+      <button class="btn-prev" onclick="wizardPrev()">← Enrere</button>
+      <button class="btn-next" onclick="wizardNext()">Continuar →</button>
+    </div>`;
+  updatePlanQuality();
+}
+
+function renderPlanSection(id, title, placeholder) {
+  return `<div class="plan-section">
+    <div class="plan-section-title">📋 ${title}</div>
+    <textarea class="plan-textarea" id="plan-${id}" placeholder="${placeholder}" oninput="updatePlanQuality()">${wizardData['plan_'+id]||''}</textarea>
+  </div>`;
+}
+
+window.updatePlanQuality = function() {
+  const sections = ['mercat','competencia','producte','marketing','finances'];
+  let totalChars = 0;
+  sections.forEach(s => {
+    const el = document.getElementById('plan-' + s);
+    if (el) { wizardData['plan_' + s] = el.value; totalChars += el.value.length; }
+  });
+  const quality = Math.min(100, Math.round(totalChars / 20));
+  wizardData.planQuality = quality;
+  const disp = document.getElementById('plan-quality-display');
+  if (disp) {
+    const stars = quality >= 80 ? '⭐⭐⭐⭐⭐' : quality >= 60 ? '⭐⭐⭐⭐' : quality >= 40 ? '⭐⭐⭐' : quality >= 20 ? '⭐⭐' : '⭐';
+    disp.textContent = `Qualitat del pla: ${stars} (${quality}%)`;
+    disp.style.color = quality >= 60 ? 'var(--green)' : quality >= 30 ? 'var(--gold)' : 'var(--red)';
+  }
+};
+
+function renderStep_Finance() {
+  const forma = FORMES_JURIDIQUES.find(f => f.id === wizardData.legalForm) || FORMES_JURIDIQUES[1];
+  const planQ = wizardData.planQuality || 0;
+  const interestBase = planQ >= 70 ? 3.5 : planQ >= 40 ? 5.5 : 8.0;
+  const maxLoan = planQ >= 70 ? 200000 : planQ >= 40 ? 100000 : 50000;
+  wizardData.estimatedInterest = interestBase;
+  wizardData.maxLoanAmount = maxLoan;
+  document.getElementById('wizard-panel').innerHTML = `
+    <div class="wizard-title">Finançament</div>
+    <div class="wizard-subtitle">Necessites capital per posar en marxa l'empresa. Combina capital propi i finançament bancari.</div>
+    <div class="bank-card">
+      <div class="bank-officer">
+        <div class="officer-avatar">🏦</div>
+        <div>
+          <div class="officer-name">Sr. Martínez — Director Banca Empreses</div>
+          <div class="officer-title">CaixaBank, Oficina Granollers</div>
+        </div>
+      </div>
+      <div class="officer-speech">"Hem revisat el vostre pla de negoci. Basant-nos en la qualitat (${planQ}%), us podem oferir un préstec de fins a <strong>${maxLoan.toLocaleString('ca')}€</strong> a un tipus del <strong>${interestBase}% anual</strong>. Necessitarem avals i documentació acreditativa."</div>
+    </div>
+    <div class="form-row">
+      <div class="form-group2"><label>Capital propi (€) — Mínim ${forma.capital.toLocaleString('ca')}€</label>
+        <input class="form-input" type="number" id="wiz-own-capital" value="${Math.max(forma.capital, wizardData.ownCapital||forma.capital)}" oninput="updateApproval()"></div>
+      <div class="form-group2"><label>Sol·licitud crèdit bancari (€) — Màx ${maxLoan.toLocaleString('ca')}€</label>
+        <input class="form-input" type="number" id="wiz-loan-amount" value="${wizardData.loanAmount||20000}" oninput="updateApproval()"></div>
+    </div>
+    <div class="form-group2"><label>Aval: propietat com a garantia</label>
+      <select class="form-select" id="wiz-aval" onchange="updateApproval()">
+        <option value="0">Cap aval</option>
+        <option value="1">Pares/tutors com a avaladors</option>
+        <option value="2">Pòlissa d'assegurança vida</option>
+        <option value="3">Propietat immobiliària</option>
+      </select></div>
+    <div id="approval-section">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:6px">Probabilitat aprovació:</div>
+      <div class="approval-bar"><div class="approval-fill" id="approval-fill" style="width:50%"></div></div>
+      <div id="approval-text" style="font-size:12px;color:var(--text2)">Calculant...</div>
+    </div>
+    <div class="info-box">💡 <strong>Capital total disponible:</strong> <span id="total-capital" class="tstat-v">—</span></div>
+    <div class="wizard-nav">
+      <button class="btn-prev" onclick="wizardPrev()">← Enrere</button>
+      <button class="btn-next" onclick="wizardNext()">Continuar →</button>
+    </div>`;
+  updateApproval();
+}
+
+window.updateApproval = function() {
+  const own = parseFloat(document.getElementById('wiz-own-capital')?.value||0);
+  const loan = parseFloat(document.getElementById('wiz-loan-amount')?.value||0);
+  const aval = parseInt(document.getElementById('wiz-aval')?.value||0);
+  const planQ = wizardData.planQuality || 0;
+  let prob = (planQ * 0.4) + (aval * 15) + (own > 10000 ? 20 : own/1000);
+  prob = Math.min(95, Math.max(5, prob));
+  wizardData.loanApprovalProb = prob;
+  const fill = document.getElementById('approval-fill');
+  const text = document.getElementById('approval-text');
+  const total = document.getElementById('total-capital');
+  if (fill) fill.style.width = prob + '%';
+  if (text) text.textContent = `${prob.toFixed(0)}% probabilitat d'aprovació. ${prob >= 70 ? '✅ Molt bona!' : prob >= 40 ? '⚠️ Acceptable' : '❌ Cal millorar el pla o aportar avals'}`;
+  if (text) text.style.color = prob >= 70 ? 'var(--green)' : prob >= 40 ? 'var(--gold)' : 'var(--red)';
+  if (total) total.textContent = (own + loan).toLocaleString('ca') + '€';
+};
+
+function renderStep_Const() {
+  const forma = FORMES_JURIDIQUES.find(f => f.id === wizardData.legalForm) || FORMES_JURIDIQUES[1];
+  const steps = [
+    {icon:'✅',step:'Denominació social',desc:'Sol·licitud al Registre Mercantil Central. 3-5 dies hàbils.',cost:20,done:true},
+    {icon:'📝',step:'Estatuts socials',desc:'Notari: redacció d\'estatuts i escriptura de constitució.',cost:400,done:false},
+    {icon:'🏛️',step:'Registre Mercantil',desc:'Inscripció de l\'empresa al Registre Mercantil Provincial.',cost:150,done:false},
+    {icon:'🔢',step:'NIF provisional (Agència Tributària)',desc:'Sol·licitar el CIF/NIF de l\'empresa. Tràmit gratuït.',cost:0,done:false},
+    {icon:'💼',step:'IAE (Impost Activitats Econòmiques)',desc:'Alta al padró municipal. Gratuït fins a 1M€ facturació.',cost:0,done:false},
+    {icon:'🏢',step:'Alta Seguretat Social (compte cotització)',desc:'Alta com a empresa a la TGSS per poder contractar.',cost:0,done:false},
+    {icon:'📋',step:'Llicència d\'obertura (Ajuntament)',desc:'Necessària per establiments i locals.',cost:250,done:false},
+  ];
+  const totalCost = steps.reduce((s,st) => s + st.cost, 0) + forma.cost_const;
+  document.getElementById('wizard-panel').innerHTML = `
+    <div class="wizard-title">Constitució de l'empresa</div>
+    <div class="wizard-subtitle">Tràmits legals necessaris per constituir la <strong style="color:var(--accent)">${wizardData.companyName}</strong> com a <strong style="color:var(--accent)">${forma.name}</strong>.</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+      ${steps.map(st => `
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px">
+          <div style="font-size:22px">${st.icon}</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:700;color:var(--text)">${st.step}</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:2px">${st.desc}</div>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:${st.cost===0?'var(--green)':'var(--gold)'}">${st.cost===0?'Gratuït':st.cost+'€'}</div>
+        </div>`).join('')}
+    </div>
+    <div class="warn-box">⚠️ <strong>Cost total aproximat de constitució:</strong> ${totalCost.toLocaleString('ca')}€ (s'extraurà del capital inicial)</div>
+    <div class="info-box">ℹ️ El temps total de constitució és d'aproximadament <strong>2-4 setmanes</strong>. Durant aquest temps no podràs operar.</div>
+    <div class="wizard-nav">
+      <button class="btn-prev" onclick="wizardPrev()">← Enrere</button>
+      <button class="btn-next" onclick="function(){wizardData.constCost=${totalCost};wizardNext();}(); wizardData.constCost=${totalCost}; wizardNext()">Finalitzar tràmits →</button>
+    </div>`;
+}
+
+function renderStep_Location() {
+  document.getElementById('wizard-panel').innerHTML = `
+    <div class="wizard-title">Instal·lacions</div>
+    <div class="wizard-subtitle">On instal·laràs la teva empresa? Escull entre llogar o comprar un local.</div>
+    <div class="form-row">
+      <div class="form-group2"><label>Municipi</label>
+        <select class="form-select" id="wiz-muni">
+          <option value="Granollers">Granollers</option>
+          <option value="Sabadell">Sabadell</option>
+          <option value="Terrassa">Terrassa</option>
+          <option value="Mollet del Vallès">Mollet del Vallès</option>
+          <option value="Cerdanyola del Vallès">Cerdanyola del Vallès</option>
+          <option value="Rubí">Rubí</option>
+          <option value="Sant Cugat">Sant Cugat del Vallès</option>
+          <option value="La Garriga">La Garriga</option>
+          <option value="Cardedeu">Cardedeu</option>
+        </select></div>
+      <div class="form-group2"><label>Superfície (m²)</label>
+        <input class="form-input" type="number" id="wiz-surface" value="${wizardData.surface||100}" oninput="updateRent()"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group2"><label>Règim</label>
+        <select class="form-select" id="wiz-regime" onchange="updateRent()">
+          <option value="lloguer">Lloguer</option>
+          <option value="compra">Compra</option>
+        </select></div>
+      <div class="form-group2" id="rent-display">
+        <label>Cost estimat</label>
+        <div id="rent-val" style="padding:12px 14px;background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--gold)">—</div>
+      </div>
+    </div>
+    <div class="info-box" id="location-info">Selecciona les opcions per veure el cost estimat.</div>
+    <div class="wizard-nav">
+      <button class="btn-prev" onclick="wizardPrev()">← Enrere</button>
+      <button class="btn-next" onclick="saveLocation(); wizardNext()">Continuar →</button>
+    </div>`;
+  updateRent();
+}
+
+window.updateRent = function() {
+  const surface = parseInt(document.getElementById('wiz-surface')?.value||100);
+  const regime = document.getElementById('wiz-regime')?.value||'lloguer';
+  const muni = document.getElementById('wiz-muni')?.value||'Granollers';
+  const pricePerM2 = {Granollers:8, Sabadell:9, Terrassa:8.5, 'Mollet del Vallès':7, 'Cerdanyola del Vallès':10, Rubí:7.5, 'Sant Cugat':12, 'La Garriga':6, Cardedeu:6.5};
+  const priceM2 = pricePerM2[muni] || 8;
+  let cost, label;
+  if (regime === 'lloguer') {
+    cost = surface * priceM2;
+    label = `${cost.toLocaleString('ca')}€/mes (${priceM2}€/m²)`;
+  } else {
+    cost = surface * priceM2 * 120;
+    label = `${cost.toLocaleString('ca')}€ (compra, ${(priceM2*120).toFixed(0)}€/m²)`;
+  }
+  wizardData.locationCost = cost; wizardData.locationRegime = regime; wizardData.locationSurface = surface; wizardData.locationMuni = muni;
+  const el = document.getElementById('rent-val');
+  if (el) el.textContent = label;
+  const info = document.getElementById('location-info');
+  if (info) info.innerHTML = regime === 'lloguer' ? `📍 <strong>${muni}</strong>: Local de ${surface}m² en lloguer. Despesa mensual fixa de <strong>${cost.toLocaleString('ca')}€</strong>.` : `📍 <strong>${muni}</strong>: Local de ${surface}m² en propietat. Inversió de <strong>${cost.toLocaleString('ca')}€</strong> (possiblement amb hipoteca).`;
+};
+
+window.saveLocation = function() {
+  wizardData.locationMuni = document.getElementById('wiz-muni')?.value;
+};
+
+function renderStep_Staff() {
+  document.getElementById('wizard-panel').innerHTML = `
+    <div class="wizard-title">Personal inicial</div>
+    <div class="wizard-subtitle">Quants treballadors necessites per iniciar l'activitat? Podràs contractar més endavant.</div>
+    <div class="form-row">
+      <div class="form-group2"><label>Comercials / Vendes</label>
+        <input class="form-input" type="number" id="wiz-sales" value="${wizardData.initSales||1}" min="0" max="10" oninput="updateStaffCost()"></div>
+      <div class="form-group2"><label>Producció / Operaris</label>
+        <input class="form-input" type="number" id="wiz-ops" value="${wizardData.initOps||2}" min="0" max="20" oninput="updateStaffCost()"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group2"><label>Administració</label>
+        <input class="form-input" type="number" id="wiz-admin" value="${wizardData.initAdmin||1}" min="0" max="5" oninput="updateStaffCost()"></div>
+      <div class="form-group2"><label>Tècnics especialistes</label>
+        <input class="form-input" type="number" id="wiz-tech" value="${wizardData.initTech||0}" min="0" max="10" oninput="updateStaffCost()"></div>
+    </div>
+    <div class="info-box" id="staff-cost-info">Calculant cost de nòmines...</div>
+    <div class="warn-box">⚠️ Recorda que a més del sou brut, l'empresa paga la Seguretat Social (~30% del sou). El cost total per treballador és superior al sou indicat.</div>
+    <div class="wizard-nav">
+      <button class="btn-prev" onclick="wizardPrev()">← Enrere</button>
+      <button class="btn-next" onclick="finishWizard()" style="background:var(--green)">🚀 Crear empresa!</button>
+    </div>`;
+  updateStaffCost();
+}
+
+window.updateStaffCost = function() {
+  const sales = parseInt(document.getElementById('wiz-sales')?.value||0);
+  const ops = parseInt(document.getElementById('wiz-ops')?.value||0);
+  const admin = parseInt(document.getElementById('wiz-admin')?.value||0);
+  const tech = parseInt(document.getElementById('wiz-tech')?.value||0);
+  const costSales = sales * 1800, costOps = ops * 1400, costAdmin = admin * 1600, costTech = tech * 2200;
+  const total = costSales + costOps + costAdmin + costTech;
+  const totalSS = Math.round(total * 1.30);
+  wizardData.initSales = sales; wizardData.initOps = ops; wizardData.initAdmin = admin; wizardData.initTech = tech;
+  wizardData.monthlySalaryCost = totalSS;
+  const el = document.getElementById('staff-cost-info');
+  if (el) el.innerHTML = `👥 <strong>${sales+ops+admin+tech} treballadors</strong>. Cost brut mensual: ${total.toLocaleString('ca')}€. Cost real amb SS: <strong style="color:var(--red)">${totalSS.toLocaleString('ca')}€/mes</strong>.`;
+};
+
+async function finishWizard() {
+  const forma = FORMES_JURIDIQUES.find(f => f.id === wizardData.legalForm) || FORMES_JURIDIQUES[1];
+  const ownCapital = wizardData.ownCapital || forma.capital;
+  const loanAmount = wizardData.loanAmount || 0;
+  const approved = Math.random() * 100 < (wizardData.loanApprovalProb || 60);
+  const actualLoan = approved ? loanAmount : 0;
+  const initialCash = ownCapital + actualLoan - (wizardData.constCost || forma.cost_const);
+  const monthlyRent = wizardData.locationRegime === 'lloguer' ? (wizardData.locationCost || 800) : 0;
+  const sectorData = SECTORS.find(s => s.id === wizardData.sector) || SECTORS[0];
+
+  // Build employees
+  const initEmps = generateInitialEmployees(wizardData);
+  const initMachines = [{...MACHINES[0], id: 'machine_' + Date.now()}];
+
+  G.gameData.mode = 'create';
+  G.gameData.prestigi = 5;
+  G.gameData.company = {
+    name: wizardData.companyName,
+    sector: wizardData.sector,
+    sectorData,
+    legalForm: wizardData.legalForm,
+    legalFormName: forma.name,
+    nif: 'B' + Math.floor(10000000 + Math.random()*89999999),
+    iae: getIAE(wizardData.sector),
+    founded: `${G.gameData.week}/2024`,
+    municipality: wizardData.locationMuni || 'Granollers',
+    surface: wizardData.locationSurface || 100,
+    regime: wizardData.locationRegime || 'lloguer',
+    monthlyRent,
+    description: wizardData.desc || '',
+  };
+  G.gameData.finances.cash = Math.max(0, initialCash);
+  G.gameData.finances.actiu.tresoreria = Math.max(0, initialCash);
+  G.gameData.finances.passiu.capital = ownCapital;
+  G.gameData.employees = initEmps;
+  G.gameData.machines = initMachines;
+  G.gameData.mktBudget = Math.floor(initialCash * 0.05);
+
+  if (actualLoan > 0) {
+    const interest = wizardData.estimatedInterest || 5.5;
+    const years = 7;
+    const monthlyPayment = Math.round(actualLoan * (interest/100/12) / (1 - Math.pow(1+interest/100/12, -years*12)));
+    G.gameData.finances.loans.push({
+      id: 'loan_' + Date.now(), amount: actualLoan, remaining: actualLoan,
+      interest, years, monthlyPayment, startWeek: G.gameData.week,
+    });
+    G.gameData.finances.passiu.deutes_llarg = actualLoan;
+  }
+
+  G.gameData.notifications.push({
+    id: Date.now(), icon: '🎉', title: 'Empresa constituïda!',
+    desc: `${wizardData.companyName} (${forma.name}) ha estat creada correctament. ${approved ? `Crèdit de ${actualLoan.toLocaleString('ca')}€ aprovat!` : 'El crèdit no ha estat aprovat.'}`,
+    time: 'Ara', urgent: false, read: false,
+  });
+
+  await saveGameData();
+  showActiveGame();
+  renderDashboard(); renderFinances(); renderHR(); renderProduction(); renderMarketing();
+  showEventToast('🎉', 'Empresa creada!', `${wizardData.companyName} ha iniciat activitats. Capital: ${initialCash.toLocaleString('ca')}€`, true);
+}
+
+function generateInitialEmployees(wd) {
+  const emps = [];
+  const names = ['Anna García','Jordi Puig','Maria López','Joan Fernández','Laura Martí','Pere Sánchez','Núria Ros','Marc Vidal'];
+  let ni = 0;
+  const addEmp = (dept, role, salary) => {
+    emps.push({id:'emp_'+Date.now()+'_'+ni, name:names[ni%names.length], dept, role, salary, morale:75, seniority:0, avatar:'👤'});
+    ni++;
+  };
+  for (let i=0;i<(wd.initSales||1);i++) addEmp('vendes','Comercial',1800);
+  for (let i=0;i<(wd.initOps||2);i++) addEmp('produccio','Operari/a',1400);
+  for (let i=0;i<(wd.initAdmin||1);i++) addEmp('admin','Administratiu/va',1600);
+  for (let i=0;i<(wd.initTech||0);i++) addEmp('tecnic','Tècnic/a',2200);
+  return emps;
+}
+
+function getIAE(sector) {
+  const iaeMap = {alimentacio:'6411',tecnologia:'6221',construccio:'5011',comerç:'6111',logistica:'7221',turisme:'6712',salut:'9411',educacio:'9311',moda:'4531',quimica:'2521'};
+  return iaeMap[sector] || '6111';
+}
+
+// ==================== HIRED MODE ====================
+function showHiredMode() {
+  document.getElementById('setup-init').style.display = 'none';
+  document.getElementById('wizard-area').style.display = 'none';
+  document.getElementById('hired-area').style.display = '';
+  document.getElementById('active-company').style.display = 'none';
+  document.getElementById('hired-prestigi').textContent = G.gameData.prestigi || 0;
+  renderJobOffers();
+}
+
+function renderJobOffers() {
+  const prest = G.gameData.prestigi || 0;
+  let available = VALLES_EMPRESES.filter(e => {
+    if (prest < 10) return e.size === 'small';
+    if (prest < 25) return e.size !== 'corp';
+    return true;
+  });
+  available = available.sort(() => Math.random() - 0.5).slice(0, 6);
+  document.getElementById('offers-grid').innerHTML = available.map(e => {
+    const sizeLabel = {small:'Petita',medium:'Mitjana',large:'Gran',corp:'Corporació'}[e.size];
+    const sectorD = SECTORS.find(s => s.id === e.sector) || SECTORS[0];
+    const salary = e.size === 'small' ? 2800 : e.size === 'medium' ? 4200 : e.size === 'large' ? 6500 : 9000;
+    const roles = JOBS_BY_PRESTIGI.find(j => prest >= j.minPrest && prest < j.maxPrest) || JOBS_BY_PRESTIGI[0];
+    const role = roles.roles[Math.floor(Math.random()*roles.roles.length)];
+    return `
+      <div class="offer-card">
+        <div class="offer-top">
+          <div>
+            <div class="offer-company">${sectorD.icon} ${e.name}</div>
+            <div class="offer-sector">${sectorD.name} · ${e.muni}</div>
+            <div style="margin-top:6px;font-size:12px;font-weight:600;color:var(--accent)">${role}</div>
+          </div>
+          <div class="offer-size-badge ${e.size}">${sizeLabel}</div>
+        </div>
+        <div class="offer-salary">💰 ${salary.toLocaleString('ca')}€/any</div>
+        <div class="offer-prestigi">Facturació: ~${(e.fact/1000000).toFixed(1)}M€ · ${e.emp} empleats</div>
+        <div class="offer-details">
+          <span class="offer-tag">📍 ${e.muni}</span>
+          <span class="offer-tag">👥 ${e.emp} persones</span>
+          <span class="offer-tag">🏭 ${sectorD.sector}</span>
+        </div>
+        <button class="offer-btn" onclick="acceptOffer(${JSON.stringify(e).replace(/"/g,'&quot;')}, '${role}', ${salary})">Acceptar oferta →</button>
+      </div>`;
+  }).join('');
+}
+
+window.acceptOffer = async function(company, role, salary) {
+  const sectorData = SECTORS.find(s => s.id === company.sector) || SECTORS[0];
+  G.gameData.mode = 'hired';
+  G.gameData.prestigi = (G.gameData.prestigi || 0) + 3;
+  G.gameData.company = {
+    name: company.name,
+    sector: company.sector,
+    sectorData,
+    legalForm: 'sa',
+    legalFormName: 'Societat Anònima',
+    nif: 'A' + Math.floor(10000000 + Math.random()*89999999),
+    municipality: company.muni,
+    myRole: role,
+    mySalary: salary,
+    totalEmployees: company.emp,
+    annualRevenue: company.fact,
+    size: company.size,
+    surface: company.size === 'small' ? 150 : company.size === 'medium' ? 500 : 2000,
+    monthlyRent: company.size === 'small' ? 1200 : company.size === 'medium' ? 4000 : 12000,
+    regime: 'lloguer',
+  };
+  G.gameData.finances.cash = company.fact * 0.1; // 10% facturació com a cash
+  G.gameData.finances.monthly_revenue = company.fact / 12;
+  G.gameData.finances.monthly_costs = (company.fact / 12) * 0.78;
+  G.gameData.employees = generateHiredEmployees(company);
+  G.gameData.notifications.push({
+    id: Date.now(), icon: '💼', title: 'Incorporació a l\'empresa!',
+    desc: `Has sigut contractat/da com a ${role} a ${company.name}. Sou: ${salary.toLocaleString('ca')}€/any`,
+    time: 'Ara', urgent: false, read: false,
+  });
+  await saveGameData();
+  showActiveGame();
+  renderDashboard(); renderFinances(); renderHR(); renderMarketing();
+  showEventToast('💼', 'Contractat/da!', `Inici com a ${role} a ${company.name}`, true);
+};
+
+function generateHiredEmployees(company) {
+  const count = Math.min(company.emp, 15);
+  const emps = [];
+  const names = ['Anna García','Jordi Puig','Maria López','Joan Fernández','Laura Martí','Pere Sánchez','Núria Ros','Marc Vidal','Ester Mas','David Font','Carla Rius','Àlex Torres','Marta Bosch','Pau Serrat','Silvia Mir'];
+  const roles = ['Comercial','Tècnic/a','Administratiu/va','Operari/a','Cap de Secció','Comptable','Logística'];
+  for (let i=0;i<count;i++) {
+    emps.push({
+      id:'emp_'+i, name:names[i%names.length], dept: i%2===0?'vendes':'produccio',
+      role:roles[i%roles.length], salary: 1400 + Math.floor(Math.random()*1400),
+      morale: 60 + Math.floor(Math.random()*35), seniority: Math.floor(Math.random()*8), avatar:'👤'
+    });
+  }
+  return emps;
+}
+
+// ==================== RENDER ACTIVE COMPANY ====================
+function renderActiveCompany() {
+  const c = G.gameData.company;
+  if (!c) return;
+  document.getElementById('company-main-icon').textContent = c.sectorData?.icon || '🏢';
+  document.getElementById('company-main-name').textContent = c.name;
+  document.getElementById('company-main-info').textContent = `${c.legalFormName || ''} · ${c.municipality || ''} · ${c.sectorData?.name || ''}`;
+  const legal = document.getElementById('company-legal-info');
+  if (legal) legal.innerHTML = [
+    `NIF/CIF: <strong style="color:var(--text)">${c.nif||'—'}</strong>`,
+    `IAE: <strong style="color:var(--text)">${c.iae||'—'}</strong>`,
+    `Forma: <strong style="color:var(--text)">${c.legalFormName||'—'}</strong>`,
+    `Municipi: <strong style="color:var(--text)">${c.municipality||'—'}</strong>`,
+    `Superfície: <strong style="color:var(--text)">${c.surface||0}m²</strong>`,
+    `Règim: <strong style="color:var(--text)">${c.regime||'—'}</strong>`,
+  ].join('<br>');
+  const loans = G.gameData.finances.loans || [];
+  const loansEl = document.getElementById('loans-list');
+  if (loansEl) loansEl.innerHTML = loans.length === 0 ? '<div style="color:var(--text2);font-size:13px">Sense préstecs actius.</div>' : loans.map(l => `
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px">
+      <span style="color:var(--text2)">Préstec bancari</span>
+      <span style="color:var(--gold);font-family:\'JetBrains Mono\',monospace">${l.remaining.toLocaleString('ca')}€ pendent</span>
+      <span style="color:var(--text2)">${l.interest}% · ${l.monthlyPayment.toLocaleString('ca')}€/mes</span>
+    </div>`).join('');
+}
+
+// ==================== DASHBOARD ====================
+function renderDashboard() {
+  const gd = G.gameData;
+  if (!gd) return;
+  const f = gd.finances;
+  const c = gd.company;
+
+  // Banner
+  if (c) {
+    document.getElementById('company-banner').style.display = '';
+    document.getElementById('banner-icon').textContent = c.sectorData?.icon || '🏢';
+    document.getElementById('banner-title').textContent = c.name;
+    document.getElementById('banner-desc').textContent = c.legalFormName + ' · ' + c.municipality + ' · Setmana ' + gd.week + ' · Any ' + gd.year;
+  } else {
+    document.getElementById('company-banner').style.display = 'none';
+  }
+
+  const cash = f.cash || 0;
+  const rev = f.monthly_revenue || 0;
+  const costs = f.monthly_costs || 0;
+  const result = rev - costs;
+
+  document.getElementById('kpi-cash').textContent = cash.toLocaleString('ca') + '€';
+  document.getElementById('kpi-cash').className = 'kpi-val ' + (cash >= 0 ? '' : 'negative');
+  document.getElementById('kpi-cash-ch').textContent = cash >= 10000 ? '✅ Situació saludable' : cash >= 0 ? '⚠️ Vigilar liquiditat' : '❌ Tresoreria negativa';
+  document.getElementById('kpi-rev').textContent = rev.toLocaleString('ca') + '€';
+  document.getElementById('kpi-costs').textContent = costs.toLocaleString('ca') + '€';
+  document.getElementById('kpi-prest').textContent = gd.prestigi || 0;
+  document.getElementById('kpi-result').textContent = result.toLocaleString('ca') + '€';
+  document.getElementById('kpi-result').className = 'kpi-val ' + (result >= 0 ? 'positive' : 'negative');
+
+  // Chart
+  const history = f.revenue_history || [];
+  const bars = document.getElementById('chart-bars');
+  if (bars) {
+    const max = Math.max(...history.map(h => Math.abs(h.rev)), 1);
+    bars.innerHTML = history.slice(-12).map(h => {
+      const pct = Math.max(4, Math.round((Math.abs(h.rev) / max) * 100));
+      return `<div class="chart-bar ${h.rev < 0 ? 'negative' : ''}" style="height:${pct}%;opacity:.7" title="S${h.week}: ${h.rev.toLocaleString('ca')}€"></div>`;
+    }).join('') || '<div style="color:var(--text3);font-size:12px;padding:10px">Sense dades encara</div>';
+  }
+
+  // Notifications
+  const notifs = gd.notifications || [];
+  document.getElementById('notif-list').innerHTML = notifs.slice(-5).reverse().map(n => `
+    <div class="notif-item ${n.urgent?'urgent':''}" onclick="markRead('${n.id}')">
+      <div class="notif-icon">${n.icon||'📋'}</div>
+      <div class="notif-body">
+        <div class="notif-title">${n.title}</div>
+        <div class="notif-desc">${n.desc}</div>
+      </div>
+      <div class="notif-time">${n.time||''}</div>
+    </div>`).join('') || '<div style="color:var(--text3);font-size:12px;text-align:center;padding:20px">Sense notificacions</div>';
+
+  // Departments
+  const depts = [
+    {icon:'💰',name:'Finances',status: cash >= 0 ? 'ok' : 'bad', statusTxt: cash >= 0 ? 'Estable' : 'Crítica'},
+    {icon:'👥',name:'RRHH',status:'ok',statusTxt:`${gd.employees?.length||0} persones`},
+    {icon:'🏭',name:'Producció',status:'ok',statusTxt:`${gd.machines?.length||0} màquines`},
+    {icon:'📦',name:'Vendes',status: rev > 0 ? 'ok' : 'warn', statusTxt: rev > 0 ? `${rev.toLocaleString('ca')}€/mes` : 'Sense vendes'},
+    {icon:'📣',name:'Màrqueting',status:'ok',statusTxt:'Actiu'},
+    {icon:'🏗️',name:'Instal·lacions',status:'ok',statusTxt: c ? c.municipality : '—'},
+  ];
+  document.getElementById('dept-grid').innerHTML = depts.map(d => `
+    <div class="dept-card" onclick="showTab('${d.name==='Finances'?'finances':d.name==='RRHH'?'hr':d.name==='Producció'?'production':d.name==='Vendes'?'sales':d.name==='Màrqueting'?'marketing':'dashboard'}')">
+      <div class="dept-icon">${d.icon}</div>
+      <div class="dept-name">${d.name}</div>
+      <div class="dept-status ${d.status}">${d.statusTxt}</div>
+    </div>`).join('');
+}
+
+// ==================== FINANCES ====================
+function renderFinances() {
+  const gd = G.gameData;
+  if (!gd) return;
+  const f = gd.finances;
+  const rev = f.monthly_revenue || 0;
+  const costs = f.monthly_costs || 0;
+  const result = rev - costs;
+  document.getElementById('fin-period').textContent = `Any ${gd.year} · Setmana ${gd.week}`;
+
+  // P&G
+  const loans = f.loans || [];
+  const loanPayments = loans.reduce((s, l) => s + (l.monthlyPayment || 0), 0);
+  const salaries = (gd.employees || []).reduce((s, e) => s + (e.salary || 0) * 1.3, 0);
+  const rent = gd.company?.monthlyRent || 0;
+  const mktCost = gd.mktBudget || 0;
+  const otherCosts = costs - salaries - rent - mktCost - loanPayments;
+
+  document.getElementById('pyg-table').innerHTML = `
+    <div class="bal-row"><div class="bal-row-label">Ingressos d'explotació</div><div class="bal-row-val" style="color:var(--green)">+${rev.toLocaleString('ca')}€</div></div>
+    <div class="bal-row"><div class="bal-row-label">Nòmines (SS inclosa)</div><div class="bal-row-val" style="color:var(--red)">-${salaries.toFixed(0).toLocaleString('ca')}€</div></div>
+    <div class="bal-row"><div class="bal-row-label">Lloguer instal·lacions</div><div class="bal-row-val" style="color:var(--red)">-${rent.toLocaleString('ca')}€</div></div>
+    <div class="bal-row"><div class="bal-row-label">Màrqueting i publicitat</div><div class="bal-row-val" style="color:var(--red)">-${mktCost.toLocaleString('ca')}€</div></div>
+    <div class="bal-row"><div class="bal-row-label">Quota préstecs</div><div class="bal-row-val" style="color:var(--red)">-${loanPayments.toLocaleString('ca')}€</div></div>
+    <div class="bal-row"><div class="bal-row-label">Altres despeses</div><div class="bal-row-val" style="color:var(--red)">-${Math.max(0,otherCosts).toFixed(0)}€</div></div>
+    <div class="bal-row total"><div class="bal-row-label">Resultat mensual</div><div class="bal-row-val" style="color:${result>=0?'var(--green)':'var(--red)'}">${result>=0?'+':''}${result.toFixed(0)}€</div></div>`;
+
+  document.getElementById('treasury-info').innerHTML = `
+    <div class="bal-row"><div class="bal-row-label">Tresoreria actual</div><div class="bal-row-val" style="color:var(--gold)">${(f.cash||0).toLocaleString('ca')}€</div></div>
+    <div class="bal-row"><div class="bal-row-label">Fons de maniobra</div><div class="bal-row-val" style="color:${((f.actiu?.existencies||0)+(f.actiu?.clients||0)+(f.cash||0))-(f.passiu?.deutes_curt||0) >= 0 ? 'var(--green)':'var(--red)'}">${(((f.actiu?.existencies||0)+(f.actiu?.clients||0)+(f.cash||0))-(f.passiu?.deutes_curt||0)).toLocaleString('ca')}€</div></div>
+    <div class="bal-row"><div class="bal-row-label">Ràtio liquiditat</div><div class="bal-row-val">${(f.passiu?.deutes_curt||0) > 0 ? (((f.actiu?.existencies||0)+(f.cash||0))/(f.passiu?.deutes_curt||1)).toFixed(2) : '∞'}</div></div>
+    <div class="bal-row"><div class="bal-row-label">Deute total</div><div class="bal-row-val" style="color:var(--red)">${((f.passiu?.deutes_llarg||0)+(f.passiu?.deutes_curt||0)).toLocaleString('ca')}€</div></div>`;
+
+  // Balance sheet
+  const actiu = f.actiu || {};
+  const passiu = f.passiu || {};
+  const totalActiu = (actiu.immobilitzat||0) + (actiu.existencies||0) + (f.cash||0) + (actiu.clients||0);
+  const totalPassiu = (passiu.capital||0) + (passiu.reserves||0) + (passiu.deutes_llarg||0) + (passiu.deutes_curt||0);
+
+  document.getElementById('actiu-rows').innerHTML = `
+    <div class="bal-row"><div class="bal-row-label">Immobilitzat (màquines, local)</div><div class="bal-row-val">${(actiu.immobilitzat||0).toLocaleString('ca')}€</div></div>
+    <div class="bal-row"><div class="bal-row-label">Existències</div><div class="bal-row-val">${(actiu.existencies||0).toLocaleString('ca')}€</div></div>
+    <div class="bal-row"><div class="bal-row-label">Clients (saldo pendent)</div><div class="bal-row-val">${(actiu.clients||0).toLocaleString('ca')}€</div></div>
+    <div class="bal-row"><div class="bal-row-label">Tresoreria</div><div class="bal-row-val" style="color:var(--gold)">${(f.cash||0).toLocaleString('ca')}€</div></div>
+    <div class="bal-row total"><div class="bal-row-label">TOTAL ACTIU</div><div class="bal-row-val">${totalActiu.toLocaleString('ca')}€</div></div>`;
+
+  document.getElementById('passiu-rows').innerHTML = `
+    <div class="bal-row"><div class="bal-row-label">Capital social</div><div class="bal-row-val">${(passiu.capital||0).toLocaleString('ca')}€</div></div>
+    <div class="bal-row"><div class="bal-row-label">Reserves</div><div class="bal-row-val">${(passiu.reserves||0).toLocaleString('ca')}€</div></div>
+    <div class="bal-row"><div class="bal-row-label">Deutes llarg termini</div><div class="bal-row-val">${(passiu.deutes_llarg||0).toLocaleString('ca')}€</div></div>
+    <div class="bal-row"><div class="bal-row-label">Deutes curt termini</div><div class="bal-row-val">${(passiu.deutes_curt||0).toLocaleString('ca')}€</div></div>
+    <div class="bal-row"><div class="bal-row-label">Proveïdors</div><div class="bal-row-val">${(passiu.proveidors||0).toLocaleString('ca')}€</div></div>
+    <div class="bal-row total"><div class="bal-row-label">TOTAL PASSIU + PN</div><div class="bal-row-val">${totalPassiu.toLocaleString('ca')}€</div></div>`;
+
+  // Ratios
+  const ratios = [
+    {name:'Rendibilitat econòmica',val: totalActiu > 0 ? ((result*12/totalActiu)*100).toFixed(1)+'%' : 'N/D', good: result > 0},
+    {name:'Ràtio d\'endeutament',val: (passiu.capital||0) > 0 ? (((passiu.deutes_llarg||0)+(passiu.deutes_curt||0))/(passiu.capital||1)).toFixed(2) : 'N/D', good: ((passiu.deutes_llarg||0)+(passiu.deutes_curt||0)) < (passiu.capital||0)*2},
+    {name:'Fons de maniobra',val: (((actiu.existencies||0)+(f.cash||0))-(passiu.deutes_curt||0)).toLocaleString('ca')+'€', good: ((actiu.existencies||0)+(f.cash||0)) > (passiu.deutes_curt||0)},
+    {name:'Marge comercial',val: rev > 0 ? ((result/rev)*100).toFixed(1)+'%' : 'N/D', good: result > 0},
+    {name:'Liquiditat',val: (passiu.deutes_curt||0) > 0 ? ((f.cash||0)/(passiu.deutes_curt||1)).toFixed(2) : '∞', good: (f.cash||0) >= (passiu.deutes_curt||0)},
+    {name:'Rotació actiu',val: totalActiu > 0 ? ((rev*12/totalActiu)).toFixed(2)+'x' : 'N/D', good: rev > 0},
+  ];
+  document.getElementById('ratios-grid').innerHTML = ratios.map(r => `
+    <div class="report-kpi">
+      <div class="report-kpi-val" style="color:${r.good?'var(--green)':'var(--red)'};font-size:18px">${r.val}</div>
+      <div class="report-kpi-label">${r.name}</div>
+    </div>`).join('');
+}
+
+// ==================== HR ====================
+function renderHR() {
+  const emps = G.gameData.employees || [];
+  const totalSalary = emps.reduce((s, e) => s + (e.salary || 0) * 1.3, 0);
+  const moraleAvg = emps.length > 0 ? Math.round(emps.reduce((s, e) => s + (e.morale || 60), 0) / emps.length) : 0;
+
+  document.getElementById('employees-list').innerHTML = emps.length === 0
+    ? '<div style="text-align:center;color:var(--text2);padding:30px;font-size:14px">Sense empleats. Contracta el teu primer treballador!</div>'
+    : emps.map(e => {
+      const moraleColor = e.morale >= 70 ? 'var(--green)' : e.morale >= 40 ? 'var(--gold)' : 'var(--red)';
+      return `
+        <div class="emp-card">
+          <div class="emp-avatar">${e.avatar||'👤'}</div>
+          <div class="emp-info">
+            <div class="emp-name">${e.name}</div>
+            <div class="emp-role">${e.dept?.toUpperCase()||'—'} · ${e.role} · ${e.seniority||0} anys</div>
+            <div class="emp-salary">${e.salary?.toLocaleString('ca')||0}€ bruts/mes</div>
+            <div class="emp-morale">
+              <div class="morale-bar"><div class="morale-fill" style="width:${e.morale||60}%;background:${moraleColor}"></div></div>
+              <span style="font-size:10px;color:${moraleColor}">${e.morale||60}% ànim</span>
+            </div>
+          </div>
+          <div class="emp-actions">
+            <button class="emp-btn raise" onclick="raiseEmployee('${e.id}')">💰 Pujada</button>
+            <button class="emp-btn fire" onclick="fireEmployee('${e.id}')">❌ Acomiadar</button>
+          </div>
+        </div>`}).join('');
+
+  document.getElementById('salary-summary').innerHTML = `
+    Empleats: <strong style="color:var(--text)">${emps.length}</strong> · 
+    Cost mensual total (SS inclosa): <strong style="color:var(--red)">${totalSalary.toFixed(0)}€</strong> · 
+    Mora mitjana: <strong style="color:${moraleAvg>=70?'var(--green)':moraleAvg>=40?'var(--gold)':'var(--red)'}">${moraleAvg}%</strong>`;
+}
+
+window.fireEmployee = async function(id) {
+  if (!confirm('Segur que vols acomiadar aquesta persona? Possible indemnització.')) return;
+  const emp = G.gameData.employees.find(e => e.id === id);
+  if (!emp) return;
+  const indemnity = (emp.salary || 1400) * (emp.seniority || 0) * 0.33;
+  G.gameData.employees = G.gameData.employees.filter(e => e.id !== id);
+  G.gameData.finances.cash -= indemnity;
+  G.gameData.notifications.push({id:Date.now(), icon:'❌', title:'Empleat acomiadat', desc:`${emp.name} — Indemnització: ${indemnity.toFixed(0)}€`, time:'Ara', urgent:false});
+  await saveGameData();
+  renderHR(); renderDashboard(); renderFinances();
+  showToast(`❌ ${emp.name} acomiadat/da. Indemnització: ${indemnity.toFixed(0)}€`);
+};
+
+window.raiseEmployee = async function(id) {
+  const emp = G.gameData.employees.find(e => e.id === id);
+  if (!emp) return;
+  const increase = Math.round(emp.salary * 0.05);
+  emp.salary += increase; emp.morale = Math.min(100, (emp.morale||60) + 15);
+  await saveGameData(); renderHR();
+  showToast(`💰 Pujada de ${increase}€/mes a ${emp.name}`);
+};
+
+window.openHireModal = function() {
+  const roles = [
+    {name:'Comercial', dept:'vendes', salary:1800, icon:'📊'},
+    {name:'Operari/a', dept:'produccio', salary:1400, icon:'⚙️'},
+    {name:'Administratiu/va', dept:'admin', salary:1600, icon:'📋'},
+    {name:'Tècnic/a especialista', dept:'tecnic', salary:2400, icon:'🔧'},
+    {name:'Cap de vendes', dept:'vendes', salary:3200, icon:'🏆'},
+    {name:'Director/a financer/a', dept:'finances', salary:4500, icon:'💰'},
+  ];
+  const names = ['Pau Ferrer','Laia Costa','Xavi Rovira','Marta Duran','Joan Albà','Carla Prat','Gerard Roca','Ester Solà'];
+  const candidates = roles.map((r, i) => ({
+    ...r, name: names[i % names.length] + ' ' + String.fromCharCode(65 + i),
+    id: 'cand_' + Date.now() + '_' + i, morale: 80 + Math.floor(Math.random()*20)
+  }));
+  document.getElementById('hire-candidates').innerHTML = candidates.map(c => `
+    <div class="offer-card" style="padding:14px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-size:30px">${c.icon}</span>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:14px;color:var(--text)">${c.name}</div>
+          <div style="font-size:12px;color:var(--text2)">${c.role} · Dept: ${c.dept}</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--gold);margin-top:4px">${c.salary.toLocaleString('ca')}€/mes bruts</div>
+        </div>
+        <button class="offer-btn" onclick="hireCandidate(${JSON.stringify(c).replace(/"/g,'&quot;')})" style="width:auto;padding:8px 14px">Contractar</button>
+      </div>
+    </div>`).join('');
+  document.getElementById('hire-modal').style.display = 'flex';
+};
+
+window.closeHireModal = function() { document.getElementById('hire-modal').style.display = 'none'; };
+
+window.hireCandidate = async function(c) {
+  const newEmp = {id:'emp_'+Date.now(), name:c.name, dept:c.dept, role:c.role, salary:c.salary, morale:c.morale, seniority:0, avatar:'👤'};
+  G.gameData.employees.push(newEmp);
+  G.gameData.notifications.push({id:Date.now(), icon:'👥', title:'Nou empleat!', desc:`${c.name} s'incorpora com a ${c.role}`, time:'Ara', urgent:false});
+  await saveGameData();
+  closeHireModal(); renderHR(); renderDashboard();
+  showToast(`✅ ${c.name} contractat/da!`);
+};
+
+// ==================== PRODUCTION ====================
+function renderProduction() {
+  const gd = G.gameData;
+  if (!gd || !gd.company) {
+    document.getElementById('prod-facility-view').innerHTML = '<div style="color:var(--text2);font-size:14px;text-align:center;padding:40px">Crea o incorpora\'t a una empresa primer.</div>';
+    return;
+  }
+  const c = gd.company;
+  const machines = gd.machines || [];
+  const totalCap = machines.reduce((s, m) => s + (m.capacity || 0), 0);
+  const usedCap = Math.min(totalCap, Math.floor(totalCap * 0.7));
+
+  document.getElementById('prod-facility-view').innerHTML = `
+    <div class="prod-facility">
+      <div class="facility-header">
+        <div class="facility-icon">${c.sectorData?.icon || '🏭'}</div>
+        <div>
+          <div class="facility-name">${c.name}</div>
+          <div class="facility-status">Operativa · ${c.municipality}</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:2px">${c.surface || 0}m² · ${c.regime || 'lloguer'}</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:6px">Capacitat productiva</div>
+      <div class="capacity-bar"><div class="capacity-fill" style="width:${totalCap>0?Math.round(usedCap/totalCap*100):0}%"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-top:4px"><span>Usada: ${usedCap.toLocaleString('ca')} u/setmana</span><span>Total: ${totalCap.toLocaleString('ca')} u/setmana</span></div>
+      <div class="machine-grid" style="margin-top:16px">
+        ${machines.length === 0 ? '<div style="color:var(--text2);font-size:13px;grid-column:1/-1;text-align:center;padding:20px">Sense maquinària. Compra la teva primera màquina!</div>' :
+          machines.map(m => `
+          <div class="machine-card">
+            <div class="machine-icon">${m.icon||'⚙️'}</div>
+            <div class="machine-name">${m.name}</div>
+            <div class="machine-detail">${m.capacity?.toLocaleString('ca') || 0} u/setmana</div>
+            <div class="machine-health" style="margin-top:8px;justify-content:center;gap:4px">
+              <div class="health-dot" style="width:8px;height:8px;border-radius:50%;background:var(--green)"></div>
+              <span style="font-size:10px;color:var(--green)">Operativa</span>
+            </div>
+            <div style="font-size:10px;color:var(--text3);margin-top:4px">Mant: ${m.maintenance?.toLocaleString('ca')||0}€/mes</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+
+  document.getElementById('machines-shop').innerHTML = MACHINES.map(m => `
+    <div class="machine-card" style="cursor:pointer;transition:.2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div class="machine-icon">${m.icon}</div>
+      <div class="machine-name">${m.name}</div>
+      <div class="machine-detail">${m.desc}</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold);margin:8px 0">${m.price.toLocaleString('ca')}€</div>
+      <div style="font-size:10px;color:var(--text2)">${m.capacity.toLocaleString('ca')} u/setmana</div>
+      <button class="emp-btn promote" style="width:100%;margin-top:10px" onclick="buyMachine('${m.id}')">Comprar</button>
+    </div>`).join('');
+
+  // Suppliers
+  const suppliers = [
+    {name:'Matèries primeres Vallès SL',icon:'📦',price:2000,delivery:3,quality:85},
+    {name:'Distribucions Granollers SA',icon:'🚛',price:1800,delivery:5,quality:75},
+    {name:'Importació Europa Direct',icon:'🌍',price:1500,delivery:14,quality:90},
+  ];
+  document.getElementById('suppliers-list').innerHTML = suppliers.map(s => `
+    <div class="offer-card" style="padding:12px">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <span style="font-size:28px">${s.icon}</span>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:14px;color:var(--text)">${s.name}</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:3px">Preu: ${s.price.toLocaleString('ca')}€/mes · Termini: ${s.delivery} dies · Qualitat: ${s.quality}%</div>
+        </div>
+        <button class="offer-btn" style="width:auto;padding:8px 14px" onclick="showToast('📦 Acord amb ${s.name} activat!')">Contractar</button>
+      </div>
+    </div>`).join('');
+}
+
+window.buyMachine = async function(machineId) {
+  const m = MACHINES.find(m => m.id === machineId);
+  if (!m) return;
+  if ((G.gameData.finances.cash || 0) < m.price) { showToast('❌ No tens prou tresoreria'); return; }
+  G.gameData.finances.cash -= m.price;
+  G.gameData.finances.actiu.immobilitzat = (G.gameData.finances.actiu.immobilitzat || 0) + m.price;
+  G.gameData.machines.push({...m, id: 'machine_' + Date.now(), health: 100});
+  G.gameData.notifications.push({id:Date.now(), icon:'⚙️', title:'Màquina comprada!', desc:`${m.name} instal·lada. Cost: ${m.price.toLocaleString('ca')}€`, time:'Ara', urgent:false});
+  await saveGameData();
+  renderProduction(); renderFinances(); renderDashboard();
+  showToast(`⚙️ ${m.name} instal·lada!`);
+};
+
+// ==================== MARKETING ====================
+function renderMarketing() {
+  const gd = G.gameData;
+  if (!gd) return;
+  const budget = gd.mktBudget || 0;
+  document.getElementById('mkt-budget').textContent = budget.toLocaleString('ca') + '€';
+  const channels = gd.marketing?.channels || {};
+
+  document.getElementById('mkt-channels').innerHTML = MARKETING_CHANNELS.map(ch => {
+    const spent = channels[ch.id] || 0;
+    const reach = Math.round(spent * ch.reach_mult);
+    return `
+      <div class="channel-card">
+        <div class="channel-header">
+          <span class="channel-icon">${ch.icon}</span>
+          <div><div class="channel-name">${ch.name}</div><div class="channel-cost">${ch.desc}</div></div>
+        </div>
+        <div class="channel-slider-wrap">
+          <input type="range" class="channel-slider" min="0" max="${ch.cost_per*10}" step="${ch.cost_per}" value="${spent}" 
+            oninput="updateChannel('${ch.id}', this.value)">
+          <div class="channel-val">${spent.toLocaleString('ca')}€</div>
+        </div>
+        <div class="reach-meter"><div class="reach-fill" style="width:${Math.min(100, reach/50)}%"></div></div>
+        <div style="font-size:10px;color:var(--text2);margin-top:4px">Abast estimat: ~${reach.toLocaleString('ca')} persones</div>
+      </div>`;
+  }).join('');
+
+  const activeSponsors = gd.marketing?.sponsors || [];
+  document.getElementById('sponsors-list').innerHTML = SPONSORS.map(sp => {
+    const isActive = activeSponsors.includes(sp.id);
+    const canAfford = (G.gameData.finances.cash || 0) >= sp.cost;
+    const meetsReq = (G.gameData.prestigi || 0) >= sp.prestigi_req;
+    return `
+      <div class="offer-card" style="padding:12px;${isActive?'border-color:var(--green);background:rgba(16,185,129,.06)':''}">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <span style="font-size:32px">${sp.icon}</span>
+          <div style="flex:1">
+            <div style="font-weight:700;font-size:14px;color:var(--text)">${sp.name}</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:3px">${sp.benefit}</div>
+            <div style="font-size:11px;color:var(--text3)">Cost: ${sp.cost.toLocaleString('ca')}€ · Prestigi mínim: ⭐${sp.prestigi_req}</div>
+          </div>
+          ${isActive ? '<span style="color:var(--green);font-weight:700;font-size:13px">✅ Actiu</span>' :
+            `<button class="offer-btn" style="width:auto;padding:8px 14px;${!canAfford||!meetsReq?'opacity:.5;cursor:not-allowed':''}" 
+              ${canAfford && meetsReq ? `onclick="activateSponsor('${sp.id}', ${sp.cost})"` : ''}>
+              ${!meetsReq ? `⭐${sp.prestigi_req} necessari` : !canAfford ? 'Sense fons' : 'Activar'}
+            </button>`}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+window.updateChannel = async function(chId, val) {
+  if (!G.gameData.marketing) G.gameData.marketing = {channels: {}, sponsors: []};
+  G.gameData.marketing.channels[chId] = parseInt(val);
+  renderMarketing();
+  await saveGameData();
+};
+
+window.activateSponsor = async function(id, cost) {
+  if ((G.gameData.finances.cash || 0) < cost) { showToast('❌ No tens prou tresoreria'); return; }
+  G.gameData.finances.cash -= cost;
+  if (!G.gameData.marketing) G.gameData.marketing = {channels: {}, sponsors: []};
+  if (!G.gameData.marketing.sponsors) G.gameData.marketing.sponsors = [];
+  G.gameData.marketing.sponsors.push(id);
+  G.gameData.prestigi = (G.gameData.prestigi || 0) + 5;
+  await saveGameData();
+  renderMarketing(); renderDashboard();
+  showToast('🏟️ Patrocini activat!');
+};
+
+// ==================== SALES ====================
+function renderSales() {
+  const gd = G.gameData;
+  const rev = gd.finances?.monthly_revenue || 0;
+  const clients = gd.clients || [];
+  const claims = gd.claims || [];
+
+  document.getElementById('sales-summary').innerHTML = `
+    Ingressos mensuals: <strong style="color:var(--green)">${rev.toLocaleString('ca')}€</strong><br>
+    Clients actius: <strong style="color:var(--text)">${clients.length}</strong><br>
+    Reclamacions obertes: <strong style="color:${claims.length>0?'var(--red)':'var(--green)'}">${claims.length}</strong><br>
+    Ticket mitjà: <strong style="color:var(--text)">${clients.length>0?(rev/clients.length).toFixed(0):0}€</strong>`;
+
+  document.getElementById('claims-list').innerHTML = claims.length === 0
+    ? '<div style="color:var(--green);font-size:12px;text-align:center;padding:16px">✅ Sense reclamacions pendents</div>'
+    : claims.map(cl => `
+      <div class="notif-item urgent">
+        <div class="notif-icon">⚠️</div>
+        <div class="notif-body"><div class="notif-title">${cl.client}</div><div class="notif-desc">${cl.issue}</div></div>
+        <button class="emp-btn fire" onclick="resolveClaim('${cl.id}')">Resoldre</button>
+      </div>`).join('');
+
+  document.getElementById('clients-list').innerHTML = clients.length === 0
+    ? '<div style="color:var(--text2);font-size:13px;text-align:center;padding:20px">Sense clients. Ajusta la teva estratègia comercial i avança setmanes!</div>'
+    : clients.map(cl => `
+      <div class="notif-item">
+        <div class="notif-icon">${cl.icon||'🏢'}</div>
+        <div class="notif-body">
+          <div class="notif-title">${cl.name}</div>
+          <div class="notif-desc">${cl.type||'B2B'} · Comanda: ${(cl.monthly_value||0).toLocaleString('ca')}€/mes · Satisfacció: ${cl.satisfaction||70}%</div>
+        </div>
+        <div class="notif-time" style="color:var(--gold)">${(cl.monthly_value||0).toLocaleString('ca')}€</div>
+      </div>`).join('');
+}
+
+window.resolveClaim = async function(id) {
+  const cl = G.gameData.claims.find(c => c.id === id);
+  if (!cl) return;
+  G.gameData.claims = G.gameData.claims.filter(c => c.id !== id);
+  G.gameData.finances.cash -= cl.compensation || 500;
+  await saveGameData();
+  renderSales(); renderFinances();
+  showToast(`✅ Reclamació resolta. Cost: ${cl.compensation || 500}€`);
+};
+
+window.openNewClient = function() {
+  showToast('📦 Funció disponible a la pròxima actualització del simulador');
+};
+
+// ==================== MAP ====================
+function renderMap() {
+  const canvas = document.getElementById('map-canvas');
+  const vp = document.getElementById('map-viewport');
+  if (!canvas || !vp) return;
+  const W = 800, H = 600;
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // Background
+  ctx.fillStyle = '#0d1225';
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid
+  ctx.strokeStyle = 'rgba(79,127,255,0.06)';
+  ctx.lineWidth = 1;
+  for (let x = 0; x < W; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+  for (let y = 0; y < H; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+
+  // Title regions
+  ctx.fillStyle = 'rgba(79,127,255,0.04)';
+  ctx.beginPath(); ctx.roundRect(20, 20, 370, H-40, 8); ctx.fill();
+  ctx.fillStyle = 'rgba(124,58,237,0.04)';
+  ctx.beginPath(); ctx.roundRect(410, 20, 370, H-40, 8); ctx.fill();
+
+  ctx.fillStyle = 'rgba(79,127,255,0.3)';
+  ctx.font = '11px "JetBrains Mono", monospace';
+  ctx.fillText('VALLÈS OCCIDENTAL', 30, 38);
+  ctx.fillStyle = 'rgba(124,58,237,0.5)';
+  ctx.fillText('VALLÈS ORIENTAL', 420, 38);
+
+  // Roads (simplified)
+  ctx.strokeStyle = 'rgba(100,120,180,0.2)';
+  ctx.lineWidth = 2;
+  const roads = [[0,180,W,180],[0,320,W,320],[0,450,W,450],[190,0,190,H],[400,0,400,H],[600,0,600,H]];
+  roads.forEach(r => { ctx.beginPath(); ctx.moveTo(r[0],r[1]); ctx.lineTo(r[2],r[3]); ctx.stroke(); });
+
+  // Convert geo coords to canvas (approximate Vallès region)
+  const geoToCanvas = (lat, lon) => {
+    const latMin = 41.45, latMax = 41.90, lonMin = 1.95, lonMax = 2.55;
+    return [
+      Math.round((lon - lonMin) / (lonMax - lonMin) * (W - 60)) + 30,
+      Math.round((latMax - lat) / (latMax - latMin) * (H - 60)) + 30
+    ];
+  };
+
+  // Background companies
+  VALLES_EMPRESES.slice(0, 15).forEach(e => {
+    const [x, y] = geoToCanvas(e.loc[0], e.loc[1]);
+    const sectorD = SECTORS.find(s => s.id === e.sector);
+    ctx.fillStyle = 'rgba(100,120,200,0.15)';
+    ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = 'rgba(150,170,255,0.35)';
+    ctx.font = '11px sans-serif';
+    ctx.fillText(sectorD?.icon || '🏢', x-6, y+4);
+  });
+
+  // Other players
+  G.otherPlayers.forEach(p => {
+    if (!p.company) return;
+    const [x, y] = geoToCanvas(
+      41.55 + Math.random() * 0.3,
+      2.05 + Math.random() * 0.4
+    );
+    ctx.fillStyle = 'rgba(124,58,237,0.4)';
+    ctx.beginPath(); ctx.arc(x, y, 8, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#a78bfa';
+    ctx.font = 'bold 10px "Space Grotesk", sans-serif';
+    ctx.fillText(p.displayName?.charAt(0) || '?', x-3, y+4);
+  });
+
+  // My company
+  if (G.gameData.company) {
+    const c = G.gameData.company;
+    const [x, y] = geoToCanvas(41.68 + Math.random()*0.05, 2.18 + Math.random()*0.05);
+    // Pulse
+    ctx.fillStyle = 'rgba(79,127,255,0.15)';
+    ctx.beginPath(); ctx.arc(x, y, 18, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = 'rgba(79,127,255,0.3)';
+    ctx.beginPath(); ctx.arc(x, y, 12, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#4f7fff';
+    ctx.beginPath(); ctx.arc(x, y, 7, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 9px "Space Grotesk"';
+    ctx.fillText(c.name.charAt(0), x-3, y+3);
+    // Label
+    ctx.fillStyle = 'rgba(14,20,45,0.9)';
+    const labelW = ctx.measureText(c.name).width + 16;
+    ctx.beginPath(); ctx.roundRect(x-labelW/2, y+12, labelW, 18, 4); ctx.fill();
+    ctx.fillStyle = '#93bbff';
+    ctx.font = '9px "Space Grotesk"';
+    ctx.fillText(c.name, x-labelW/2+8, y+25);
+    G.myMapPos = [x, y];
+  }
+
+  document.getElementById('map-info').textContent = `${G.otherPlayers.length} altres empreses actives`;
+}
+
+function renderRanking() {
+  const all = [...G.otherPlayers, G.gameData].filter(p => p && p.company);
+  all.sort((a, b) => (b.finances?.cash || 0) - (a.finances?.cash || 0));
+  document.getElementById('rank-body').innerHTML = all.slice(0, 15).map((p, i) => `
+    <div class="rank-row ${p.uid === G.uid ? 'me' : ''}" onclick="">
+      <div class="rank-num">${i+1}</div>
+      <div class="rank-name">${p.company?.sectorData?.icon || '🏢'} ${p.displayName || '—'}</div>
+      <div class="rank-info">${p.company?.name || '—'}</div>
+      <div class="rank-val">${(p.finances?.cash || 0).toLocaleString('ca')}€</div>
+    </div>`).join('') || '<div style="color:var(--text2);font-size:13px;text-align:center;padding:16px">Sense empreses actives</div>';
+}
+
+window.toggleRanking = function() {
+  const drawer = document.getElementById('ranking-drawer');
+  drawer.classList.toggle('open');
+  G.rankingOpen = !G.rankingOpen;
+};
+
+// ==================== WEEK ADVANCE ====================
+window.advanceWeek = async function() {
+  if (!G.gameData.mode) { showToast('⚠️ Crea o incorpora\'t a una empresa primer!'); return; }
+  const gd = G.gameData;
+  gd.week++;
+  // Month/year progression
+  const weekInYear = ((gd.week - 1) % 52) + 1;
+  gd.month = Math.ceil(weekInYear / 4.33);
+  if (gd.week > 1 && (gd.week - 1) % 52 === 0) {
+    gd.year++;
+    endOfYear();
+  }
+
+  // Revenue simulation
+  const emps = gd.employees || [];
+  const salesEmps = emps.filter(e => e.dept === 'vendes').length;
+  const machines = gd.machines || [];
+  const capacity = machines.reduce((s, m) => s + m.capacity, 0);
+  const mktChannels = gd.marketing?.channels || {};
+  const mktSpend = Object.values(mktChannels).reduce((s, v) => s + v, 0);
+  const sponsors = gd.marketing?.sponsors || [];
+  const prestigi = gd.prestigi || 0;
+
+  // Base revenue calculation
+  let baseRev = capacity * 0.8 * 5; // 5€ per unit
+  baseRev += salesEmps * 3500; // Each sales person generates 3500/week
+  baseRev += mktSpend * 2.5; // Marketing ROI
+  baseRev += sponsors.length * 800;
+  baseRev += prestigi * 50;
+  baseRev = Math.max(baseRev, 0);
+
+  // Costs
+  const salaries = emps.reduce((s, e) => s + e.salary * 1.3, 0) / 4.33;
+  const rent = (gd.company?.monthlyRent || 0) / 4.33;
+  const maintenance = machines.reduce((s, m) => s + (m.maintenance || 0), 0) / 4.33;
+  const loanPayments = (gd.finances.loans || []).reduce((s, l) => s + l.monthlyPayment / 4.33, 0);
+  const totalCosts = salaries + rent + maintenance + loanPayments + mktSpend / 4.33;
+
+  // Apply active events
+  let revenueMultiplier = 1;
+  (gd.events || []).forEach(ev => {
+    if (ev.weeksLeft > 0) revenueMultiplier += ev.impact;
+  });
+  // Reduce weeks left
+  gd.events = (gd.events || []).map(ev => ({...ev, weeksLeft: ev.weeksLeft - 1})).filter(ev => ev.weeksLeft > 0);
+
+  const weekRev = baseRev * revenueMultiplier;
+  const weekResult = weekRev - totalCosts;
+
+  gd.finances.cash = (gd.finances.cash || 0) + weekResult;
+  gd.finances.monthly_revenue = weekRev * 4.33;
+  gd.finances.monthly_costs = totalCosts * 4.33;
+  gd.finances.annual_revenue = (gd.finances.annual_revenue || 0) + weekRev;
+  gd.finances.annual_costs = (gd.finances.annual_costs || 0) + totalCosts;
+  gd.finances.actiu.tresoreria = gd.finances.cash;
+
+  // Revenue history
+  if (!gd.finances.revenue_history) gd.finances.revenue_history = [];
+  gd.finances.revenue_history.push({week: gd.week, rev: weekRev, costs: totalCosts, result: weekResult});
+  if (gd.finances.revenue_history.length > 52) gd.finances.revenue_history.shift();
+
+  // Morale drift
+  emps.forEach(e => {
+    if (gd.finances.cash < 0) e.morale = Math.max(0, (e.morale||60) - 5);
+    else e.morale = Math.min(100, (e.morale||60) + 1);
+    e.seniority = (e.seniority || 0) + 1/52;
+  });
+
+  // Client acquisition (simplified)
+  if (Math.random() < 0.15 + prestigi * 0.01) {
+    const clientTypes = ['🏢 Empresa industrial','🏪 Comerç local','🏥 Centre mèdic','🏫 Centre educatiu','🏨 Hotel'];
+    const newClient = {
+      id:'cl_'+Date.now(), icon:'🤝',
+      name: clientTypes[Math.floor(Math.random()*clientTypes.length)],
+      type: Math.random() > 0.5 ? 'B2B' : 'B2C',
+      monthly_value: Math.round(500 + Math.random() * 5000),
+      satisfaction: 70 + Math.floor(Math.random()*25),
+    };
+    if (!gd.clients) gd.clients = [];
+    gd.clients.push(newClient);
+    showEventToast('🤝', 'Nou client!', `${newClient.name} vol contractar els teus serveis!`, true);
+    gd.notifications.push({id:Date.now(), icon:'🤝', title:'Nou client!', desc:`${newClient.name} s'incorpora com a client`, time:`S${gd.week}`, urgent:false});
+  }
+
+  // Random claims
+  if (gd.clients?.length > 0 && Math.random() < 0.08) {
+    const cl = gd.clients[Math.floor(Math.random()*gd.clients.length)];
+    const issue = ['Retard en el lliurament','Defecte en el producte','Error en la facturació','Mala atenció al client'][Math.floor(Math.random()*4)];
+    if (!gd.claims) gd.claims = [];
+    gd.claims.push({id:'claim_'+Date.now(), client:cl.name, issue, compensation:Math.round(200+Math.random()*1000)});
+    gd.notifications.push({id:Date.now(), icon:'⚠️', title:'Reclamació!', desc:`${cl.name}: ${issue}`, time:`S${gd.week}`, urgent:true});
+    showEventToast('⚠️', 'Reclamació!', `${cl.name}: ${issue}`, false);
+  }
+
+  // Random events
+  if (Math.random() < 0.12) {
+    const ev = EVENT_POOL[Math.floor(Math.random()*EVENT_POOL.length)];
+    if (Math.random() < ev.probability * 5) {
+      const activeEv = {...ev, id:'ev_'+Date.now(), weeksLeft: ev.duration || 1};
+      gd.events.push(activeEv);
+      const impact = ev.impact >= 0 ? `+${(ev.impact*100).toFixed(0)}%` : `${(ev.impact*100).toFixed(0)}%`;
+      gd.notifications.push({id:Date.now(), icon:ev.icon, title:ev.title, desc:ev.desc + ` (Impacte: ${impact})`, time:`S${gd.week}`, urgent:ev.impact<0});
+      showEventToast(ev.icon, ev.title, ev.desc, ev.impact >= 0);
+    }
+  }
+
+  // Prestigi update
+  if (weekResult > 0) gd.prestigi = Math.min(100, (gd.prestigi||0) + 0.1);
+  else if (weekResult < -5000) gd.prestigi = Math.max(0, (gd.prestigi||0) - 0.2);
+
+  // Insolvency check
+  if (gd.finances.cash < -50000) {
+    gd.notifications.push({id:Date.now(), icon:'🚨', title:'ALERTA: Concurs de creditors', desc:'La tresoreria és críticament negativa. Risc de suspensió de pagaments.', time:`S${gd.week}`, urgent:true});
+    showEventToast('🚨', 'Alerta financera!', 'Tresoreria crítica. Risc de suspensió de pagaments!', false);
+  }
+
+  document.getElementById('week-display').textContent = `Setmana ${gd.week} · ${gd.year}`;
+  updateTopStats();
+  renderDashboard(); renderFinances(); renderHR(); renderProduction(); renderMarketing(); renderSales();
+  if (G.currentTab === 'map') renderMap();
+
+  showToast(`⏩ Setmana ${gd.week} · Resultat: ${weekResult >= 0 ? '+' : ''}${weekResult.toFixed(0)}€`);
+  await saveGameData();
+};
+
+function endOfYear() {
+  const gd = G.gameData;
+  const annualResult = (gd.finances.annual_revenue || 0) - (gd.finances.annual_costs || 0);
+  const tax = Math.max(0, annualResult * 0.25); // IS 25%
+  gd.finances.cash -= tax;
+  gd.finances.passiu.reserves = (gd.finances.passiu.reserves || 0) + Math.max(0, annualResult - tax);
+  gd.finances.annual_revenue = 0;
+  gd.finances.annual_costs = 0;
+  gd.notifications.push({id:Date.now(), icon:'📊', title:`Tancament any ${gd.year-1}`, desc:`Resultat: ${annualResult.toFixed(0)}€. IS pagat: ${tax.toFixed(0)}€. Noves reserves: ${Math.max(0,annualResult-tax).toFixed(0)}€`, time:'31/12', urgent:false});
+  showEventToast('📊', `Tancament any ${gd.year-1}`, `Resultat: ${annualResult.toFixed(0)}€ · Impost: ${tax.toFixed(0)}€`, annualResult >= 0);
+}
+
+// ==================== LOAN ====================
+window.requestLoan = async function() {
+  if (!G.gameData.company) { showToast('⚠️ Crea una empresa primer'); return; }
+  const amount = parseFloat(document.getElementById('loan-amount').value || 0);
+  const years = parseInt(document.getElementById('loan-years').value || 7);
+  if (amount < 5000) { showToast('⚠️ Import mínim: 5.000€'); return; }
+  const interest = 5.5;
+  const monthlyPayment = Math.round(amount * (interest/100/12) / (1 - Math.pow(1+interest/100/12, -years*12)));
+  const approved = Math.random() > 0.25; // 75% approval
+  if (!approved) {
+    document.getElementById('loan-result').innerHTML = `<span style="color:var(--red)">❌ Sol·licitud denegada. Millora el teu historial de crèdit o aporta avals.</span>`;
+    return;
+  }
+  G.gameData.finances.cash += amount;
+  G.gameData.finances.passiu.deutes_llarg = (G.gameData.finances.passiu.deutes_llarg || 0) + amount;
+  G.gameData.finances.loans = G.gameData.finances.loans || [];
+  G.gameData.finances.loans.push({id:'loan_'+Date.now(), amount, remaining:amount, interest, years, monthlyPayment, startWeek:G.gameData.week});
+  await saveGameData();
+  renderFinances(); renderDashboard(); renderActiveCompany();
+  document.getElementById('loan-result').innerHTML = `<span style="color:var(--green)">✅ Préstec de ${amount.toLocaleString('ca')}€ aprovat! Quota mensual: ${monthlyPayment.toLocaleString('ca')}€</span>`;
+};
+
+// ==================== NAV ====================
+window.showTab = function(tab) {
+  G.currentTab = tab;
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab)?.classList.add('active');
+  document.getElementById('nav-' + tab)?.classList.add('active');
+  if (tab === 'map') { setTimeout(() => { renderMap(); renderRanking(); }, 100); }
+  if (tab === 'dashboard') renderDashboard();
+  if (tab === 'finances') renderFinances();
+  if (tab === 'hr') renderHR();
+  if (tab === 'production') renderProduction();
+  if (tab === 'marketing') renderMarketing();
+  if (tab === 'sales') renderSales();
+};
+
+// ==================== PROFILE ====================
+window.openProfile = function() {
+  const gd = G.gameData;
+  document.getElementById('modal-username').textContent = gd.displayName || '—';
+  document.getElementById('modal-email').textContent = G.user?.email || '—';
+  const stats = [
+    {v: gd.prestigi || 0, l: 'Prestigi'},
+    {v: gd.week || 1, l: 'Setmana'},
+    {v: gd.employees?.length || 0, l: 'Empleats'},
+    {v: (gd.finances?.cash || 0).toLocaleString('ca') + '€', l: 'Tresoreria'},
+    {v: gd.clients?.length || 0, l: 'Clients'},
+    {v: gd.machines?.length || 0, l: 'Màquines'},
+  ];
+  document.getElementById('profile-stats').innerHTML = stats.map(s => `
+    <div class="sg-box" style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center">
+      <div style="font-size:18px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--gold)">${s.v}</div>
+      <div style="font-size:9px;color:var(--text2);margin-top:3px;font-weight:600;text-transform:uppercase;letter-spacing:.5px">${s.l}</div>
+    </div>`).join('');
+  document.getElementById('profile-modal').style.display = 'flex';
+};
+
+window.closeProfile = function() { document.getElementById('profile-modal').style.display = 'none'; };
+
+// ==================== EVENTS/TOASTS ====================
+function showEventToast(icon, title, desc, isPos) {
+  const container = document.getElementById('events-container');
+  const toast = document.createElement('div');
+  toast.className = 'event-toast';
+  toast.innerHTML = `
+    <div class="event-icon">${icon}</div>
+    <div class="event-body">
+      <div class="event-title" style="color:${isPos?'var(--green)':'var(--red)'}">${title}</div>
+      <div class="event-desc">${desc}</div>
+    </div>`;
+  container.appendChild(toast);
+  toast.addEventListener('click', () => toast.remove());
+  setTimeout(() => toast.remove(), 6000);
+}
+
+function showToast(msg) {
+  const list = document.getElementById('toast-list');
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  list.appendChild(t);
+  setTimeout(() => t.remove(), 2800);
+}
+
+function updateTopStats() {
+  const gd = G.gameData;
+  if (!gd) return;
+  const date = `S${gd.week} · ${gd.year}`;
+  const cash = (gd.finances?.cash || 0).toLocaleString('ca') + '€';
+  const rev = gd.finances?.monthly_revenue || 0;
+  const costs = gd.finances?.monthly_costs || 0;
+  const result = rev - costs;
+  document.getElementById('stat-date').textContent = date;
+  document.getElementById('stat-cash').textContent = cash;
+  document.getElementById('stat-result').textContent = (result >= 0 ? '+' : '') + result.toFixed(0) + '€/mes';
+  const resultStat = document.getElementById('stat-result').parentElement;
+  resultStat.className = 'tstat ' + (result >= 0 ? 'green' : 'red');
+  document.getElementById('stat-prestigi').textContent = gd.prestigi?.toFixed(1) || 0;
+  document.getElementById('stat-emp').textContent = gd.employees?.length || 0;
+}
+
+window.markRead = function(id) {
+  const n = G.gameData.notifications?.find(n => n.id == id);
+  if (n) n.read = true;
+};
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.key === ' ' && e.ctrlKey) { e.preventDefault(); advanceWeek(); }
+});
+
+console.log('🏢 EmpresaBat carregat correctament');
 </script>
 </body>
 </html>
