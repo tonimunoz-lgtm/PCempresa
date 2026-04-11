@@ -17,7 +17,7 @@ const SECTOR_COLORS = {
   default:     { primary: '#4f7fff', secondary: '#dbeafe', accent: '#93bbff' },
 };
 
-export function renderFacilityIllustration(containerId) {
+window.renderFacilityIllustration = function renderFacilityIllustration(containerId) {
   const gd = G?.gameData;
   if (!gd?.company) return;
 

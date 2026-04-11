@@ -60,7 +60,7 @@ const PROVEIDORS_MERCAT = {
   ],
 };
 
-export function renderProveidors() {
+window.renderProveidors = function renderProveidors() {
   const gd = getG()?.gameData;
   if (!gd) return;
   if (!gd?.company) {

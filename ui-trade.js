@@ -11,7 +11,7 @@ const getCOUNTRIES = () => window.COUNTRIES_DATA || [];
 //  ui-trade.js  —  Importació/Exportació + Incoterms
 // ============================================================
 
-export function renderTrade() {
+window.renderTrade = function renderTrade() {
   const gd = getG()?.gameData;
   if (!gd) return;
   if (!gd.company) {

@@ -4,7 +4,7 @@
 // Cada empresa té un perfil complet: actiu/passiu, empleats,
 // clients reals, proveïdors, deutes, etc. en funció de la mida.
 
-export const EMPRESA_PROFILES = [
+window.EMPRESA_PROFILES = [
   {
     name: 'Aigüa Mineral Montseny SAU',
     sector: 'alimentacio', legalForm: 'sa', size: 'large',
@@ -362,7 +362,7 @@ export const EMPRESA_PROFILES = [
 ];
 
 // Genera un perfil complet de gameData per a una empresa existent
-export function generateHiredCompanyData(empresaProfile, uid, displayName) {
+window.generateHiredCompanyData = function generateHiredCompanyData(empresaProfile, uid, displayName) {
   const p = empresaProfile;
   const now = new Date();
 

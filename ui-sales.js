@@ -7,7 +7,7 @@ const showToast      = (...a) => window.showToast(...a);
 const showEventToast = (...a) => window.showEventToast(...a);
 const fmt = (...a) => window.fmt(...a);
 
-export function renderSales() {
+window.renderSales = function renderSales() {
   const gd = getG()?.gameData;
   if (!gd) return;
   if (!gd?.company) {

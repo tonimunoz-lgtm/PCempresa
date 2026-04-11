@@ -1,17 +1,15 @@
 // engine2.js — Funcions auxiliars del motor de joc
 // Les funcions principals han estat integrades a l'index.html
 
-export function generateDeptAIRequests(gd) {
+window.generateDeptAIRequests = function(gd) {
   // Integrat directament a advanceWeek() de l'index.html
-  // Aquest mòdul existeix per compatibilitat
 }
 
-export function renderDeptRequests() {
+window.renderDeptRequests = function() {
   // Les notificacions es mostren al panell de notificacions del dashboard
 }
 
-export function buildHiredCompanyFinances(company) {
-  // Fallback bàsic si no hi ha perfil a data-empreses.js
+window.buildHiredCompanyFinances = function(company) {
   const size = company.size || 'medium';
   const fact = company.fact || 1000000;
   const emp  = company.emp  || 20;

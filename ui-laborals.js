@@ -18,7 +18,7 @@ const RECLAMACIONS_POOL = [
   { id:'bonus',  titol:'Participació beneficis',    desc:'Reclamen participació en beneficis: 5% del resultat net repartit.',       cost_perc:0.05, importancia:'alta'  },
 ];
 
-export function renderLaborals() {
+window.renderLaborals = function renderLaborals() {
   const gd = getG()?.gameData;
   if (!gd) return;
   if (!gd?.company) {

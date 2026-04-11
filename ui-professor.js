@@ -6,24 +6,16 @@ const showEventToast = (...a) => window.showEventToast(...a);
 const fmt  = (...a) => window.fmt(...a);
 const EVENT_POOL = window.EVENT_POOL_DATA || [];
 
-// Firebase via CDN per les operacions del professor
-import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-const _fbApp = getApps().length ? getApps()[0] : initializeApp({
-  apiKey: 'AIzaSyCkhLFKvgo-iPlHmHau-nxIysdnqp5ZdmI',
-  authDomain: 'clicker-ea94f.firebaseapp.com',
-  projectId: 'clicker-ea94f',
-  storageBucket: 'clicker-ea94f.firebasestorage.app',
-  messagingSenderId: '873459350629',
-  appId: '1:873459350629:web:813bb901d6e928c8e8da8c'
-});
-const _db = getFirestore(_fbApp);
+// Usar Firebase ja inicialitzat per index.html
+const _getDb = () => window._db;
+const _setDoc = (...a) => window._firestore_setDoc(...a);
+const _doc    = (...a) => window._firestore_doc(...a);
 
 // ============================================================
 //  ui-professor.js  —  Mode Professor
 // ============================================================
 
-export function renderProfessor() {
+window.renderProfessor = function renderProfessor() {
   if (!getG()?.isProf) { document.getElementById('tab-professor').innerHTML = '<div style="padding:40px;text-align:center;color:var(--text2)">Accés restringit</div>'; return; }
   if (!getG().isProf) {
     document.getElementById('tab-professor').innerHTML = `
@@ -261,7 +253,7 @@ window.broadcastEvent = async function() {
     try {
       const events = [...(s.events||[]), {...ev, id:'prof_ev_'+Date.now(), weeksLeft:Math.max(1,ev.duration||1)}];
       const notifications = [...(s.notifications||[]), {id:Date.now(), icon:ev.icon, title:'[PROFESSOR] '+ev.title, desc:ev.desc, time:`S${s.week}`, urgent:ev.impact<0}];
-      await setDoc(doc(_db,'games',s.uid), {...s, events, notifications}, {merge:true});
+      await window._firestore_setDoc(window._firestore_doc(window._db,'games',s.uid), {...s, events, notifications}, {merge:true});
       count++;
     } catch(e) { console.warn(e); }
   }
@@ -280,7 +272,7 @@ window.injectCash = async function() {
     finances: {...student.finances, cash:(student.finances?.cash||0)+50000, actiu:{...(student.finances?.actiu||{}), tresoreria:(student.finances?.cash||0)+50000}},
     notifications:[...(student.notifications||[]),{id:Date.now(),icon:'💉',title:'Ajuda del professor/a',desc:'El/la professor/a ha injectat 50.000€ de capital de rescat educatiu.',time:`S${student.week}`,urgent:false}]
   };
-  await setDoc(doc(_db,'games',uid), updated, {merge:true});
+  await window._firestore_setDoc(window._firestore_doc(window._db,'games',uid), updated, {merge:true});
   showToast(`💉 50.000€ injectats a ${student.displayName}`);
 };
 
@@ -296,7 +288,7 @@ window.triggerCrisis = async function() {
     events:[...(student.events||[]),{...crisisEv, id:'prof_crisis_'+Date.now(), weeksLeft:4}],
     notifications:[...(student.notifications||[]),{id:Date.now(),icon:'💥',title:'[PROFESSOR] Crisi simulada',desc:'El professor/a ha activat una crisi econòmica per a la teva empresa.',time:`S${student.week}`,urgent:true}]
   };
-  await setDoc(doc(_db,'games',uid), updated, {merge:true});
+  await window._firestore_setDoc(window._firestore_doc(window._db,'games',uid), updated, {merge:true});
   showToast(`💥 Crisi activada per a ${student.displayName}`);
 };
 

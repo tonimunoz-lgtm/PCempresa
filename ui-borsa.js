@@ -15,7 +15,7 @@ const getCRYPTOS = () => window.CRYPTOS_DATA || [];
 let borsaPrices = {}; // preus live de la sessió
 let initialized = false;
 
-export function renderBorsa() {
+window.renderBorsa = function renderBorsa() {
   const gd = getG()?.gameData;
   if (!gd) { document.getElementById('tab-borsa').innerHTML = '<div style="padding:40px;text-align:center;color:var(--text2)">Carregant dades...</div>'; return; }
   if (!initialized) initBorsaPrices();

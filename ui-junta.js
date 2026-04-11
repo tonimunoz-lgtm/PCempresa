@@ -11,7 +11,7 @@ const fmtPct = (...a) => window.fmtPct(...a);
 //  ui-junta.js  —  Junta d'accionistes + Decisions corporatives
 // ============================================================
 
-export function renderJunta() {
+window.renderJunta = function renderJunta() {
   const gd = getG()?.gameData;
   if (!gd) return;
   if (!gd.company) {

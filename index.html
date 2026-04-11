@@ -103,8 +103,8 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 
 /* Content area */
 .content{flex:1;overflow:hidden;position:relative}
-.tab-panel{position:absolute;inset:0;display:none;opacity:0;pointer-events:none}
-.tab-panel.active{display:block;overflow-y:auto;background:var(--bg);opacity:1;pointer-events:auto}
+.tab-panel{position:absolute;inset:0;display:none}
+.tab-panel.active{display:block;overflow-y:auto;background:var(--bg)}
 
 /* ====== DASHBOARD ====== */
 .dash-wrap{padding:16px;max-width:1200px;margin:0 auto;display:grid;gap:12px}
@@ -1038,6 +1038,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+window._db = db;
+window._firestore_doc = doc;
+window._firestore_setDoc = setDoc;
 
 // ==================== DATA STRUCTURES ====================
 const SECTORS = [
@@ -1962,7 +1965,7 @@ function showHiredMode() {
 
 async function renderJobOffers() {
   const prest = G.gameData.prestigi || 0;
-  const { EMPRESA_PROFILES } = await import('./data-empreses.js');
+  const EMPRESA_PROFILES = window.EMPRESA_PROFILES;
 
   let available = EMPRESA_PROFILES.filter(e => {
     if (prest < 10) return e.size === 'small';
@@ -2019,7 +2022,8 @@ window.acceptOffer = async function(companyName, role, salary) {
   }
   const now = new Date();
   // Carregar dades creïbles de l'empresa des de data-empreses.js
-  const { EMPRESA_PROFILES, generateHiredCompanyData } = await import('./data-empreses.js');
+  const EMPRESA_PROFILES = window.EMPRESA_PROFILES;
+  const generateHiredCompanyData = window.generateHiredCompanyData;
   const profile = EMPRESA_PROFILES.find(p => p.name === companyName);
 
   let newData;
@@ -2177,14 +2181,14 @@ function renderDashboard() {
       const dashWrap = document.querySelector('.dash-wrap');
       if (dashWrap) dashWrap.insertBefore(facilEl, dashWrap.firstChild);
     }
-    import('./ui-visuals.js').then(m => m.renderFacilityIllustration('facility-illustration-dash'));
+    if (window.renderFacilityIllustration) window.renderFacilityIllustration('facility-illustration-dash');
   }
 
   // Sol·licituds de departaments (IA caps)
-  import('./engine2.js').then(m => {
-    m.generateDeptAIRequests(gd);
-    m.renderDeptRequests();
-  }).catch(()=>{});
+  if (window.generateDeptAIRequests) {
+    window.generateDeptAIRequests(gd);
+    window.renderDeptRequests();
+  }
 
   // Departments
   const depts = [
@@ -2614,7 +2618,7 @@ window.activateSponsor = async function(id, cost) {
 // ==================== SALES ====================
 function renderSales() {
   // Delegat al mòdul extern ui-sales.js
-  import('./ui-sales.js').then(m => m.renderSales()).catch(e => console.warn('ui-sales:', e));
+  if (window.renderSales) window.renderSales();
 }
 
 window.resolveClaim = async function(id) {
@@ -2628,7 +2632,7 @@ window.resolveClaim = async function(id) {
 };
 
 window.openNewClient = function() {
-  import('./ui-sales.js').then(m => m.openNewClientModal ? m.openNewClientModal() : showToast("Obre la pestanya Vendes"));
+  if (window.openNewClientModal) window.openNewClientModal(); else showToast("Obre la pestanya Vendes");
 };
 
 // ==================== MAP ====================
@@ -3103,14 +3107,14 @@ window.acceptLoan = async function(amount, interest, years) {
 // ==================== NAV ====================
 // Mapa de funcions de render dels mòduls externs
 const EXTERN_RENDER = {
-  sales:       () => import('./ui-sales.js').then(m => m.renderSales()),
-  borsa:       () => import('./ui-borsa.js').then(m => m.renderBorsa()),
-  junta:       () => import('./ui-junta.js').then(m => m.renderJunta()),
-  trade:       () => import('./ui-trade.js').then(m => m.renderTrade()),
-  franquicies: () => import('./ui-franquicies.js').then(m => m.renderFranquicies()),
-  professor:   () => import('./ui-professor.js').then(m => m.renderProfessor()),
-  proveidors:  () => import('./ui-proveidors.js').then(m => m.renderProveidors()),
-  laborals:    () => import('./ui-laborals.js').then(m => m.renderLaborals()),
+  sales:       () => Promise.resolve(window.renderSales && window.renderSales()),
+  borsa:       () => Promise.resolve(window.renderBorsa && window.renderBorsa()),
+  junta:       () => Promise.resolve(window.renderJunta && window.renderJunta()),
+  trade:       () => Promise.resolve(window.renderTrade && window.renderTrade()),
+  franquicies: () => Promise.resolve(window.renderFranquicies && window.renderFranquicies()),
+  professor:   () => Promise.resolve(window.renderProfessor && window.renderProfessor()),
+  proveidors:  () => Promise.resolve(window.renderProveidors && window.renderProveidors()),
+  laborals:    () => Promise.resolve(window.renderLaborals && window.renderLaborals()),
 };
 
 // Refresh suau sense spinner (per a quan el tab ja té contingut)
@@ -3266,5 +3270,16 @@ window.EVENT_POOL_DATA  = EVENT_POOL;
 window.SECTORS_DATA     = SECTORS;
 window.generateShareholders = generateShareholders;
 </script>
+<script defer src="data-empreses.js"></script>
+<script defer src="engine2.js"></script>
+<script defer src="ui-visuals.js"></script>
+<script defer src="ui-sales.js"></script>
+<script defer src="ui-borsa.js"></script>
+<script defer src="ui-junta.js"></script>
+<script defer src="ui-trade.js"></script>
+<script defer src="ui-franquicies.js"></script>
+<script defer src="ui-professor.js"></script>
+<script defer src="ui-proveidors.js"></script>
+<script defer src="ui-laborals.js"></script>
 </body>
 </html>

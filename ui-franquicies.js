@@ -11,7 +11,7 @@ const getFRANCHISES = () => window.FRANCHISES_DATA || [];
 //  ui-franquicies.js  —  Sistema de Franquícies
 // ============================================================
 
-export function renderFranquicies() {
+window.renderFranquicies = function renderFranquicies() {
   const gd = getG()?.gameData;
   if (!gd) return;
   const franchise = gd.franchise;
