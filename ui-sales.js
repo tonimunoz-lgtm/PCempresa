@@ -170,7 +170,7 @@ function renderClientsPanel(clients, gd) {
     <div style="display:flex;flex-direction:column;gap:8px">
       ${clients.map((cl, i) => {
         const satColor = cl.satisfaction>=75?'var(--green)':cl.satisfaction>=50?'var(--gold)':'var(--red)';
-        const satLabel = cl.satisfaction>=75?'Satisfet':'Satisfet':cl.satisfaction>=50?'Neutral':'En risc';
+        const satLabel = cl.satisfaction>=75?'Satisfet':cl.satisfaction>=50?'Neutral':'En risc';
         return `
         <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px">
           <div style="font-size:26px">${cl.icon||'🤝'}</div>
