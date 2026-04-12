@@ -1017,7 +1017,7 @@ body::before {
 
 <!-- Loading -->
 <div id="loading-overlay">
-  <div class="loading-logo">🏢</div>
+  <div class="loading-logo" data-icon="logo"></div>
   <div class="loading-text">EmpresaBat</div>
   <div class="loading-sub">Carregant simulador...</div>
   <div class="loading-bar"><div class="loading-bar-fill"></div></div>
@@ -1027,7 +1027,7 @@ body::before {
 <div id="auth-screen" style="display:none">
   <div class="auth-wrap">
     <div class="auth-logo">
-      <span class="auth-logo-icon">🏢</span>
+      <span class="auth-logo-icon" data-icon="logo"></span>
       <h1>Empresa<span>Bat</span></h1>
       <p>SIMULADOR EMPRESARIAL · BATXILLERAT</p>
     </div>
@@ -1090,20 +1090,20 @@ body::before {
 <div id="game-screen">
   <div class="topbar">
     <div class="topbar-brand">
-      <span class="topbar-brand-icon">🏢</span>
+      <span class="topbar-brand-icon" id="brand-icon-slot">🏢</span>
       <span class="topbar-brand-name">Empresa<span>Bat</span></span>
     </div>
     <div class="topbar-stats">
-      <div class="tstat">📅 <span id="stat-date" class="tstat-v">—</span></div>
-      <div class="tstat">💰 <span id="stat-cash" class="tstat-v">—</span></div>
-      <div class="tstat green">📈 <span id="stat-result" class="tstat-v">—</span></div>
-      <div class="tstat">⭐ <span id="stat-prestigi" class="tstat-v">—</span></div>
-      <div class="tstat">👥 <span id="stat-emp" class="tstat-v">—</span></div>
+      <div class="tstat"><span class="tstat-icon" data-icon="calendari"></span> <span id="stat-date" class="tstat-v">—</span></div>
+      <div class="tstat"><span class="tstat-icon" data-icon="tresoreria"></span> <span id="stat-cash" class="tstat-v">—</span></div>
+      <div class="tstat green"><span class="tstat-icon" data-icon="resultat"></span> <span id="stat-result" class="tstat-v">—</span></div>
+      <div class="tstat"><span class="tstat-icon" data-icon="prestigi"></span> <span id="stat-prestigi" class="tstat-v">—</span></div>
+      <div class="tstat"><span class="tstat-icon" data-icon="empleats"></span> <span id="stat-emp" class="tstat-v">—</span></div>
     </div>
     <div class="topbar-right">
       <div class="week-display" id="week-display">Setmana 1</div>
-      <button class="week-advance-btn" onclick="advanceWeek()">⏩ Avançar setmana</button>
-      <button class="profile-btn" onclick="openProfile()">👤 <span id="profile-name">—</span></button>
+      <button class="week-advance-btn" onclick="advanceWeek()"><span class="btn-icon" data-icon="avançar"></span> Avançar setmana</button>
+      <button class="profile-btn" onclick="openProfile()"><span class="btn-icon" data-icon="perfil"></span> <span id="profile-name">—</span></button>
     </div>
   </div>
 
@@ -1111,68 +1111,68 @@ body::before {
     <!-- Sidebar -->
     <div class="sidebar">
       <button class="nav-btn active" onclick="showTab('dashboard')" id="nav-dashboard">
-        <span class="nav-icon">📊</span>
+        <span class="nav-icon" data-icon="dashboard"></span>
         <span class="nav-lbl">Resum</span>
       </button>
       <button class="nav-btn" onclick="showTab('setup')" id="nav-setup">
-        <span class="nav-icon">🏗️</span>
+        <span class="nav-icon" data-icon="empresa"></span>
         <span class="nav-lbl">Empresa</span>
       </button>
       <button class="nav-btn" onclick="showTab('finances')" id="nav-finances">
-        <span class="nav-icon">💰</span>
+        <span class="nav-icon" data-icon="finances"></span>
         <span class="nav-lbl">Finances</span>
       </button>
       <button class="nav-btn" onclick="showTab('hr')" id="nav-hr">
-        <span class="nav-icon">👥</span>
+        <span class="nav-icon" data-icon="rrhh"></span>
         <span class="nav-lbl">RRHH</span>
       </button>
       <div class="nav-sep"></div>
       <button class="nav-btn" onclick="showTab('production')" id="nav-production">
-        <span class="nav-icon">🏭</span>
+        <span class="nav-icon" data-icon="produccio"></span>
         <span class="nav-lbl">Producció</span>
       </button>
       <button class="nav-btn" onclick="showTab('marketing')" id="nav-marketing">
-        <span class="nav-icon">📣</span>
+        <span class="nav-icon" data-icon="marketing"></span>
         <span class="nav-lbl">Màrqueting</span>
       </button>
       <button class="nav-btn" onclick="showTab('sales')" id="nav-sales">
-        <span class="nav-icon">📦</span>
+        <span class="nav-icon" data-icon="vendes"></span>
         <span class="nav-lbl">Vendes</span>
       </button>
       <div class="nav-sep"></div>
       <button class="nav-btn" onclick="showTab('map')" id="nav-map">
-        <span class="nav-icon">🗺️</span>
+        <span class="nav-icon" data-icon="mapa"></span>
         <span class="nav-lbl">Mapa</span>
       </button>
       <div class="nav-sep"></div>
       <button class="nav-btn" onclick="showTab('borsa')" id="nav-borsa">
-        <span class="nav-icon">📈</span>
+        <span class="nav-icon" data-icon="borsa"></span>
         <span class="nav-lbl">Borsa</span>
       </button>
       <button class="nav-btn" onclick="showTab('junta')" id="nav-junta">
-        <span class="nav-icon">🏛️</span>
+        <span class="nav-icon" data-icon="junta"></span>
         <span class="nav-lbl">Junta</span>
       </button>
       <button class="nav-btn" onclick="showTab('trade')" id="nav-trade">
-        <span class="nav-icon">🌍</span>
+        <span class="nav-icon" data-icon="comerc"></span>
         <span class="nav-lbl">Comerç</span>
       </button>
       <button class="nav-btn" onclick="showTab('franquicies')" id="nav-franquicies">
-        <span class="nav-icon">🏪</span>
+        <span class="nav-icon" data-icon="franquicies"></span>
         <span class="nav-lbl">Franquíc.</span>
       </button>
       <div class="nav-sep"></div>
       <button class="nav-btn" onclick="showTab('proveidors')" id="nav-proveidors">
-        <span class="nav-icon">🏭</span>
+        <span class="nav-icon" data-icon="proveidors"></span>
         <span class="nav-lbl">Proveïdors</span>
       </button>
       <button class="nav-btn" onclick="showTab('laborals')" id="nav-laborals">
-        <span class="nav-icon">⚖️</span>
+        <span class="nav-icon" data-icon="laborals"></span>
         <span class="nav-lbl">Laborals</span>
       </button>
       <div class="nav-sep" id="prof-sep" style="display:none"></div>
       <button class="nav-btn" onclick="showTab('professor')" id="nav-professor" style="display:none">
-        <span class="nav-icon">👩‍🏫</span>
+        <span class="nav-icon" data-icon="professor"></span>
         <span class="nav-lbl">Classe</span>
       </button>
     </div>
@@ -1193,31 +1193,31 @@ body::before {
 
           <div class="dash-top">
             <div class="kpi-card">
-              <div class="kpi-icon">💰</div>
+              <div class="kpi-icon" data-icon="kpi_cash"></div>
               <div class="kpi-label">Tresoreria</div>
               <div class="kpi-val" id="kpi-cash">—</div>
               <div class="kpi-change up" id="kpi-cash-ch">—</div>
             </div>
             <div class="kpi-card">
-              <div class="kpi-icon">📈</div>
+              <div class="kpi-icon" data-icon="kpi_rev"></div>
               <div class="kpi-label">Ingressos (mes)</div>
               <div class="kpi-val positive" id="kpi-rev">—</div>
               <div class="kpi-change up" id="kpi-rev-ch">—</div>
             </div>
             <div class="kpi-card">
-              <div class="kpi-icon">📉</div>
+              <div class="kpi-icon" data-icon="kpi_costs"></div>
               <div class="kpi-label">Despeses (mes)</div>
               <div class="kpi-val negative" id="kpi-costs">—</div>
               <div class="kpi-change" id="kpi-costs-ch">—</div>
             </div>
             <div class="kpi-card">
-              <div class="kpi-icon">⭐</div>
+              <div class="kpi-icon" data-icon="kpi_prestigi"></div>
               <div class="kpi-label">Prestigi empresa</div>
               <div class="kpi-val" id="kpi-prest">—</div>
               <div class="kpi-change" id="kpi-prest-ch">—</div>
             </div>
             <div class="kpi-card">
-              <div class="kpi-icon">📊</div>
+              <div class="kpi-icon" data-icon="kpi_result"></div>
               <div class="kpi-label">Resultat mensual</div>
               <div class="kpi-val" id="kpi-result">—</div>
               <div class="kpi-change" id="kpi-result-ch">—</div>
@@ -1741,6 +1741,7 @@ function defaultGameData(uid, displayName) {
     shareholders: [],
     boardDecisions: [],
     isProf: false,
+    gamification: {xp:0,level:1,title:'Becari',achievements:[],streak:0,lastPlayDate:null,weeklyChallenge:null,weeklyChallengeTarget:0,totalWeeksPlayed:0,xpHistory:[]},
     lastSaved: Date.now(),
   };
 }
@@ -1849,6 +1850,7 @@ async function loadGameData() {
     if (!G.gameData.serveis)        G.gameData.serveis        = [];
     if (!G.gameData.proveidors)     G.gameData.proveidors     = [];
     if (!G.gameData.startDate)      G.gameData.startDate      = new Date().toISOString();
+    if (!G.gameData.gamification)   G.gameData.gamification   = {xp:0,level:1,title:'Becari',achievements:[],streak:0,lastPlayDate:null,weeklyChallenge:null,weeklyChallengeTarget:0,totalWeeksPlayed:0,xpHistory:[]};
   }
   window.G = G;
   console.log('loadGameData: mode=', G.gameData.mode, 'isProf=', G.gameData.isProf);
