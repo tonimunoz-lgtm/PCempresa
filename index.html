@@ -1619,23 +1619,46 @@ const JOBS_BY_PRESTIGI = [
 
 // ---- Borsa ----
 const STOCKS = [
-  {ticker:'INDT', name:'Inditex',          sector:'moda',      basePrice:28.40, volatility:0.030, icon:'👔', desc:'Grup de moda global (Zara, Massimo Dutti...)'},
-  {ticker:'RPSOL',name:'Repsol',           sector:'energia',   basePrice:13.20, volatility:0.040, icon:'⛽', desc:'Empresa petroliera integrada'},
-  {ticker:'SAN',  name:'Banco Santander',  sector:'finances',  basePrice:4.80,  volatility:0.050, icon:'🏦', desc:'Banc multinacional espanyol'},
-  {ticker:'IBE',  name:'Iberdrola',        sector:'energia',   basePrice:12.60, volatility:0.025, icon:'⚡', desc:'Líder energies renovables'},
-  {ticker:'TEF',  name:'Telefónica',       sector:'telco',     basePrice:3.90,  volatility:0.030, icon:'📡', desc:'Telecomunicacions'},
-  {ticker:'AMS',  name:'Amades Tech SL',   sector:'tecnologia',basePrice:45.00, volatility:0.080, icon:'💻', desc:'Startup tecnologia IA'},
-  {ticker:'VFOOD',name:'Vallès Foods SA',  sector:'alimentacio',basePrice:8.20, volatility:0.035, icon:'🍎', desc:'Agroalimentació regional'},
-  {ticker:'BMED', name:'BarcelonaMed SA',  sector:'salut',     basePrice:22.50, volatility:0.045, icon:'💊', desc:'Biotecnologia i farmàcia'},
+  // ── IBEX 35 (preus referència abril 2025) ──
+  {ticker:'INDT', name:'Inditex',            sector:'moda',      basePrice:50.20, volatility:0.025, icon:'👔', desc:'Grup tèxtil global (Zara, Massimo Dutti, Pull&Bear)'},
+  {ticker:'SAN',  name:'Banco Santander',    sector:'finances',  basePrice:5.80,  volatility:0.035, icon:'🏦', desc:'Banc multinacional espanyol. El més gran d\'Europa.'},
+  {ticker:'IBE',  name:'Iberdrola',          sector:'energia',   basePrice:13.40, volatility:0.020, icon:'⚡', desc:'Líder mundial en energies renovables'},
+  {ticker:'BBVA', name:'BBVA',               sector:'finances',  basePrice:11.20, volatility:0.040, icon:'🏛️', desc:'Banc amb presència a Mèxic i Turquia'},
+  {ticker:'TEF',  name:'Telefónica',         sector:'telco',     basePrice:4.30,  volatility:0.030, icon:'📡', desc:'Telecomunicacions. Movistar, O2.'},
+  {ticker:'RPSOL',name:'Repsol',             sector:'energia',   basePrice:13.50, volatility:0.040, icon:'⛽', desc:'Petroliera integrada. Transició energètica.'},
+  {ticker:'CABK', name:'CaixaBank',          sector:'finances',  basePrice:5.90,  volatility:0.030, icon:'🏦', desc:'Principal banc retail d\'Espanya'},
+  {ticker:'AMS',  name:'Amadeus IT',         sector:'tecnologia',basePrice:62.50, volatility:0.030, icon:'✈️', desc:'Sistemes de reserva de viatges global'},
+  {ticker:'FER',  name:'Ferrovial',          sector:'construccio',basePrice:38.20,volatility:0.025, icon:'🏗️', desc:'Infraestructures i autopistes globals'},
+  {ticker:'AENA', name:'Aena',               sector:'logistica', basePrice:195.00,volatility:0.020, icon:'🛫', desc:'Gestor aeroportuari. Monopoli natural.'},
+  {ticker:'ACS',  name:'ACS',                sector:'construccio',basePrice:43.50,volatility:0.030, icon:'🏗️', desc:'Construcció i serveis. Hochtief, Cimic.'},
+  {ticker:'NTGY', name:'Naturgy',            sector:'energia',   basePrice:23.80, volatility:0.025, icon:'🔥', desc:'Gas natural i electricitat'},
+  {ticker:'GRLS', name:'Grifols',            sector:'salut',     basePrice:9.20,  volatility:0.060, icon:'💉', desc:'Hemoderivats. Alta volatilitat per deute.'},
+  {ticker:'MAP',  name:'MAPFRE',             sector:'finances',  basePrice:2.40,  volatility:0.025, icon:'🛡️', desc:'Asseguradora global espanyola'},
+  {ticker:'CEL',  name:'Cellnex',            sector:'telco',     basePrice:32.50, volatility:0.035, icon:'📡', desc:'Torres de telecomunicacions a Europa'},
+  {ticker:'ENG',  name:'Enagás',             sector:'energia',   basePrice:14.80, volatility:0.020, icon:'🔥', desc:'Transport de gas natural. Dividends estables.'},
+  {ticker:'RED',  name:'Red Eléctrica',      sector:'energia',   basePrice:17.20, volatility:0.015, icon:'⚡', desc:'Xarxa elèctrica nacional. Molt estable.'},
+  {ticker:'MRL',  name:'Merlin Properties',  sector:'construccio',basePrice:11.30,volatility:0.035, icon:'🏢', desc:'SOCIMI. Oficines i centres comercials.'},
+  {ticker:'FLR',  name:'Fluidra',            sector:'construccio',basePrice:22.40,volatility:0.040, icon:'🏊', desc:'Piscines i wellness global'},
+  {ticker:'SAB',  name:'Banco Sabadell',     sector:'finances',  basePrice:2.10,  volatility:0.045, icon:'🏦', desc:'Banc regional amb TSB al UK'},
+  // ── Valors locals fictícis ──
+  {ticker:'VFOOD',name:'Vallès Foods SA',    sector:'alimentacio',basePrice:8.20,  volatility:0.035, icon:'🍎', desc:'Agroalimentació regional del Vallès'},
+  {ticker:'BMED', name:'BarcelonaMed SA',    sector:'salut',     basePrice:22.50, volatility:0.045, icon:'💊', desc:'Biotecnologia i farmàcia catalana'},
+  {ticker:'TSOFT',name:'TecnoSoft Vallès',   sector:'tecnologia',basePrice:15.80, volatility:0.070, icon:'💻', desc:'Startup IA i software del Vallès'},
 ];
 
 const CRYPTOS = [
-  {symbol:'BTC',  name:'Bitcoin',   icon:'₿',  basePrice:65000, volatility:0.12, desc:'La primera criptomoneda. Molt volàtil.'},
-  {symbol:'ETH',  name:'Ethereum',  icon:'Ξ',  basePrice:3200,  volatility:0.14, desc:'Plataforma de contractes intel·ligents.'},
-  {symbol:'SOL',  name:'Solana',    icon:'◎',  basePrice:180,   volatility:0.18, desc:'Blockchain d\'alta velocitat.'},
-  {symbol:'ADA',  name:'Cardano',   icon:'₳',  basePrice:0.65,  volatility:0.16, desc:'Blockchain acadèmic i peer-reviewed.'},
-  {symbol:'DOGE', name:'Dogecoin',  icon:'Ð',  basePrice:0.18,  volatility:0.25, desc:'Cripto meme. Altament especulativa!'},
-  {symbol:'RIBA', name:'RibaCoin', icon:'🏭',  basePrice:0.08,  volatility:0.40, desc:'Cripto fictícia local. Risc màxim!'},
+  {symbol:'BTC',  name:'Bitcoin',     icon:'₿',  basePrice:84000, volatility:0.08, desc:'La primera criptomoneda. Reserva de valor digital.'},
+  {symbol:'ETH',  name:'Ethereum',    icon:'Ξ',  basePrice:1800,  volatility:0.10, desc:'Plataforma de contractes intel·ligents i DeFi.'},
+  {symbol:'BNB',  name:'BNB',         icon:'◆',  basePrice:600,   volatility:0.09, desc:'Token de l\'exchange Binance.'},
+  {symbol:'SOL',  name:'Solana',      icon:'◎',  basePrice:130,   volatility:0.14, desc:'Blockchain d\'alta velocitat i baix cost.'},
+  {symbol:'XRP',  name:'XRP',         icon:'✕',  basePrice:2.10,  volatility:0.12, desc:'Pagaments internacionals. Regulació incerta.'},
+  {symbol:'ADA',  name:'Cardano',     icon:'₳',  basePrice:0.70,  volatility:0.15, desc:'Blockchain acadèmic i peer-reviewed.'},
+  {symbol:'DOGE', name:'Dogecoin',    icon:'Ð',  basePrice:0.17,  volatility:0.22, desc:'Cripto meme. Altament especulativa!'},
+  {symbol:'DOT',  name:'Polkadot',    icon:'●',  basePrice:4.50,  volatility:0.13, desc:'Interoperabilitat entre blockchains.'},
+  {symbol:'AVAX', name:'Avalanche',   icon:'▲',  basePrice:22.00, volatility:0.16, desc:'Blockchain ràpida amb subnets.'},
+  {symbol:'MATIC',name:'Polygon',     icon:'⬡',  basePrice:0.22,  volatility:0.18, desc:'Escalat d\'Ethereum. Layer 2.'},
+  {symbol:'LINK', name:'Chainlink',   icon:'⬢',  basePrice:14.50, volatility:0.12, desc:'Oracles descentralitzats per smart contracts.'},
+  {symbol:'RIBA', name:'RibaCoin',    icon:'🏭', basePrice:0.03,  volatility:0.45, desc:'Cripto fictícia local. RISC EXTREM! Pot perdre tot el valor.'},
 ];
 
 // ---- Comerç Internacional ----
@@ -1750,6 +1773,8 @@ function defaultGameData(uid, displayName) {
     boardDecisions: [],
     isProf: false,
     gamification: {xp:0,level:1,title:'Becari',achievements:[],streak:0,lastPlayDate:null,weeklyChallenge:null,weeklyChallengeTarget:0,totalWeeksPlayed:0,xpHistory:[]},
+    rdi: {projects:[],completed:[],budget:0,totalInvested:0,innovations:0,esg:0},
+    negotiations: [],
     lastSaved: Date.now(),
   };
 }
@@ -1859,6 +1884,8 @@ async function loadGameData() {
     if (!G.gameData.proveidors)     G.gameData.proveidors     = [];
     if (!G.gameData.startDate)      G.gameData.startDate      = new Date().toISOString();
     if (!G.gameData.gamification)   G.gameData.gamification   = {xp:0,level:1,title:'Becari',achievements:[],streak:0,lastPlayDate:null,weeklyChallenge:null,weeklyChallengeTarget:0,totalWeeksPlayed:0,xpHistory:[]};
+    if (!G.gameData.rdi)            G.gameData.rdi            = {projects:[],completed:[],budget:0,totalInvested:0,innovations:0,esg:0};
+    if (!G.gameData.negotiations)   G.gameData.negotiations   = [];
   }
   window.G = G;
   console.log('loadGameData: mode=', G.gameData.mode, 'isProf=', G.gameData.isProf);
@@ -3953,6 +3980,7 @@ window.generateShareholders = generateShareholders;
 <script defer src="ui-proveidors.js"></script>
 <script defer src="ui-laborals.js"></script>
 <script defer src="ui-rdi.js"></script>
+<script defer src="ui-advanced.js"></script>
 <script defer src="icons-gamification.js"></script>
 </body>
 </html>
