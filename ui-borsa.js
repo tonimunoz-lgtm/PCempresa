@@ -59,12 +59,17 @@ window.renderBorsa = function renderBorsa() {
   updatePortfolioTotal(port);
 
   window.switchBorsaTab = (tab) => {
+    const panelMap = {stocks:'stocks', crypto:'crypto', portfolio:'port', edu:'edu'};
+    const tabMap   = {stocks:'stocks', crypto:'crypto', portfolio:'port', edu:'edu'};
     ['stocks','crypto','portfolio','edu'].forEach(t => {
-      document.getElementById(`borsa-${t}-panel`).style.display = t===tab ? '' : 'none';
-      document.getElementById(`btab-${t==='portfolio'?'port':t}`).classList.toggle('active', t===tab);
+      const panel = document.getElementById(`borsa-${panelMap[t]}-panel`);
+      const btn   = document.getElementById(`btab-${tabMap[t]}`);
+      if (panel) panel.style.display = t===tab ? '' : 'none';
+      if (btn) btn.classList.toggle('active', t===tab);
     });
     if (tab==='portfolio') {
-      document.getElementById('borsa-port-panel').innerHTML = renderPortfolioPanel(getG().gameData.portfolio||{stocks:{},crypto:{}}, getG().gameData.finances?.cash||0);
+      const pp = document.getElementById('borsa-port-panel');
+      if (pp) pp.innerHTML = renderPortfolioPanel(getG().gameData.portfolio||{stocks:{},crypto:{}}, getG().gameData.finances?.cash||0);
     }
   };
 }

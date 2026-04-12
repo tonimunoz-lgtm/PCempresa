@@ -201,6 +201,17 @@ window.renderProfessor = function renderProfessor() {
       </div>
     </div>
 
+    <!-- AVALUACIÓ COMPETENCIAL -->
+    <div class="section-card" style="margin-top:14px;border-color:rgba(124,58,237,.3)">
+      <div class="section-title">🎓 Avaluació per competències</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:14px">Avaluació automàtica basada en les accions i decisions de cada alumne dins el simulador.</div>
+      <div id="eval-table-container"></div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-primary" style="font-size:12px;background:var(--accent2)" onclick="exportEvaluation()">📄 Exportar avaluació CSV</button>
+        <div style="font-size:10px;color:var(--text3);align-self:center">Nota: L'avaluació es calcula automàticament basant-se en les decisions i accions de l'alumne.</div>
+      </div>
+    </div>
+
     <!-- Taula detallada alumnes -->
     <div class="section-card" style="margin-top:14px;overflow-x:auto">
       <div class="section-title">📋 Tots els alumnes — Vista detallada</div>
@@ -237,6 +248,41 @@ window.renderProfessor = function renderProfessor() {
       </table>
     </div>
   </div>`;
+
+  // Renderitzar taula d'avaluació (fora del template literal per evitar nesting)
+  setTimeout(function() {
+    var container = document.getElementById('eval-table-container');
+    if (!container) return;
+    var activeStudents = getG().allStudents.filter(function(s) { return !s.isProf && s.company; });
+    var html = '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px;min-width:900px"><thead><tr style="border-bottom:2px solid var(--border2)">';
+    html += '<th style="text-align:left;padding:8px 6px;color:var(--text2);font-weight:600">Alumne</th>';
+    html += '<th style="text-align:center;padding:8px 4px;color:var(--text2);font-weight:600;font-size:9px">📈 Risc inv.</th>';
+    html += '<th style="text-align:center;padding:8px 4px;color:var(--text2);font-weight:600;font-size:9px">🤝 Negoc.</th>';
+    html += '<th style="text-align:center;padding:8px 4px;color:var(--text2);font-weight:600;font-size:9px">⚖️ Drets lab.</th>';
+    html += '<th style="text-align:center;padding:8px 4px;color:var(--text2);font-weight:600;font-size:9px">📊 Comptab.</th>';
+    html += '<th style="text-align:center;padding:8px 4px;color:var(--text2);font-weight:600;font-size:9px">💶 Gestió fin.</th>';
+    html += '<th style="text-align:center;padding:8px 4px;color:var(--text2);font-weight:600;font-size:9px">🔬 Innovació</th>';
+    html += '<th style="text-align:center;padding:8px 4px;color:var(--text2);font-weight:600;font-size:9px">🌐 Comerç</th>';
+    html += '<th style="text-align:center;padding:8px 4px;color:var(--accent);font-weight:700;font-size:10px">NOTA</th>';
+    html += '</tr></thead><tbody>';
+    activeStudents.forEach(function(s) {
+      var ev = evaluateStudent(s);
+      html += '<tr style="border-bottom:1px solid rgba(255,255,255,.04)">';
+      html += '<td style="padding:8px 6px"><div style="font-weight:700;color:var(--text)">' + s.displayName + '</div><div style="font-size:9px;color:var(--text3)">' + (s.company?.name||'—') + '</div></td>';
+      html += '<td style="text-align:center;padding:8px 4px">' + renderGrade(ev.riskMgmt) + '</td>';
+      html += '<td style="text-align:center;padding:8px 4px">' + renderGrade(ev.negotiation) + '</td>';
+      html += '<td style="text-align:center;padding:8px 4px">' + renderGrade(ev.laborRights) + '</td>';
+      html += '<td style="text-align:center;padding:8px 4px">' + renderGrade(ev.accounting) + '</td>';
+      html += '<td style="text-align:center;padding:8px 4px">' + renderGrade(ev.financeMgmt) + '</td>';
+      html += '<td style="text-align:center;padding:8px 4px">' + renderGrade(ev.innovation) + '</td>';
+      html += '<td style="text-align:center;padding:8px 4px">' + renderGrade(ev.intlTrade) + '</td>';
+      var gradeColor = ev.finalGrade >= 7 ? 'var(--green)' : ev.finalGrade >= 5 ? 'var(--gold)' : 'var(--red)';
+      html += '<td style="text-align:center;padding:8px 4px"><div style="font-family:\'JetBrains Mono\',monospace;font-size:14px;font-weight:800;color:' + gradeColor + '">' + ev.finalGrade.toFixed(1) + '</div></td>';
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
+  }, 50);
 }
 
 window.broadcastEvent = async function() {
@@ -322,4 +368,140 @@ window.printLeaderboard = function() { window.print(); };
 window.advanceClassWeeks = function() {
   showToast('⏩ Funció avançada: requereix Cloud Functions. Properament disponible.');
 };
+
+// ============================================================
+//  SISTEMA D'AVALUACIÓ PER COMPETÈNCIES
+// ============================================================
+
+function evaluateStudent(s) {
+  const f = s.finances || {};
+  const cash = f.cash || 0;
+  const rev = f.monthly_revenue || 0;
+  const costs = f.monthly_costs || 0;
+  const result = rev - costs;
+  const emps = s.employees || [];
+  const loans = f.loans || [];
+  const port = s.portfolio || {stocks:{},crypto:{}};
+  const trade = s.trade || {imports:[],exports:[]};
+  const rdi = s.rdi || {projects:[],completed:[],esg:0};
+  const labor = s.laborRelations || {};
+  const prest = s.prestigi || 0;
+  const week = s.week || 1;
+  const provs = s.proveidors || [];
+
+  // 1. RISC D'INVERSIÓ (0-10)
+  // Mesura: ha invertit a la borsa? Ha diversificat? Ha perdut tot?
+  let riskMgmt = 5;
+  const stockEntries = Object.keys(port.stocks || {}).length;
+  const cryptoEntries = Object.keys(port.crypto || {}).length;
+  if (stockEntries + cryptoEntries > 0) riskMgmt += 1; // Ha invertit
+  if (stockEntries >= 2) riskMgmt += 1; // Diversifica accions
+  if (cryptoEntries > 0 && stockEntries > cryptoEntries) riskMgmt += 1; // Més accions que cripto (prudent)
+  if (cryptoEntries > stockEntries + 2) riskMgmt -= 2; // Massa cripto = especulació
+  const totalInvested = Object.values(port.stocks||{}).reduce((s,v) => s + (v.invested||0), 0) + Object.values(port.crypto||{}).reduce((s,v) => s + (v.invested||0), 0);
+  if (totalInvested > cash * 0.5) riskMgmt -= 1; // Massa exposició
+  if (totalInvested > 0 && totalInvested < rev * 0.2) riskMgmt += 1; // Inversió raonable
+  riskMgmt = Math.max(0, Math.min(10, riskMgmt));
+
+  // 2. NEGOCIACIÓ (0-10)
+  let negotiation = 5;
+  if (provs.length >= 1) negotiation += 1;
+  if (provs.length >= 3) negotiation += 1;
+  if (s.clients?.length >= 3) negotiation += 1;
+  if (s.franchise) negotiation += 1;
+  if (trade.exports?.length >= 1) negotiation += 1;
+  if (prest >= 30) negotiation += 1;
+  negotiation = Math.max(0, Math.min(10, negotiation));
+
+  // 3. DRETS LABORALS (0-10)
+  let laborRights = 6;
+  const avgSalary = emps.length > 0 ? emps.reduce((s,e) => s + (e.salary||0), 0) / emps.length : 0;
+  if (avgSalary >= 1500) laborRights += 1; // Salari digne
+  if (avgSalary >= 2000) laborRights += 1;
+  if (avgSalary < 1000 && emps.length > 0) laborRights -= 2; // Salaris baixos
+  const avgMorale = emps.length > 0 ? emps.reduce((s,e) => s + (e.morale||60), 0) / emps.length : 70;
+  if (avgMorale >= 70) laborRights += 1;
+  if (avgMorale < 40) laborRights -= 2;
+  if (labor.convenis?.length > 0) laborRights += 1; // Té convenis
+  if (labor.vaga) laborRights -= 1; // Hi ha vaga activa
+  laborRights = Math.max(0, Math.min(10, laborRights));
+
+  // 4. COMPTABILITAT (0-10)
+  let accounting = 5;
+  if (f.actiu && f.passiu) accounting += 1; // Té balanç
+  if (loans.length > 0) accounting += 1; // Ha gestionat préstecs
+  if (f.revenue_history?.length >= 8) accounting += 1; // Historial
+  if (week >= 26) accounting += 1; // Experiència temporal
+  if (week >= 52) accounting += 1; // Any complet
+  const totalActiu = (f.actiu?.immobilitzat||0) + (f.actiu?.existencies||0) + cash + (f.actiu?.clients||0);
+  const totalPassiu = (f.passiu?.capital||0) + (f.passiu?.reserves||0) + (f.passiu?.deutes_llarg||0) + (f.passiu?.deutes_curt||0) + (f.passiu?.proveidors||0);
+  if (totalActiu > 0 && totalPassiu > 0) accounting += 1;
+  accounting = Math.max(0, Math.min(10, accounting));
+
+  // 5. GESTIÓ FINANCERA (0-10)
+  let financeMgmt = 5;
+  if (cash >= 0) financeMgmt += 1;
+  if (cash >= 10000) financeMgmt += 1;
+  if (result >= 0) financeMgmt += 1; // Beneficis
+  if (result > rev * 0.1) financeMgmt += 1; // Bon marge
+  const totalDeute = (f.passiu?.deutes_llarg||0) + (f.passiu?.deutes_curt||0);
+  const capital = (f.passiu?.capital||0) + (f.passiu?.reserves||0);
+  if (capital > 0 && totalDeute / capital < 2) financeMgmt += 1; // Endeutament sa
+  if (cash < -50000) financeMgmt -= 3; // Greu problema
+  financeMgmt = Math.max(0, Math.min(10, financeMgmt));
+
+  // 6. INNOVACIÓ / ESG (0-10)
+  let innovation = 3;
+  if (rdi.completed?.length >= 1) innovation += 2;
+  if (rdi.completed?.length >= 3) innovation += 2;
+  if (rdi.completed?.length >= 5) innovation += 1;
+  if ((rdi.esg||0) >= 15) innovation += 1;
+  if ((rdi.esg||0) >= 40) innovation += 1;
+  if ((rdi.totalInvested||0) > 0) innovation += 1;
+  innovation = Math.max(0, Math.min(10, innovation));
+
+  // 7. COMERÇ INTERNACIONAL (0-10)
+  let intlTrade = 4;
+  if (trade.exports?.length >= 1) intlTrade += 2;
+  if (trade.exports?.length >= 3) intlTrade += 1;
+  if (trade.imports?.length >= 1) intlTrade += 1;
+  if (trade.imports?.length + trade.exports?.length >= 5) intlTrade += 1;
+  if (Object.keys(trade.incoterms||{}).length > 0) intlTrade += 1;
+  intlTrade = Math.max(0, Math.min(10, intlTrade));
+
+  // NOTA FINAL (ponderada)
+  const weights = { riskMgmt: 0.12, negotiation: 0.12, laborRights: 0.15, accounting: 0.18, financeMgmt: 0.20, innovation: 0.13, intlTrade: 0.10 };
+  const finalGrade = riskMgmt * weights.riskMgmt + negotiation * weights.negotiation + laborRights * weights.laborRights + accounting * weights.accounting + financeMgmt * weights.financeMgmt + innovation * weights.innovation + intlTrade * weights.intlTrade;
+
+  return { riskMgmt, negotiation, laborRights, accounting, financeMgmt, innovation, intlTrade, finalGrade };
+}
+
+function renderGrade(val) {
+  const v = Math.round(val * 10) / 10;
+  const color = v >= 7 ? 'var(--green)' : v >= 5 ? 'var(--gold)' : 'var(--red)';
+  const bg = v >= 7 ? 'rgba(16,185,129,.12)' : v >= 5 ? 'rgba(245,158,11,.12)' : 'rgba(239,68,68,.12)';
+  return `<div style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:24px;background:${bg};border-radius:6px;font-size:11px;font-weight:700;color:${color};font-family:'JetBrains Mono',monospace">${v.toFixed(1)}</div>`;
+}
+
+window.exportEvaluation = function() {
+  const students = getG().allStudents.filter(s => !s.isProf && s.company);
+  const header = ['Alumne','Empresa','Risc inversió','Negociació','Drets laborals','Comptabilitat','Gestió financera','Innovació/ESG','Comerç int.','NOTA FINAL'];
+  const rows = students.map(s => {
+    const ev = evaluateStudent(s);
+    return [
+      s.displayName, s.company?.name||'—',
+      ev.riskMgmt.toFixed(1), ev.negotiation.toFixed(1), ev.laborRights.toFixed(1),
+      ev.accounting.toFixed(1), ev.financeMgmt.toFixed(1), ev.innovation.toFixed(1),
+      ev.intlTrade.toFixed(1), ev.finalGrade.toFixed(1)
+    ].join(',');
+  });
+  const csv = [header.join(','), ...rows].join('\n');
+  const blob = new Blob(['\uFEFF' + csv], {type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'empresabat_avaluacio.csv';
+  a.click(); URL.revokeObjectURL(url);
+  showToast('📄 Avaluació exportada!');
+};
+
 })();

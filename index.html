@@ -848,6 +848,7 @@ body::before {
 .machine-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:10px; }
 .machine-card { background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;transition:.2s; }
 .machine-card:hover { border-color:var(--border2); }
+.machine-card.installing { border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.04); }
 .machine-icon { font-size:30px;margin-bottom:8px; }
 .machine-name { font-size:12px;font-weight:700;color:var(--text); }
 .machine-detail { font-size:10px;color:var(--text2);margin-top:3px; }
@@ -1017,7 +1018,7 @@ body::before {
 
 <!-- Loading -->
 <div id="loading-overlay">
-  <div class="loading-logo" data-icon="logo"></div>
+  <div class="loading-logo">🏢</div>
   <div class="loading-text">EmpresaBat</div>
   <div class="loading-sub">Carregant simulador...</div>
   <div class="loading-bar"><div class="loading-bar-fill"></div></div>
@@ -1027,7 +1028,7 @@ body::before {
 <div id="auth-screen" style="display:none">
   <div class="auth-wrap">
     <div class="auth-logo">
-      <span class="auth-logo-icon" data-icon="logo"></span>
+      <span class="auth-logo-icon">🏢</span>
       <h1>Empresa<span>Bat</span></h1>
       <p>SIMULADOR EMPRESARIAL · BATXILLERAT</p>
     </div>
@@ -1090,20 +1091,20 @@ body::before {
 <div id="game-screen">
   <div class="topbar">
     <div class="topbar-brand">
-      <span class="topbar-brand-icon" id="brand-icon-slot">🏢</span>
+      <span class="topbar-brand-icon">🏢</span>
       <span class="topbar-brand-name">Empresa<span>Bat</span></span>
     </div>
     <div class="topbar-stats">
-      <div class="tstat"><span class="tstat-icon" data-icon="calendari"></span> <span id="stat-date" class="tstat-v">—</span></div>
-      <div class="tstat"><span class="tstat-icon" data-icon="tresoreria"></span> <span id="stat-cash" class="tstat-v">—</span></div>
-      <div class="tstat green"><span class="tstat-icon" data-icon="resultat"></span> <span id="stat-result" class="tstat-v">—</span></div>
-      <div class="tstat"><span class="tstat-icon" data-icon="prestigi"></span> <span id="stat-prestigi" class="tstat-v">—</span></div>
-      <div class="tstat"><span class="tstat-icon" data-icon="empleats"></span> <span id="stat-emp" class="tstat-v">—</span></div>
+      <div class="tstat">📅 <span id="stat-date" class="tstat-v">—</span></div>
+      <div class="tstat">💶 <span id="stat-cash" class="tstat-v">—</span></div>
+      <div class="tstat green">📈 <span id="stat-result" class="tstat-v">—</span></div>
+      <div class="tstat">⭐ <span id="stat-prestigi" class="tstat-v">—</span></div>
+      <div class="tstat">🧑‍💼 <span id="stat-emp" class="tstat-v">—</span></div>
     </div>
     <div class="topbar-right">
       <div class="week-display" id="week-display">Setmana 1</div>
-      <button class="week-advance-btn" onclick="advanceWeek()"><span class="btn-icon" data-icon="avançar"></span> Avançar setmana</button>
-      <button class="profile-btn" onclick="openProfile()"><span class="btn-icon" data-icon="perfil"></span> <span id="profile-name">—</span></button>
+      <button class="week-advance-btn" onclick="advanceWeek()">⏩ Avançar setmana</button>
+      <button class="profile-btn" onclick="openProfile()">👤 <span id="profile-name">—</span></button>
     </div>
   </div>
 
@@ -1111,68 +1112,72 @@ body::before {
     <!-- Sidebar -->
     <div class="sidebar">
       <button class="nav-btn active" onclick="showTab('dashboard')" id="nav-dashboard">
-        <span class="nav-icon" data-icon="dashboard"></span>
+        <span class="nav-icon">📊</span>
         <span class="nav-lbl">Resum</span>
       </button>
       <button class="nav-btn" onclick="showTab('setup')" id="nav-setup">
-        <span class="nav-icon" data-icon="empresa"></span>
+        <span class="nav-icon">🏗️</span>
         <span class="nav-lbl">Empresa</span>
       </button>
       <button class="nav-btn" onclick="showTab('finances')" id="nav-finances">
-        <span class="nav-icon" data-icon="finances"></span>
+        <span class="nav-icon">💶</span>
         <span class="nav-lbl">Finances</span>
       </button>
       <button class="nav-btn" onclick="showTab('hr')" id="nav-hr">
-        <span class="nav-icon" data-icon="rrhh"></span>
+        <span class="nav-icon">🧑‍💼</span>
         <span class="nav-lbl">RRHH</span>
       </button>
       <div class="nav-sep"></div>
       <button class="nav-btn" onclick="showTab('production')" id="nav-production">
-        <span class="nav-icon" data-icon="produccio"></span>
+        <span class="nav-icon">⚙️</span>
         <span class="nav-lbl">Producció</span>
       </button>
       <button class="nav-btn" onclick="showTab('marketing')" id="nav-marketing">
-        <span class="nav-icon" data-icon="marketing"></span>
+        <span class="nav-icon">📢</span>
         <span class="nav-lbl">Màrqueting</span>
       </button>
       <button class="nav-btn" onclick="showTab('sales')" id="nav-sales">
-        <span class="nav-icon" data-icon="vendes"></span>
+        <span class="nav-icon">🛒</span>
         <span class="nav-lbl">Vendes</span>
       </button>
       <div class="nav-sep"></div>
       <button class="nav-btn" onclick="showTab('map')" id="nav-map">
-        <span class="nav-icon" data-icon="mapa"></span>
+        <span class="nav-icon">🗺️</span>
         <span class="nav-lbl">Mapa</span>
       </button>
       <div class="nav-sep"></div>
       <button class="nav-btn" onclick="showTab('borsa')" id="nav-borsa">
-        <span class="nav-icon" data-icon="borsa"></span>
+        <span class="nav-icon">📈</span>
         <span class="nav-lbl">Borsa</span>
       </button>
       <button class="nav-btn" onclick="showTab('junta')" id="nav-junta">
-        <span class="nav-icon" data-icon="junta"></span>
+        <span class="nav-icon">🏛️</span>
         <span class="nav-lbl">Junta</span>
       </button>
       <button class="nav-btn" onclick="showTab('trade')" id="nav-trade">
-        <span class="nav-icon" data-icon="comerc"></span>
+        <span class="nav-icon">🌐</span>
         <span class="nav-lbl">Comerç</span>
       </button>
       <button class="nav-btn" onclick="showTab('franquicies')" id="nav-franquicies">
-        <span class="nav-icon" data-icon="franquicies"></span>
+        <span class="nav-icon">🏪</span>
         <span class="nav-lbl">Franquíc.</span>
       </button>
       <div class="nav-sep"></div>
       <button class="nav-btn" onclick="showTab('proveidors')" id="nav-proveidors">
-        <span class="nav-icon" data-icon="proveidors"></span>
+        <span class="nav-icon">📦</span>
         <span class="nav-lbl">Proveïdors</span>
       </button>
       <button class="nav-btn" onclick="showTab('laborals')" id="nav-laborals">
-        <span class="nav-icon" data-icon="laborals"></span>
+        <span class="nav-icon">⚖️</span>
         <span class="nav-lbl">Laborals</span>
+      </button>
+      <button class="nav-btn" onclick="showTab('rdi')" id="nav-rdi">
+        <span class="nav-icon">🔬</span>
+        <span class="nav-lbl">I+D+i</span>
       </button>
       <div class="nav-sep" id="prof-sep" style="display:none"></div>
       <button class="nav-btn" onclick="showTab('professor')" id="nav-professor" style="display:none">
-        <span class="nav-icon" data-icon="professor"></span>
+        <span class="nav-icon">🎓</span>
         <span class="nav-lbl">Classe</span>
       </button>
     </div>
@@ -1193,31 +1198,31 @@ body::before {
 
           <div class="dash-top">
             <div class="kpi-card">
-              <div class="kpi-icon" data-icon="kpi_cash"></div>
+              <div class="kpi-icon">💶</div>
               <div class="kpi-label">Tresoreria</div>
               <div class="kpi-val" id="kpi-cash">—</div>
               <div class="kpi-change up" id="kpi-cash-ch">—</div>
             </div>
             <div class="kpi-card">
-              <div class="kpi-icon" data-icon="kpi_rev"></div>
+              <div class="kpi-icon">📈</div>
               <div class="kpi-label">Ingressos (mes)</div>
               <div class="kpi-val positive" id="kpi-rev">—</div>
               <div class="kpi-change up" id="kpi-rev-ch">—</div>
             </div>
             <div class="kpi-card">
-              <div class="kpi-icon" data-icon="kpi_costs"></div>
+              <div class="kpi-icon">📉</div>
               <div class="kpi-label">Despeses (mes)</div>
               <div class="kpi-val negative" id="kpi-costs">—</div>
               <div class="kpi-change" id="kpi-costs-ch">—</div>
             </div>
             <div class="kpi-card">
-              <div class="kpi-icon" data-icon="kpi_prestigi"></div>
+              <div class="kpi-icon">⭐</div>
               <div class="kpi-label">Prestigi empresa</div>
               <div class="kpi-val" id="kpi-prest">—</div>
               <div class="kpi-change" id="kpi-prest-ch">—</div>
             </div>
             <div class="kpi-card">
-              <div class="kpi-icon" data-icon="kpi_result"></div>
+              <div class="kpi-icon">📊</div>
               <div class="kpi-label">Resultat mensual</div>
               <div class="kpi-val" id="kpi-result">—</div>
               <div class="kpi-change" id="kpi-result-ch">—</div>
@@ -1461,6 +1466,9 @@ body::before {
       <!-- RELACIONS LABORALS -->
       <div class="tab-panel" id="tab-laborals"></div>
 
+      <!-- I+D+i -->
+      <div class="tab-panel" id="tab-rdi"></div>
+
     </div><!-- /content -->
   </div><!-- /main-area -->
 </div><!-- /game-screen -->
@@ -1565,10 +1573,10 @@ const VALLES_EMPRESES = [
 ];
 
 const MACHINES = [
-  {id:'basic',name:'Màquina bàsica',icon:'⚙️',price:15000,capacity:100,maintenance:200,desc:'Producció estàndard'},
-  {id:'advanced',name:'Màquina CNC',icon:'🤖',price:45000,capacity:350,maintenance:500,desc:'Alta precisió'},
-  {id:'auto',name:'Línia automàtica',icon:'🏭',price:120000,capacity:1000,maintenance:1200,desc:'Producció massiva'},
-  {id:'robot',name:'Braç robòtic',icon:'🦾',price:80000,capacity:600,maintenance:800,desc:'Flexible i eficient'},
+  {id:'basic',name:'Màquina bàsica',icon:'⚙️',price:15000,capacity:100,maintenance:200,desc:'Producció estàndard',installWeeks:2},
+  {id:'advanced',name:'Màquina CNC',icon:'🤖',price:45000,capacity:350,maintenance:500,desc:'Alta precisió',installWeeks:4},
+  {id:'auto',name:'Línia automàtica',icon:'🏭',price:120000,capacity:1000,maintenance:1200,desc:'Producció massiva',installWeeks:8},
+  {id:'robot',name:'Braç robòtic',icon:'🦾',price:80000,capacity:600,maintenance:800,desc:'Flexible i eficient',installWeeks:6},
 ];
 
 const MARKETING_CHANNELS = [
@@ -2589,12 +2597,25 @@ function renderActiveCompany() {
   ].join('<br>');
   const loans = G.gameData.finances.loans || [];
   const loansEl = document.getElementById('loans-list');
-  if (loansEl) loansEl.innerHTML = loans.length === 0 ? '<div style="color:var(--text2);font-size:13px">Sense préstecs actius.</div>' : loans.map(l => `
-    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px">
-      <span style="color:var(--text2)">Préstec bancari</span>
-      <span style="color:var(--gold);font-family:\'JetBrains Mono\',monospace">${l.remaining.toLocaleString('ca')}€ pendent</span>
-      <span style="color:var(--text2)">${l.interest}% · ${l.monthlyPayment.toLocaleString('ca')}€/mes</span>
-    </div>`).join('');
+  if (loansEl) loansEl.innerHTML = loans.length === 0 ? '<div style="color:var(--text2);font-size:13px">Sense préstecs actius.</div>' : loans.map((l, idx) => {
+    const penalitzacio = Math.round((l.remaining || 0) * 0.02);
+    return `
+    <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px">
+        <span style="color:var(--text);font-weight:700">🏦 Préstec bancari #${idx+1}</span>
+        <span style="color:var(--gold);font-family:'JetBrains Mono',monospace">${(l.remaining||0).toLocaleString('ca')}€ pendent</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:10px">
+        <span>Interès: ${l.interest||5}%</span>
+        <span>Quota: ${(l.monthlyPayment||0).toLocaleString('ca')}€/mes</span>
+        <span>Mesos restants: ${l.monthsLeft||'—'}</span>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="emp-btn promote" style="flex:1;font-size:11px;padding:6px" onclick="earlyRepayLoan(${idx})">💶 Amortitzar anticipadament</button>
+        <button class="emp-btn fire" style="flex:1;font-size:11px;padding:6px" onclick="cancelLoan(${idx})">❌ Cancel·lar (penalització ${penalitzacio.toLocaleString('ca')}€)</button>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 // ==================== DASHBOARD ====================
@@ -2965,14 +2986,24 @@ function renderProduction() {
       <div class="machine-grid" style="margin-top:16px">
         ${machines.length === 0 ? '<div style="color:var(--text2);font-size:13px;grid-column:1/-1;text-align:center;padding:20px">Sense maquinària. Compra la teva primera màquina!</div>' :
           machines.map(m => `
-          <div class="machine-card">
+          <div class="machine-card${m.installing ? ' installing' : ''}">
             <div class="machine-icon">${m.icon||'⚙️'}</div>
             <div class="machine-name">${m.name}</div>
-            <div class="machine-detail">${m.capacity?.toLocaleString('ca') || 0} u/setmana</div>
-            <div class="machine-health" style="margin-top:8px;justify-content:center;gap:4px">
-              <div class="health-dot" style="width:8px;height:8px;border-radius:50%;background:var(--green)"></div>
-              <span style="font-size:10px;color:var(--green)">Operativa</span>
-            </div>
+            ${m.installing ? `
+              <div class="machine-detail" style="color:var(--gold)">🔧 En instal·lació</div>
+              <div style="margin-top:8px">
+                <div style="background:rgba(255,255,255,.08);border-radius:4px;height:6px;overflow:hidden">
+                  <div style="height:100%;background:var(--gold);border-radius:4px;width:${Math.round((1 - (m.installWeeksLeft||0) / (m.installWeeks||4)) * 100)}%;transition:width .3s"></div>
+                </div>
+                <div style="font-size:10px;color:var(--gold);margin-top:3px;text-align:center">${m.installWeeksLeft||0} setmanes restants</div>
+              </div>
+            ` : `
+              <div class="machine-detail">${m.capacity?.toLocaleString('ca') || 0} u/setmana</div>
+              <div class="machine-health" style="margin-top:8px;justify-content:center;gap:4px">
+                <div class="health-dot" style="width:8px;height:8px;border-radius:50%;background:var(--green)"></div>
+                <span style="font-size:10px;color:var(--green)">Operativa</span>
+              </div>
+            `}
             <div style="font-size:10px;color:var(--text3);margin-top:4px">Mant: ${m.maintenance?.toLocaleString('ca')||0}€/mes</div>
           </div>`).join('')}
       </div>
@@ -2985,6 +3016,7 @@ function renderProduction() {
       <div class="machine-detail">${m.desc}</div>
       <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold);margin:8px 0">${m.price.toLocaleString('ca')}€</div>
       <div style="font-size:10px;color:var(--text2)">${m.capacity.toLocaleString('ca')} u/setmana</div>
+      <div style="font-size:10px;color:var(--gold);margin-top:2px">🔧 Instal·lació: ${m.installWeeks||2} setmanes</div>
       <button class="emp-btn promote" style="width:100%;margin-top:10px" onclick="buyMachine('${m.id}')">Comprar</button>
     </div>`).join('');
 
@@ -3013,11 +3045,12 @@ window.buyMachine = async function(machineId) {
   if ((G.gameData.finances.cash || 0) < m.price) { showToast('❌ No tens prou tresoreria'); return; }
   G.gameData.finances.cash -= m.price;
   G.gameData.finances.actiu.immobilitzat = (G.gameData.finances.actiu.immobilitzat || 0) + m.price;
-  G.gameData.machines.push({...m, id: 'machine_' + Date.now(), health: 100});
-  G.gameData.notifications.push({id:Date.now(), icon:'⚙️', title:'Màquina comprada!', desc:`${m.name} instal·lada. Cost: ${m.price.toLocaleString('ca')}€`, time:'Ara', urgent:false});
+  const installWeeks = m.installWeeks || 2;
+  G.gameData.machines.push({...m, id: 'machine_' + Date.now(), health: 100, installing: true, installWeeksLeft: installWeeks, capacity: 0, originalCapacity: m.capacity});
+  G.gameData.notifications.push({id:Date.now(), icon:'🔧', title:'Màquina en instal·lació', desc:`${m.name} comprada. Estarà operativa en ${installWeeks} setmanes.`, time:'Ara', urgent:false});
   await saveGameData();
   renderProduction(); renderFinances(); renderDashboard();
-  showToast(`⚙️ ${m.name} instal·lada!`);
+  showToast(`🔧 ${m.name} comprada — ${installWeeks} setmanes d'instal·lació`);
 };
 
 // ==================== MARKETING ====================
@@ -3272,7 +3305,20 @@ window.advanceWeek = async function() {
     .reduce((s, e) => s + (e.salary || 0) * 1.30, 0) / 4.33;
   const rent        = (gd.company?.monthlyRent || 0) / 4.33;
   const machines    = gd.machines || [];
-  const maintenance = machines.reduce((s, m) => s + (m.maintenance || 0), 0) / 4.33;
+  // ── Instal·lació maquinària ──
+  machines.forEach(m => {
+    if (m.installing && m.installWeeksLeft > 0) {
+      m.installWeeksLeft--;
+      if (m.installWeeksLeft <= 0) {
+        m.installing = false;
+        m.capacity = m.originalCapacity || m.capacity;
+        delete m.originalCapacity;
+        gd.notifications.push({id:Date.now()+Math.random(), icon:'✅', title:'Màquina operativa!', desc:`${m.name} ja està instal·lada i produint.`, time:'S'+gd.week, urgent:false});
+        showEventToast('✅', 'Màquina operativa!', m.name + ' ja produeix', true);
+      }
+    }
+  });
+  const maintenance = machines.filter(m => !m.installing).reduce((s, m) => s + (m.maintenance || 0), 0) / 4.33;
   const loanPays    = (gd.finances.loans || []).reduce((s, l) => s + (l.monthlyPayment || 0) / 4.33, 0);
   const mktSpend    = Object.values(gd.marketing?.channels || {}).reduce((s, v) => s + v, 0) / 4.33;
   const provCosts   = (gd.proveidors || []).reduce((s, p) => s + (p.cost_mes || 0), 0) / 4.33;
@@ -3568,6 +3614,7 @@ window.acceptLoan = async function(amount, interest, years) {
   G.gameData.finances.loans.push({
     id: 'loan_'+Date.now(), entitat: 'Banc Sabadell',
     amount, remaining: amount, interest, years, monthlyPayment,
+    monthsLeft: years * 12,
     startWeek: G.gameData.week
   });
   await saveGameData();
@@ -3578,6 +3625,48 @@ window.acceptLoan = async function(amount, interest, years) {
     <div style="font-size:12px;color:var(--text2);margin-top:6px">${amount.toLocaleString('ca')}€ al ${interest.toFixed(2)}% TIN · Quota: ${monthlyPayment.toLocaleString('ca')}€/mes · ${years} anys</div>
   </div>`;
   showToast('✅ Préstec aprovat: ' + amount.toLocaleString('ca') + '€');
+};
+
+window.earlyRepayLoan = async function(idx) {
+  const loans = G.gameData.finances.loans || [];
+  const l = loans[idx];
+  if (!l) return;
+  const amount = prompt(`Import a amortitzar anticipadament (màx ${l.remaining.toLocaleString('ca')}€):`, Math.round(l.remaining * 0.25));
+  if (!amount) return;
+  const repay = Math.min(parseFloat(amount), l.remaining);
+  if (repay <= 0 || isNaN(repay)) { showToast('⚠️ Import invàlid'); return; }
+  if (G.gameData.finances.cash < repay) { showToast('❌ No tens prou tresoreria'); return; }
+  const comissio = Math.round(repay * 0.005);
+  G.gameData.finances.cash -= (repay + comissio);
+  l.remaining -= repay;
+  G.gameData.finances.passiu.deutes_llarg = Math.max(0, (G.gameData.finances.passiu.deutes_llarg||0) - repay);
+  if (l.remaining <= 0) {
+    loans.splice(idx, 1);
+    showToast('🎉 Préstec liquidat completament!');
+    showEventToast('🎉', 'Préstec liquidat!', 'Has pagat tot el deute bancari.', true);
+  } else {
+    l.monthlyPayment = Math.round(l.remaining * (l.interest/100/12) / (1 - Math.pow(1+l.interest/100/12, -(l.monthsLeft||12))));
+    showToast(`💶 Amortitzat ${repay.toLocaleString('ca')}€ (comissió: ${comissio.toLocaleString('ca')}€)`);
+  }
+  await saveGameData();
+  renderFinances(); renderDashboard();
+};
+
+window.cancelLoan = async function(idx) {
+  const loans = G.gameData.finances.loans || [];
+  const l = loans[idx];
+  if (!l) return;
+  const penalitzacio = Math.round(l.remaining * 0.02);
+  const totalPagar = l.remaining + penalitzacio;
+  if (!confirm(`Cancel·lar préstec?\n\nCapital pendent: ${l.remaining.toLocaleString('ca')}€\nPenalització (2%): ${penalitzacio.toLocaleString('ca')}€\nTotal a pagar: ${totalPagar.toLocaleString('ca')}€`)) return;
+  if (G.gameData.finances.cash < totalPagar) { showToast('❌ No tens prou tresoreria per cancel·lar'); return; }
+  G.gameData.finances.cash -= totalPagar;
+  G.gameData.finances.passiu.deutes_llarg = Math.max(0, (G.gameData.finances.passiu.deutes_llarg||0) - l.remaining);
+  loans.splice(idx, 1);
+  await saveGameData();
+  renderFinances(); renderDashboard();
+  showToast(`❌ Préstec cancel·lat. Penalització: ${penalitzacio.toLocaleString('ca')}€`);
+  showEventToast('🏦', 'Préstec cancel·lat', `Has pagat ${totalPagar.toLocaleString('ca')}€ (inclou penalització)`, false);
 };
 
 // ==================== NAV ====================
@@ -3591,6 +3680,7 @@ const EXTERN_RENDER = {
   professor:   () => Promise.resolve(window.renderProfessor && window.renderProfessor()),
   proveidors:  () => Promise.resolve(window.renderProveidors && window.renderProveidors()),
   laborals:    () => Promise.resolve(window.renderLaborals && window.renderLaborals()),
+  rdi:         () => Promise.resolve(window.renderRDI && window.renderRDI()),
 };
 
 // Refresh suau sense spinner (per a quan el tab ja té contingut)
@@ -3761,6 +3851,7 @@ window.generateShareholders = generateShareholders;
 <script defer src="ui-professor.js"></script>
 <script defer src="ui-proveidors.js"></script>
 <script defer src="ui-laborals.js"></script>
+<script defer src="ui-rdi.js"></script>
 <script defer src="icons-gamification.js"></script>
 </body>
 </html>
