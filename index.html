@@ -2252,7 +2252,7 @@ function renderStep_Const() {
     <div class="info-box">ℹ️ El temps total de constitució és d'aproximadament <strong>2-4 setmanes</strong>. Durant aquest temps no podràs operar.</div>
     <div class="wizard-nav">
       <button class="btn-prev" onclick="wizardPrev()">← Enrere</button>
-      <button class="btn-next" onclick="function(){wizardData.constCost=${totalCost};wizardNext();}(); wizardData.constCost=${totalCost}; wizardNext()">Finalitzar tràmits →</button>
+      <button class="btn-next" onclick="wizardData.constCost=${totalCost}; wizardNext()">Finalitzar tràmits →</button>
     </div>`;
 }
 
@@ -2895,16 +2895,21 @@ function renderHR() {
 }
 
 window.fireEmployee = async function(id) {
-  if (!confirm('Segur que vols acomiadar aquesta persona? Possible indemnització.')) return;
   const emp = G.gameData.employees.find(e => e.id === id);
   if (!emp) return;
-  const indemnity = (emp.salary || 1400) * (emp.seniority || 0) * 0.33;
+  const seniority = Math.max(0.5, emp.seniority || 0);
+  const indemnity = Math.round((emp.salary || 1400) * seniority * 0.33 * 12); // 33 dies per any treballat
+  const monthsSalary = Math.round(indemnity / (emp.salary || 1400));
+  if (!confirm(`Acomiadar ${emp.name}?\n\nAntigüitat: ${seniority.toFixed(1)} anys\nIndemnització legal: ${indemnity.toLocaleString('ca')}€ (${monthsSalary} mesos de salari)\nSalari pendent: ${Math.round((emp.salary||0)/2).toLocaleString('ca')}€\n\nTotal cost: ${(indemnity + Math.round((emp.salary||0)/2)).toLocaleString('ca')}€`)) return;
   G.gameData.employees = G.gameData.employees.filter(e => e.id !== id);
-  G.gameData.finances.cash -= indemnity;
-  G.gameData.notifications.push({id:Date.now(), icon:'❌', title:'Empleat acomiadat', desc:`${emp.name} — Indemnització: ${indemnity.toFixed(0)}€`, time:'Ara', urgent:false});
+  const totalCost = indemnity + Math.round((emp.salary||0)/2);
+  G.gameData.finances.cash -= totalCost;
+  // Registrar com a despesa extraordinària
+  if (!G.gameData._pendingFirings) G.gameData._pendingFirings = [];
+  G.gameData.notifications.push({id:Date.now(), icon:'❌', title:'Empleat acomiadat', desc:`${emp.name} (${emp.dept}) — Indemnització: ${indemnity.toLocaleString('ca')}€`, time:'S'+G.gameData.week, urgent:false});
   await saveGameData();
   renderHR(); renderDashboard(); renderFinances();
-  showToast(`❌ ${emp.name} acomiadat/da. Indemnització: ${indemnity.toFixed(0)}€`);
+  showToast(`❌ ${emp.name} acomiadat. Cost total: ${totalCost.toLocaleString('ca')}€`);
 };
 
 window.raiseEmployee = async function(id) {
@@ -3278,10 +3283,45 @@ window.advanceWeek = async function() {
   const serveis  = gd.serveis || [];
   const clients  = gd.clients || [];
   const prestigi = gd.prestigi || 0;
+  const emps = gd.employees || [];
+
+  // ════ FACTOR FORÇA LABORAL ════
+  // Sense empleats, la producció i serveis no funcionen
+  const empsProduccio = emps.filter(e => e.dept === 'produccio' && !e.en_vaga).length;
+  const empsVendes    = emps.filter(e => e.dept === 'vendes' && !e.en_vaga).length;
+  const empsAdmin     = emps.filter(e => e.dept === 'administracio' && !e.en_vaga).length;
+  const empsAtencio   = emps.filter(e => e.dept === 'atencio_client' && !e.en_vaga).length;
+  const empsMarketing = emps.filter(e => e.dept === 'marketing' && !e.en_vaga).length;
+  const totalEmpsActius = emps.filter(e => !e.en_vaga).length;
+  
+  // Factor laboral: si no hi ha ningú treballant, no hi ha ingressos
+  const laborFactor = totalEmpsActius === 0 ? 0 : Math.min(1, totalEmpsActius / Math.max(3, (gd._optimalEmployees || 5)));
+  
+  // Factor producció: necessites gent a producció per produir
+  const machines = gd.machines || [];
+  const machinesOperatives = machines.filter(m => !m.installing);
+  const capacitatMax = machinesOperatives.reduce((s, m) => s + (m.capacity || 0), 0);
+  const prodFactor = capacitatMax > 0 ? Math.min(1, empsProduccio / Math.max(1, Math.ceil(capacitatMax / 200))) : (empsProduccio > 0 ? 0.5 : 0);
+  
+  // Factor vendes: sense comercials no arribes als clients
+  const salesFactor = empsVendes > 0 ? Math.min(1, 0.4 + empsVendes * 0.15) : 0.15;
+  
+  // Factor atenció client: afecta retenció i satisfacció
+  const atencioFactor = empsAtencio > 0 ? Math.min(1, 0.5 + empsAtencio * 0.15) : 0.3;
+  
+  // ════ CÀLCUL INGRESSOS ════
   let revMensual = serveis.reduce((s, sv) => s + sv.preu * sv.unitats_mes, 0);
   revMensual += clients.reduce((s, cl) => s + (cl.monthly_value || 0), 0);
-  if (revMensual === 0) revMensual = gd.finances?.monthly_revenue || 0;
-
+  
+  // Si no hi ha serveis ni clients, els ingressos són ZERO (no magic money)
+  // Només mantenim una base mínima si hi ha empleats de vendes actius i prestigi > 0
+  if (revMensual === 0 && empsVendes > 0 && prestigi > 5) {
+    revMensual = empsVendes * 800 + prestigi * 30; // molt poc, per permetre captació orgànica
+  }
+  
+  // Aplicar factors de força laboral
+  revMensual *= laborFactor * prodFactor * salesFactor;
+  
   const weekVariation = 0.92 + Math.random() * 0.16 + prestigi * 0.001;
   let weekRev = (revMensual / 4.33) * weekVariation;
 
@@ -3300,13 +3340,12 @@ window.advanceWeek = async function() {
   if (gd.franchise?.mode === 'franquiciador') weekRev += (gd.franchise.royaltyWeekly || 0);
 
   // ── Costos setmanals ──
-  const emps = gd.employees || [];
   const salariesSetm = emps.filter(e => !e.en_vaga)
     .reduce((s, e) => s + (e.salary || 0) * 1.30, 0) / 4.33;
   const rent        = (gd.company?.monthlyRent || 0) / 4.33;
-  const machines    = gd.machines || [];
+  const machines2   = gd.machines || [];
   // ── Instal·lació maquinària ──
-  machines.forEach(m => {
+  machines2.forEach(m => {
     if (m.installing && m.installWeeksLeft > 0) {
       m.installWeeksLeft--;
       if (m.installWeeksLeft <= 0) {
@@ -3318,14 +3357,50 @@ window.advanceWeek = async function() {
       }
     }
   });
-  const maintenance = machines.filter(m => !m.installing).reduce((s, m) => s + (m.maintenance || 0), 0) / 4.33;
+  const maintenance = machines2.filter(m => !m.installing).reduce((s, m) => s + (m.maintenance || 0), 0) / 4.33;
   const loanPays    = (gd.finances.loans || []).reduce((s, l) => s + (l.monthlyPayment || 0) / 4.33, 0);
   const mktSpend    = Object.values(gd.marketing?.channels || {}).reduce((s, v) => s + v, 0) / 4.33;
   const provCosts   = (gd.proveidors || []).reduce((s, p) => s + (p.cost_mes || 0), 0) / 4.33;
   const impCosts    = (gd.trade?.imports || []).reduce((s, i) => s + (i.weeklyCost || 0), 0);
   const franchCost  = gd.franchise?.mode === 'franquiciat' ? weekRev * (gd.franchise.royaltyRate || 0.06) : 0;
 
-  const totalCosts = salariesSetm + rent + maintenance + loanPays + mktSpend + provCosts + impCosts + franchCost;
+  // ════ DESPESES NOVES ════
+  // Subministraments (aigua, llum, gas, internet) — proporcional a la mida
+  const surface = gd.company?.surface || 100;
+  const subministraments = (surface * 1.2 + totalEmpsActius * 25 + machinesOperatives.length * 80) / 4.33;
+  
+  // Impostos trimestrals (IVA, IS a compte, IAE)
+  let impostos = 0;
+  const weekInQuarter = ((gd.week - 1) % 13) + 1;
+  if (weekInQuarter === 13) { // Última setmana del trimestre
+    const trimRev = weekRev * 13;
+    const trimCosts = (salariesSetm + rent + maintenance + mktSpend + provCosts) * 13;
+    const trimResult = trimRev - trimCosts;
+    const ivaLiquidar = Math.max(0, trimRev * 0.21 - trimCosts * 0.21); // IVA net
+    const isAConta = Math.max(0, trimResult * 0.05); // Pagament fraccionat IS
+    const iae = 200; // Impost activitat econòmica fix trimestral
+    impostos = ivaLiquidar + isAConta + iae;
+    gd.notifications.push({id:Date.now()+Math.random(), icon:'🏛️', title:'Liquidació impostos trimestral', desc:`IVA: ${Math.round(ivaLiquidar)}€ · IS a/c: ${Math.round(isAConta)}€ · IAE: ${iae}€ — Total: ${Math.round(impostos)}€`, time:'S'+gd.week, urgent:false});
+  }
+  
+  // Pèrdues/beneficis inversions (borsa i cripto)
+  let investmentPL = 0;
+  const port = gd.portfolio || {stocks:{},crypto:{}};
+  Object.values(port.stocks || {}).forEach(s => { investmentPL += ((s.currentValue||0) - (s.invested||0)) * 0.01; }); // Mark-to-market setmanal
+  Object.values(port.crypto || {}).forEach(c => { investmentPL += ((c.currentValue||0) - (c.invested||0)) * 0.02; }); // Cripto més volàtil
+  
+  // Despeses extraordinàries (acomiadaments pendents, multes)
+  let extraordinary = 0;
+  if (gd._pendingFirings && gd._pendingFirings.length > 0) {
+    gd._pendingFirings.forEach(f => { extraordinary += f.severance || 0; });
+    gd._pendingFirings = [];
+  }
+  if (gd._pendingFines && gd._pendingFines.length > 0) {
+    gd._pendingFines.forEach(f => { extraordinary += f.amount || 0; });
+    gd._pendingFines = [];
+  }
+
+  const totalCosts = salariesSetm + rent + maintenance + loanPays + mktSpend + provCosts + impCosts + franchCost + subministraments + impostos + extraordinary - investmentPL;
   const weekResult = weekRev - totalCosts;
 
   // ── Actualitzar finances ──
@@ -3350,6 +3425,21 @@ window.advanceWeek = async function() {
     e.morale = gd.finances.cash < 0 ? Math.max(0,(e.morale||60)-4) : Math.min(100,(e.morale||60)+0.8);
     e.seniority = (e.seniority||0) + 1/52;
   });
+  
+  // Empleats que marxen voluntàriament (baixa moral + mercat laboral)
+  if (emps.length > 0) {
+    const toQuit = [];
+    emps.forEach((e, i) => {
+      if ((e.morale || 60) < 25 && Math.random() < 0.15) toQuit.push(i);
+      else if ((e.morale || 60) < 40 && (e.salary || 0) < 1200 && Math.random() < 0.06) toQuit.push(i);
+    });
+    toQuit.reverse().forEach(i => {
+      const e = emps[i];
+      gd.notifications.push({id:Date.now()+Math.random(), icon:'👋', title:'Baixa voluntària', desc:`${e.name} (${e.dept}) ha decidit marxar. Moral: ${Math.round(e.morale||0)}%`, time:'S'+gd.week, urgent:true});
+      showEventToast('👋', 'Empleat marxa!', e.name + ' ha dimitit', false);
+      emps.splice(i, 1);
+    });
+  }
 
   // ── Accionistes ──
   (gd.shareholders||[]).forEach(sh => {
@@ -3397,11 +3487,22 @@ window.advanceWeek = async function() {
 
   // ── Pèrdua clients ──
   if (gd.clients) {
+    const pendingClaims = (gd.claims || []).filter(c => !c.resolved).length;
     gd.clients = gd.clients.filter(cl => {
-      cl.satisfaction = Math.max(0,(cl.satisfaction||70)+(weekResult>=0?0.5:-2));
+      // Satisfacció afectada per: resultats, atenció, reclamacions, qualitat servei
+      let satChange = weekResult >= 0 ? 0.5 : -1.5;
+      if (empsAtencio === 0) satChange -= 2; // Ningú atén els clients!
+      if (pendingClaims > 2) satChange -= 1.5; // Reclamacions sense resoldre
+      if (empsVendes === 0) satChange -= 1; // Ningú fa seguiment comercial
+      cl.satisfaction = Math.max(0, Math.min(100, (cl.satisfaction||70) + satChange));
+      
       if (cl.satisfaction < 20 && Math.random() < 0.35) {
-        showEventToast("💔","Client perdut!",cl.name+" ha cancel·lat el contracte.",false);
+        showEventToast("💔","Client perdut!",cl.name+" ha cancel·lat el contracte per mal servei.",false);
+        gd.notifications.push({id:Date.now()+Math.random(), icon:'💔', title:'Client perdut', desc:cl.name+' ha marxat (satisfacció: '+Math.round(cl.satisfaction)+'%)', time:'S'+gd.week, urgent:true});
         return false;
+      }
+      if (cl.satisfaction < 35 && Math.random() < 0.10) {
+        showEventToast("😤","Client insatisfet!",cl.name+" amenitza amb marxar.",false);
       }
       return true;
     });
