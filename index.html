@@ -1731,7 +1731,6 @@ let G = {
 };
 // Exposar G globalment perquè els mòduls externs puguin accedir-hi
 window.G = G;
-window._db = null; // s'assigna després de Firebase init
 
 function defaultGameData(uid, displayName) {
   const now = new Date(); // DATA REAL DEL SISTEMA
@@ -2766,6 +2765,11 @@ function renderFinances() {
   const provCosts      = (gd.proveidors||[]).reduce((s,p) => s+(p.cost_mes||0), 0);
   const tradeImport    = (gd.trade?.imports||[]).reduce((s,i) => s+(i.weeklyCost||0)*4.33, 0);
   const franchRoyalty  = gd.franchise?.mode==='franquiciat' ? Math.round(rev*(gd.franchise?.royaltyRate||0.06)) : 0;
+  const machMaint      = (gd.machines||[]).filter(m=>!m.installing).reduce((s,m) => s+(m.maintenance||0), 0);
+  const surface        = gd.company?.surface || 100;
+  const totalEmps      = (gd.employees||[]).length;
+  const machCount      = (gd.machines||[]).filter(m=>!m.installing).length;
+  const subministraments = Math.round(surface * 1.2 + totalEmps * 25 + machCount * 80);
   
   document.getElementById('pyg-table').innerHTML = `
     <div class="bal-row" style="cursor:pointer" onclick="toggleFinDetail('ing-detail')">
@@ -2780,7 +2784,7 @@ function renderFinances() {
     </div>
     <div id="sal-detail" style="display:none">
       <div class="bal-row" style="padding-left:16px;opacity:.85">
-        <div class="bal-row-label" style="font-size:11px">↳ Nòmines brutes (${(gd.employees||[]).length} empleats)</div>
+        <div class="bal-row-label" style="font-size:11px">↳ Nòmines brutes (${totalEmps} empleats)</div>
         <div class="bal-row-val" style="color:var(--red);font-size:11px">-${salariesBrutes.toLocaleString('ca')}€</div>
       </div>
       <div class="bal-row" style="padding-left:16px;opacity:.85">
@@ -2790,6 +2794,8 @@ function renderFinances() {
     </div>
     
     <div class="bal-row"><div class="bal-row-label">Lloguer instal·lacions</div><div class="bal-row-val" style="color:var(--red)">-${rent.toLocaleString('ca')}€</div></div>
+    <div class="bal-row"><div class="bal-row-label">⚡ Subministraments (llum, aigua, gas, internet)</div><div class="bal-row-val" style="color:var(--red)">-${subministraments.toLocaleString('ca')}€</div></div>
+    ${machMaint > 0 ? `<div class="bal-row"><div class="bal-row-label">🔧 Manteniment maquinària</div><div class="bal-row-val" style="color:var(--red)">-${machMaint.toLocaleString('ca')}€</div></div>` : ''}
     ${provCosts > 0 ? `<div class="bal-row"><div class="bal-row-label">Cost proveïdors</div><div class="bal-row-val" style="color:var(--red)">-${provCosts.toLocaleString('ca')}€</div></div>` : ''}
     <div class="bal-row"><div class="bal-row-label">Màrqueting i publicitat</div><div class="bal-row-val" style="color:var(--red)">-${mktCost.toLocaleString('ca')}€</div></div>
     ${loanPayments > 0 ? `<div class="bal-row"><div class="bal-row-label">Quota préstecs / leasing</div><div class="bal-row-val" style="color:var(--red)">-${loanPayments.toLocaleString('ca')}€</div></div>` : ''}

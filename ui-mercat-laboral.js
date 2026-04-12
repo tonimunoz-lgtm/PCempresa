@@ -121,7 +121,7 @@ function buildLaborMarket() {
 
 
 // Override openHireModal with shared market
-window.openHireModal = function() {
+function openHireModalShared() {
   var market = buildLaborMarket();
   window._hireCandidates = market;
   
@@ -189,7 +189,7 @@ function renderCandidateCard(c, idx, isPoach) {
 }
 
 // Override hireCandidate with negotiation for poaching
-window.hireCandidate = async function(idx) {
+async function hireCandidateShared(idx) {
   var c = window._hireCandidates && window._hireCandidates[idx];
   if (!c) return;
   var gd = getG().gameData;
@@ -278,7 +278,7 @@ window.hireCandidate = async function(idx) {
 // ════════════════════════════════════════════════════════════
 
 // Override joinFranchise
-window.joinFranchise = async function(franchiseId) {
+async function joinFranchiseNego(franchiseId) {
   var gd = getG().gameData;
   var FRANCHISES = window.FRANCHISES_DATA || [];
   var fr = FRANCHISES.find(function(f) { return f.id === franchiseId; });
@@ -310,7 +310,7 @@ window.joinFranchise = async function(franchiseId) {
 };
 
 // Override recruitFranchisee
-window.recruitFranchisee = async function() {
+async function recruitFranchiseeNego() {
   var gd = getG().gameData;
   var fr = gd.franchise;
   if (!fr) return;
@@ -340,7 +340,7 @@ window.recruitFranchisee = async function() {
 // ════════════════════════════════════════════════════════════
 
 // Override startExport
-window.startExport = async function(countryCode, weeklyValue, setupCost) {
+async function startExportNego(countryCode, weeklyValue, setupCost) {
   var gd = getG().gameData;
   if ((gd.finances?.cash||0) < setupCost) { showToast('❌ Necessites ' + fmt(setupCost) + '€'); return; }
   
@@ -410,7 +410,7 @@ window.startExport = async function(countryCode, weeklyValue, setupCost) {
 };
 
 // Override startImport
-window.startImport = async function(id, name, weeklyCost, saving) {
+async function startImportNego(id, name, weeklyCost, saving) {
   var gd = getG().gameData;
   var emps = gd.employees || [];
   
@@ -488,10 +488,25 @@ var attempts = 0;
 function tryInit() {
   attempts++;
   if (attempts > 60) return;
-  if (!window.G || !window.advanceWeek || !document.querySelector('.sidebar')) {
+  if (!window.G || !window.advanceWeek || !window.openHireModal || !document.querySelector('.sidebar')) {
     setTimeout(tryInit, 500);
     return;
   }
+  
+  // Store originals before overriding
+  var _origOpenHire = window.openHireModal;
+  var _origJoinFranchise = window.joinFranchise;
+  var _origRecruitFranchisee = window.recruitFranchisee;
+  var _origStartExport = window.startExport;
+  var _origStartImport = window.startImport;
+  
+  // NOW override (after module has defined them)
+  window.openHireModal = openHireModalShared;
+  window.hireCandidate = hireCandidateShared;
+  window.joinFranchise = joinFranchiseNego;
+  window.recruitFranchisee = recruitFranchiseeNego;
+  window.startExport = startExportNego;
+  window.startImport = startImportNego;
   
   hookAdvanceWeekLabor();
   console.log('👥 EmpresaBat Mercat Laboral + Negociacions carregat');
