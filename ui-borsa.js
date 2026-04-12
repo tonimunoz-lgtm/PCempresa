@@ -37,6 +37,7 @@ async function fetchRealCryptoPrices() {
 }
 
 function genHistory(base, vol, n) {
+  base = parseFloat(base) || 1; vol = parseFloat(vol) || 0.03;
   var h=[base]; for(var i=1;i<n;i++) h.push(Math.max(0.001, h[i-1]*(1+(Math.random()-0.48)*vol))); return h;
 }
 
@@ -48,7 +49,9 @@ async function initBorsaPrices() {
   });
   getCRYPTOS().forEach(function(c){
     var k='c_'+c.symbol;
-    borsaPrices[k] = (realCryptoPrices && realCryptoPrices[c.symbol]) ? realCryptoPrices[c.symbol].price : c.basePrice*(0.8+Math.random()*0.4);
+    var realP = (realCryptoPrices && realCryptoPrices[c.symbol]) ? realCryptoPrices[c.symbol].price : null;
+    var baseP = parseFloat(realP) || parseFloat(c.basePrice) || 1;
+    borsaPrices[k] = realP ? baseP : baseP*(0.8+Math.random()*0.4);
     priceHistory[k]=genHistory(borsaPrices[k], c.volatility, 30);
   });
   initialized=true;
@@ -60,8 +63,8 @@ async function initBorsaPrices() {
   }, 15*60*1000);
 }
 
-function fluctuate(k,v){ borsaPrices[k]=Math.max(0.001,borsaPrices[k]*(1+(Math.random()-0.48)*v)); return borsaPrices[k]; }
-function miniChart(d){ if(!d||d.length<2)return''; var mn=Math.min.apply(null,d),mx=Math.max.apply(null,d),r=mx-mn||1,W=100,H=35; var pts=d.map(function(v,i){return(i/(d.length-1))*W+','+(H-((v-mn)/r)*H);}).join(' '); var up=d[d.length-1]>=d[0]; return '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none"><polyline points="'+pts+'" fill="none" stroke="'+(up?'#10b981':'#ef4444')+'" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'; }
+function fluctuate(k,v){ var p=borsaPrices[k]; if(!p||!isFinite(p))p=1; borsaPrices[k]=Math.max(0.001,p*(1+(Math.random()-0.48)*v)); return borsaPrices[k]; }
+function miniChart(d){ if(!d||d.length<2)return''; d=d.filter(function(v){return typeof v==='number'&&isFinite(v);}); if(d.length<2)return''; var mn=Math.min.apply(null,d),mx=Math.max.apply(null,d),r=mx-mn||1,W=100,H=35; var pts=d.map(function(v,i){return(i/(d.length-1))*W+','+(H-((v-mn)/r)*H);}).join(' '); var up=d[d.length-1]>=d[0]; return '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none"><polyline points="'+pts+'" fill="none" stroke="'+(up?'#10b981':'#ef4444')+'" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'; }
 
 window.renderBorsa = async function() {
   var gd=getG()?.gameData; if(!gd){document.getElementById('tab-borsa').innerHTML='<div style="padding:40px;text-align:center;color:var(--text2)">Carregant...</div>';return;}
