@@ -2871,15 +2871,20 @@ function renderHR() {
     const ssEmp  = Math.round((e.salary||0) * 0.30);
     const costTotal = (e.salary||0) + ssEmp;
     const vagaBadge = e.en_vaga ? '<span style="background:var(--red);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:10px;margin-left:6px">EN VAGA</span>' : '';
+    const incorpBadge = e.incorporating ? '<span style="background:rgba(245,158,11,.2);color:var(--gold);font-size:9px;font-weight:800;padding:2px 6px;border-radius:10px;margin-left:6px">📋 INCORPORANT-SE</span>' : '';
+    const langs = (e.languages||[]).slice(0,3).map(l=>'<span style="display:inline-block;background:rgba(79,127,255,.08);border-radius:8px;padding:1px 5px;font-size:8px;color:var(--accent);margin:1px">'+l+'</span>').join('');
+    const skills = (e.skills||[]).slice(0,2).map(s=>'<span style="display:inline-block;background:rgba(255,255,255,.04);border-radius:8px;padding:1px 5px;font-size:8px;color:var(--text3);margin:1px">'+s+'</span>').join('');
     return `
-      <div class="emp-card" style="${e.en_vaga ? 'border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.04)' : ''}">
+      <div class="emp-card" style="${e.en_vaga ? 'border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.04)' : e.incorporating ? 'border-color:rgba(245,158,11,.3);opacity:.7' : ''}">
         <div class="emp-avatar" style="background:${e.nivel==='directiu'?'linear-gradient(135deg,var(--gold),#d97706)':e.nivel==='intermedi'?'linear-gradient(135deg,var(--accent),var(--accent2))':'linear-gradient(135deg,#374151,#1f2937)'}">${e.avatar||e.emoji||'👤'}</div>
         <div class="emp-info">
-          <div class="emp-name">${e.name}${vagaBadge}</div>
+          <div class="emp-name">${e.name}${vagaBadge}${incorpBadge}</div>
           <div class="emp-role">${e.dept?.toUpperCase()||'—'} · ${e.role||e.name} · ${Math.round(e.seniority||0)} anys</div>
+          ${langs?'<div style="margin-top:3px">'+langs+'</div>':''}
+          ${skills?'<div style="margin-top:2px">'+skills+'</div>':''}
           <div style="font-size:11px;margin-top:4px">
             <span class="emp-salary">${(e.salary||0).toLocaleString('ca')}€</span>
-            <span style="color:var(--text3);margin-left:6px">+SS ${ssEmp.toLocaleString('ca')}€ = <strong style="color:var(--red)">${costTotal.toLocaleString('ca')}€/mes empresa</strong></span>
+            <span style="color:var(--text3);margin-left:6px">+SS ${ssEmp.toLocaleString('ca')}€ = <strong style="color:var(--red)">${costTotal.toLocaleString('ca')}€/mes</strong></span>
           </div>
           <div class="emp-morale" style="display:flex;align-items:center;gap:8px;margin-top:5px">
             <div class="morale-bar"><div class="morale-fill" style="width:${e.morale||60}%;background:${moraleColor}"></div></div>
@@ -2888,7 +2893,7 @@ function renderHR() {
         </div>
         <div class="emp-actions" style="display:flex;flex-direction:column;gap:4px">
           <button class="emp-btn raise" data-eid="${e.id}" onclick="raiseEmployee(this.dataset.eid)">💰 Pujada</button>
-          <button class="emp-btn fire"  data-eid="${e.id}" onclick="fireEmployee(this.dataset.eid)">❌ Acomiadar</button>
+          <button class="emp-btn fire"  data-eid="${e.id}" onclick="fireEmployee(this.dataset.eid)" ${e.incorporating?'disabled style="opacity:.4"':''}>❌ Acomiadar</button>
         </div>
       </div>`;
   }
@@ -3314,12 +3319,13 @@ window.advanceWeek = async function() {
 
   // ════ FACTOR FORÇA LABORAL ════
   // Sense empleats, la producció i serveis no funcionen
-  const empsProduccio = emps.filter(e => e.dept === 'produccio' && !e.en_vaga).length;
-  const empsVendes    = emps.filter(e => e.dept === 'vendes' && !e.en_vaga).length;
-  const empsAdmin     = emps.filter(e => e.dept === 'administracio' && !e.en_vaga).length;
-  const empsAtencio   = emps.filter(e => e.dept === 'atencio_client' && !e.en_vaga).length;
-  const empsMarketing = emps.filter(e => e.dept === 'marketing' && !e.en_vaga).length;
-  const totalEmpsActius = emps.filter(e => !e.en_vaga).length;
+  const empsProduccio = emps.filter(e => e.dept === 'produccio' && !e.en_vaga && !e.incorporating).length;
+  const empsVendes    = emps.filter(e => e.dept === 'vendes' && !e.en_vaga && !e.incorporating).length;
+  const empsAdmin     = emps.filter(e => e.dept === 'administracio' && !e.en_vaga && !e.incorporating).length;
+  const empsAtencio   = emps.filter(e => e.dept === 'atencio_client' && !e.en_vaga && !e.incorporating).length;
+  const empsMarketing = emps.filter(e => e.dept === 'marketing' && !e.en_vaga && !e.incorporating).length;
+  const empsComercExt = emps.filter(e => e.dept === 'comerc_ext' && !e.en_vaga && !e.incorporating).length;
+  const totalEmpsActius = emps.filter(e => !e.en_vaga && !e.incorporating).length;
   
   // Factor laboral: si no hi ha ningú treballant, no hi ha ingressos
   const laborFactor = totalEmpsActius === 0 ? 0 : Math.min(1, totalEmpsActius / Math.max(3, (gd._optimalEmployees || 5)));
@@ -3981,6 +3987,7 @@ window.generateShareholders = generateShareholders;
 <script defer src="ui-laborals.js"></script>
 <script defer src="ui-rdi.js"></script>
 <script defer src="ui-advanced.js"></script>
+<script defer src="ui-mercat-laboral.js"></script>
 <script defer src="icons-gamification.js"></script>
 </body>
 </html>
