@@ -422,7 +422,10 @@ css.textContent = `
 .kpi-icon svg { width: 22px; height: 22px; }
 .kpi-icon { color: var(--accent); }
 .dept-icon svg { width: 22px; height: 22px; }
-.tstat svg { width: 14px; height: 14px; flex-shrink: 0; }
+.tstat svg, .tstat-icon svg { width: 14px; height: 14px; flex-shrink: 0; }
+.tstat-icon { display: inline-flex; align-items: center; }
+.btn-icon { display: inline-flex; align-items: center; }
+.btn-icon svg { width: 14px; height: 14px; }
 
 /* ── XP Bar a la topbar ── */
 .xp-bar-wrap {
@@ -581,87 +584,26 @@ document.head.appendChild(css);
 
 // Esperar que el DOM estigui llest i l'app carregada
 function patchUI() {
-  // ── Sidebar navigation icons ──
-  const navMap = {
-    'nav-dashboard': 'dashboard',
-    'nav-setup': 'empresa',
-    'nav-finances': 'finances',
-    'nav-hr': 'rrhh',
-    'nav-production': 'produccio',
-    'nav-marketing': 'marketing',
-    'nav-sales': 'vendes',
-    'nav-map': 'mapa',
-    'nav-borsa': 'borsa',
-    'nav-junta': 'junta',
-    'nav-trade': 'comerc',
-    'nav-franquicies': 'franquicies',
-    'nav-proveidors': 'proveidors',
-    'nav-laborals': 'laborals',
-    'nav-professor': 'professor',
-  };
-  
-  for (const [id, iconName] of Object.entries(navMap)) {
-    const btn = document.getElementById(id);
-    if (btn) {
-      const iconEl = btn.querySelector('.nav-icon');
-      if (iconEl) iconEl.innerHTML = icon(iconName, 20);
-    }
-  }
-  
-  // ── Topbar brand ──
-  const brandIcon = document.querySelector('.topbar-brand-icon');
-  if (brandIcon) brandIcon.innerHTML = icon('logo', 22);
-  
-  // ── Topbar stats ──
-  const stats = document.querySelectorAll('.tstat');
-  const statIcons = [icon('calendari',14), icon('tresoreria',14), icon('resultat',14), icon('prestigi',14), icon('empleats',14)];
-  stats.forEach((s, i) => {
-    if (statIcons[i]) {
-      const text = s.innerHTML;
-      // Reemplaçar el primer emoji amb la icona SVG
-      s.innerHTML = text.replace(/^[^\w<]*/, statIcons[i] + ' ');
-    }
+  // ── Universal: patch tots els elements amb data-icon ──
+  document.querySelectorAll('[data-icon]').forEach(el => {
+    const name = el.dataset.icon;
+    if (!ICONS[name]) return;
+    // Determinar mida segons context
+    let size = 20;
+    if (el.classList.contains('nav-icon')) size = 20;
+    else if (el.classList.contains('kpi-icon')) size = 22;
+    else if (el.classList.contains('tstat-icon')) size = 14;
+    else if (el.classList.contains('btn-icon')) size = 14;
+    else if (el.classList.contains('loading-logo')) size = 56;
+    else if (el.classList.contains('auth-logo-icon')) size = 56;
+    else if (el.classList.contains('topbar-brand-icon')) size = 22;
+    else if (el.classList.contains('dept-icon')) size = 22;
+    el.innerHTML = icon(name, size);
   });
-  
-  // ── Avançar setmana ──
-  const advBtn = document.querySelector('.week-advance-btn');
-  if (advBtn) advBtn.innerHTML = icon('avançar', 14) + ' Avançar setmana';
-  
-  // ── Profile button ──
-  const profBtn = document.querySelector('.profile-btn');
-  if (profBtn) {
-    const nameSpan = profBtn.querySelector('#profile-name');
-    profBtn.innerHTML = '';
-    const svgSpan = document.createElement('span');
-    svgSpan.innerHTML = icon('perfil', 16);
-    profBtn.appendChild(svgSpan);
-    profBtn.appendChild(document.createTextNode(' '));
-    if (nameSpan) profBtn.appendChild(nameSpan);
-    else {
-      const ns = document.createElement('span');
-      ns.id = 'profile-name';
-      ns.textContent = '—';
-      profBtn.appendChild(ns);
-    }
-  }
-  
-  // ── KPI icons ──
-  const kpiMap = ['kpi_cash', 'kpi_rev', 'kpi_costs', 'kpi_prestigi', 'kpi_result'];
-  document.querySelectorAll('.kpi-icon').forEach((el, i) => {
-    if (kpiMap[i]) el.innerHTML = icon(kpiMap[i], 22);
-  });
-  
-  // ── Loading screen ──
-  const loadLogo = document.querySelector('.loading-logo');
-  if (loadLogo) loadLogo.innerHTML = icon('logo', 56);
-  
-  // ── Auth screen ──
-  const authLogo = document.querySelector('.auth-logo-icon');
-  if (authLogo) authLogo.innerHTML = icon('logo', 56);
   
   // ── Injectar barra XP a la topbar ──
   const topbarRight = document.querySelector('.topbar-right');
-  if (topbarRight) {
+  if (topbarRight && !document.getElementById('xp-bar-fill')) {
     const xpWrap = document.createElement('div');
     xpWrap.className = 'xp-bar-wrap';
     xpWrap.innerHTML = `
@@ -674,7 +616,7 @@ function patchUI() {
   
   // ── Streak badge (al costat de la setmana) ──
   const weekDisplay = document.getElementById('week-display');
-  if (weekDisplay) {
+  if (weekDisplay && !document.getElementById('streak-badge')) {
     const streakEl = document.createElement('div');
     streakEl.className = 'streak-badge';
     streakEl.id = 'streak-badge';
@@ -796,10 +738,11 @@ function hookDashboard() {
 let patchAttempts = 0;
 function tryPatch() {
   patchAttempts++;
-  if (patchAttempts > 30) return; // Max 15s d'espera
+  if (patchAttempts > 60) return; // Max 30s d'espera
   
-  // Esperar que l'app estigui carregada
-  if (!document.querySelector('.sidebar') || !window.G) {
+  // Esperar que l'app estigui carregada (module script ha d'haver executat)
+  const ready = document.querySelector('.sidebar') && window.G && window.advanceWeek && window.renderDashboard;
+  if (!ready) {
     setTimeout(tryPatch, 500);
     return;
   }
@@ -825,9 +768,9 @@ function tryPatch() {
   console.log('🎮 EmpresaBat Gamificació + Icones SVG carregat!');
 }
 
-// Començar a intentar
+// Començar a intentar (module scripts s'executen després de defer)
 if (document.readyState === 'complete') tryPatch();
-else window.addEventListener('load', () => setTimeout(tryPatch, 300));
+else window.addEventListener('load', () => setTimeout(tryPatch, 500));
 
 // Exposar funcions per ús extern
 window.EBGamification = {
