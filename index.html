@@ -2801,6 +2801,7 @@ function renderFinances() {
     ${loanPayments > 0 ? `<div class="bal-row"><div class="bal-row-label">Quota préstecs / leasing</div><div class="bal-row-val" style="color:var(--red)">-${loanPayments.toLocaleString('ca')}€</div></div>` : ''}
     ${tradeImport > 0 ? `<div class="bal-row"><div class="bal-row-label">Importacions internacionals</div><div class="bal-row-val" style="color:var(--red)">-${Math.round(tradeImport).toLocaleString('ca')}€</div></div>` : ''}
     ${franchRoyalty > 0 ? `<div class="bal-row"><div class="bal-row-label">Royalties franquícia</div><div class="bal-row-val" style="color:var(--red)">-${franchRoyalty.toLocaleString('ca')}€</div></div>` : ''}
+    ${(gd._lastFiringCosts||0) > 0 ? `<div class="bal-row"><div class="bal-row-label">❌ Acomiadaments (indemnitzacions)</div><div class="bal-row-val" style="color:var(--red)">-${(gd._lastFiringCosts||0).toLocaleString('ca')}€</div></div>` : ''}
     <div class="bal-row total"><div class="bal-row-label">Resultat mensual</div><div class="bal-row-val" style="color:${result>=0?'var(--green)':'var(--red)'};">${result>=0?'+':''}${Math.round(result).toLocaleString('ca')}€</div></div>`;
   
   // IS estimat
@@ -2942,8 +2943,10 @@ window.fireEmployee = async function(id) {
   G.gameData.employees = G.gameData.employees.filter(e => e.id !== id);
   const totalCost = indemnity + Math.round((emp.salary||0)/2);
   G.gameData.finances.cash -= totalCost;
-  // Registrar com a despesa extraordinària
+  // Registrar com a despesa extraordinària per mostrar al P&G
   if (!G.gameData._pendingFirings) G.gameData._pendingFirings = [];
+  G.gameData._pendingFirings.push({ name: emp.name, severance: totalCost });
+  G.gameData._lastFiringCosts = (G.gameData._lastFiringCosts || 0) + totalCost;
   G.gameData.notifications.push({id:Date.now(), icon:'❌', title:'Empleat acomiadat', desc:`${emp.name} (${emp.dept}) — Indemnització: ${indemnity.toLocaleString('ca')}€`, time:'S'+G.gameData.week, urgent:false});
   await saveGameData();
   renderHR(); renderDashboard(); renderFinances();
