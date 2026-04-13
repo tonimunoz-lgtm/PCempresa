@@ -984,42 +984,56 @@ window._resolveInteractiveEvent = function(choiceIdx) {
 //  MÒDUL D: TUTORIAL INTERACTIU
 // ════════════════════════════════════════════════════════════
 
+// Tutorial steps — cada pas pot tenir un 'tab' per navegar-hi primer
 const TUTORIAL_STEPS = [
   {
-    target: '.topbar-brand',
-    title: 'Benvingut/da a EmpresaBat!',
-    text: 'Aquí gestionaràs la teva pròpia empresa. T\'ajudem a fer els primers passos?',
-    arrow: 'bottom',
+    target: null,
+    tab: null,
+    title: '👋 Benvingut/da a EmpresaBat!',
+    text: 'En aquest simulador gestionaràs la teva pròpia empresa al Vallès. Prendràs decisions reals: contractar, invertir, vendre, demanar préstecs... T\'ensenyem com funciona?',
+    img: '🏢',
   },
   {
-    target: '#nav-setup',
-    title: 'Crea la teva empresa',
-    text: 'Primer de tot, clica aquí per escollir: crear una empresa nova o ser contractat/da per una ja existent.',
-    arrow: 'left',
-  },
-  {
-    target: '.week-advance-btn',
-    title: 'Avançar el temps',
-    text: 'Cada cop que cliques aquí, passa una setmana. L\'empresa genera ingressos, paga costos i passen coses!',
-    arrow: 'bottom',
-  },
-  {
-    target: '.topbar-stats',
-    title: 'Els teus indicadors clau',
-    text: 'Aquí veus la tresoreria (diners disponibles), el resultat mensual i el prestigi. Vigila-ho!',
-    arrow: 'bottom',
+    target: '#tab-setup',
+    tab: 'setup',
+    title: '🚀 El primer pas: tria el teu camí',
+    text: 'Aquí decideixes com començar. Pots <strong>crear la teva empresa des de zero</strong> (més complex) o <strong>ser contractat/da</strong> per una empresa existent del Vallès. Tria la que vulguis!',
+    img: '🎯',
   },
   {
     target: '.sidebar',
-    title: 'Els departaments',
-    text: 'Cada pestanya és un departament: Finances, RRHH, Producció, Màrqueting... Alguns es desbloquejaran quan cresquis!',
-    arrow: 'left',
+    tab: null,
+    title: '📋 El menú lateral',
+    text: 'Aquestes icones són els <strong>departaments de la teva empresa</strong>: Finances, RRHH, Producció, Màrqueting, Vendes... Al principi només en tindràs alguns. <strong>Se\'n desbloquejaran més</strong> a mesura que cresquis!',
+    img: '📂',
+  },
+  {
+    target: '.topbar',
+    tab: null,
+    title: '📊 La barra superior',
+    text: 'Aquí veus les <strong>dades clau</strong> de la teva empresa en tot moment: la setmana actual, la tresoreria (diners disponibles), el resultat mensual i el prestigi. Si el resultat és verd, vas bé!',
+    img: '💰',
+  },
+  {
+    target: '.week-advance-btn',
+    tab: null,
+    title: '⏩ Avançar el temps',
+    text: 'Aquest botó fa <strong>passar una setmana</strong>. L\'empresa cobrarà clients, pagarà sous, i passaran coses. Cada setmana és una oportunitat de prendre decisions. <strong>Prova\'l quan tinguis empresa!</strong>',
+    img: '⏱️',
   },
   {
     target: null,
-    title: 'Missió activa 🎯',
-    text: 'Al dashboard sempre tindràs una missió activa que et diu què fer. Segueix-les per aprendre jugant! Molta sort!',
-    arrow: 'bottom',
+    tab: null,
+    title: '🎯 Les missions et guien!',
+    text: 'Al <strong>Dashboard</strong> sempre tindràs una <strong>missió activa</strong> que t\'indica què fer a continuació. Segueix-les per aprendre tots els conceptes econòmics jugant. Cada missió dóna XP i recompenses!',
+    img: '🏆',
+  },
+  {
+    target: null,
+    tab: null,
+    title: '🏁 A jugar!',
+    text: 'Ara ja ho saps tot. Comença triant el teu camí empresarial. Recorda: el <strong>rànquing</strong> compara la teva empresa amb les dels companys de classe. Molta sort i bona gestió!',
+    img: '🚀',
   },
 ];
 
@@ -1042,50 +1056,110 @@ function showTutorialStep() {
   
   const step = TUTORIAL_STEPS[tutorialStep];
   
+  // Navegar al tab correcte si cal
+  if (step.tab && typeof window.showTab === 'function') {
+    window.showTab(step.tab);
+  }
+  
   // Eliminar overlay anterior
   if (tutorialOverlay) tutorialOverlay.remove();
   
-  tutorialOverlay = document.createElement('div');
-  tutorialOverlay.className = 'tutorial-overlay';
-  tutorialOverlay.style.pointerEvents = 'all';
+  // Petit delay per deixar que el DOM es renderitzi
+  setTimeout(() => {
+    _renderTutorialBubble(step);
+  }, step.tab ? 300 : 50);
+}
+
+function _renderTutorialBubble(step) {
+  if (tutorialOverlay) tutorialOverlay.remove();
   
-  // Spotlight
+  tutorialOverlay = document.createElement('div');
+  tutorialOverlay.style.cssText = 'position:fixed;inset:0;z-index:300;pointer-events:none;';
+  
+  // Spotlight sobre l'element target si existeix
   let spotlightHTML = '';
-  let bubbleStyle = 'left:50%;top:50%;transform:translate(-50%,-50%)';
-  let arrowClass = 'arrow-top';
+  let bubblePos = {};
+  let targetFound = false;
   
   if (step.target) {
     const el = document.querySelector(step.target);
     if (el) {
       const rect = el.getBoundingClientRect();
-      spotlightHTML = `<div class="tutorial-spotlight" style="
-        left:${rect.left-6}px;top:${rect.top-6}px;
-        width:${rect.width+12}px;height:${rect.height+12}px;
-      "></div>`;
+      targetFound = true;
       
-      if (step.arrow === 'bottom') {
-        bubbleStyle = `left:${Math.min(rect.left, window.innerWidth-380)}px;top:${rect.bottom+20}px`;
-        arrowClass = 'arrow-top';
-      } else if (step.arrow === 'left') {
-        bubbleStyle = `left:${rect.right+20}px;top:${rect.top}px`;
-        arrowClass = 'arrow-left';
+      // Overlay fosc amb forat
+      spotlightHTML = `
+        <div style="position:fixed;inset:0;pointer-events:all;z-index:300" onclick="event.stopPropagation()">
+          <svg style="position:fixed;inset:0;width:100%;height:100%">
+            <defs>
+              <mask id="tut-mask">
+                <rect width="100%" height="100%" fill="white"/>
+                <rect x="${rect.left-8}" y="${rect.top-8}" width="${rect.width+16}" height="${rect.height+16}" rx="12" fill="black"/>
+              </mask>
+            </defs>
+            <rect width="100%" height="100%" fill="rgba(0,0,0,0.7)" mask="url(#tut-mask)"/>
+          </svg>
+          <div style="position:fixed;left:${rect.left-10}px;top:${rect.top-10}px;width:${rect.width+20}px;height:${rect.height+20}px;
+            border:2px solid var(--accent);border-radius:14px;box-shadow:0 0 30px rgba(79,127,255,.3);pointer-events:none;z-index:301"></div>
+        </div>`;
+      
+      // Posicionar bombolla a la dreta o a sota de l'element
+      if (rect.right + 400 < window.innerWidth) {
+        bubblePos = { left: rect.right + 20, top: Math.max(20, rect.top - 20) };
+      } else if (rect.bottom + 250 < window.innerHeight) {
+        bubblePos = { left: Math.max(20, rect.left), top: rect.bottom + 20 };
+      } else {
+        bubblePos = { left: Math.max(20, Math.min(rect.left, window.innerWidth - 400)), top: Math.max(20, rect.top - 260) };
       }
     }
   }
   
+  // Si no hi ha target o no s'ha trobat, centrar
+  if (!targetFound) {
+    spotlightHTML = `<div style="position:fixed;inset:0;background:rgba(0,0,0,0.75);pointer-events:all;z-index:300" onclick="event.stopPropagation()"></div>`;
+    bubblePos = { left: '50%', top: '50%', transform: 'translate(-50%,-50%)' };
+  }
+  
+  const totalSteps = TUTORIAL_STEPS.length;
   const dots = TUTORIAL_STEPS.map((_, i) => 
-    `<div class="tutorial-dot ${i < tutorialStep ? 'done' : i === tutorialStep ? 'active' : ''}"></div>`
+    `<div style="width:${i===tutorialStep?'20px':'8px'};height:8px;border-radius:4px;background:${i<tutorialStep?'var(--green)':i===tutorialStep?'var(--accent)':'rgba(255,255,255,.15)'};transition:.3s"></div>`
   ).join('');
+  
+  const posStyle = bubblePos.transform 
+    ? `left:${bubblePos.left};top:${bubblePos.top};transform:${bubblePos.transform}`
+    : `left:${bubblePos.left}px;top:${bubblePos.top}px`;
   
   tutorialOverlay.innerHTML = `
     ${spotlightHTML}
-    <div class="tutorial-bubble ${arrowClass}" style="${bubbleStyle}">
-      <div class="tutorial-bubble-title">${step.title}</div>
-      <div class="tutorial-bubble-text">${step.text}</div>
-      <div class="tutorial-bubble-actions">
-        ${tutorialStep > 0 ? '<button class="tutorial-btn secondary" onclick="window._tutorialPrev()">← Anterior</button>' : ''}
-        <button class="tutorial-btn primary" onclick="window._tutorialNext()">${tutorialStep < TUTORIAL_STEPS.length-1 ? 'Següent →' : 'Començar! 🚀'}</button>
-        <div class="tutorial-steps">${dots}</div>
+    <div style="position:fixed;${posStyle};z-index:302;pointer-events:all;
+      background:linear-gradient(135deg,rgba(14,20,45,.98),rgba(20,28,60,.98));
+      border:1px solid var(--accent);border-radius:18px;padding:24px;max-width:380px;width:calc(100vw - 40px);
+      box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 40px rgba(79,127,255,.15);
+      animation:slideUp .4s ease" id="tutorial-bubble-el">
+      
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+        <div style="font-size:36px;flex-shrink:0;animation:float 2s ease-in-out infinite">${step.img || '📘'}</div>
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:1px;margin-bottom:2px">PAS ${tutorialStep+1} DE ${totalSteps}</div>
+          <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--text);line-height:1.3">${step.title}</div>
+        </div>
+      </div>
+      
+      <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:18px">${step.text}</div>
+      
+      <div style="display:flex;gap:4px;margin-bottom:14px;justify-content:center">${dots}</div>
+      
+      <div style="display:flex;gap:8px;align-items:center">
+        ${tutorialStep > 0 ? '<button class="tutorial-btn secondary" onclick="window._tutorialPrev()" style="padding:10px 16px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)">← Anterior</button>' : ''}
+        <button onclick="window._tutorialNext()" style="flex:1;padding:10px 20px;background:var(--accent);border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);transition:.2s">
+          ${tutorialStep < TUTORIAL_STEPS.length-1 ? 'Següent →' : '🚀 Començar a jugar!'}
+        </button>
+      </div>
+      
+      <div style="text-align:center;margin-top:10px">
+        <button onclick="window._tutorialSkip()" style="background:none;border:none;color:var(--text3);font-size:11px;cursor:pointer;font-family:var(--font);text-decoration:underline">
+          Saltar tutorial
+        </button>
       </div>
     </div>`;
   
@@ -1100,6 +1174,9 @@ window._tutorialPrev = function() {
   tutorialStep = Math.max(0, tutorialStep - 1);
   showTutorialStep();
 };
+window._tutorialSkip = function() {
+  endTutorial();
+};
 
 function endTutorial() {
   if (tutorialOverlay) tutorialOverlay.remove();
@@ -1109,7 +1186,9 @@ function endTutorial() {
     gd._tutorialDone = true;
     saveGameData();
   }
-  showToast('🎓 Tutorial completat! Ara ets lliure d\'explorar!');
+  // Tornar al setup per començar
+  if (window.showTab) window.showTab('setup');
+  showToast('🎓 Tutorial completat! Ara tria el teu camí empresarial!');
 }
 
 
