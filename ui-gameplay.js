@@ -1152,6 +1152,9 @@ function checkTabUnlocked(tabId, gd) {
   return unlocked;
 }
 
+// Set per guardar quins tabs estan bloquejats (NO toquem mai l'onclick dels botons)
+const _lockedTabs = new Set();
+
 function updateTabLocks() {
   const gd = getG()?.gameData;
   if (!gd || !gd.mode) return;
@@ -1162,25 +1165,18 @@ function updateTabLocks() {
     const nav = document.getElementById('nav-' + tabId);
     if (!nav) return;
     
-    const wasLocked = nav.classList.contains('locked');
+    const wasLocked = _lockedTabs.has(tabId);
     const isUnlocked = checkTabUnlocked(tabId, gd);
     
     if (isUnlocked) {
       nav.classList.remove('locked');
-      nav.onclick = null; // Permetre click normal
+      _lockedTabs.delete(tabId);
       if (wasLocked) {
         justUnlocked.push(tabId);
       }
     } else {
       nav.classList.add('locked');
-      const cond = TAB_UNLOCK_CONDITIONS[tabId];
-      // Override click per mostrar tooltip
-      nav.onclick = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        showToast('🔒 ' + (cond.desc || 'Secció bloquejada'));
-        return false;
-      };
+      _lockedTabs.add(tabId);
     }
   });
   
@@ -1195,11 +1191,42 @@ function updateTabLocks() {
         setTimeout(() => { nav.style.borderColor = ''; nav.style.animation = ''; }, 3000);
       });
     }
-    const cond = TAB_UNLOCK_CONDITIONS[tabId];
     showEventToast('🔓', 'Nova secció!', `Has desbloquejat: ${tabId.toUpperCase()}`, true);
     showToast('🔓 Nova secció desbloquejada: ' + tabId);
   });
 }
+
+// Interceptor al sidebar — capturem el click ABANS que arribi al botó
+// Si el tab està bloquejat, bloquegem l'event. Si no, el deixem passar.
+(function installSidebarInterceptor() {
+  function tryInstall() {
+    const sidebar = document.querySelector('.sidebar');
+    if (!sidebar) { setTimeout(tryInstall, 500); return; }
+    
+    sidebar.addEventListener('click', function(e) {
+      // Trobar el nav-btn clicat (pot ser un fill)
+      const btn = e.target.closest('.nav-btn');
+      if (!btn) return;
+      
+      // Extreure el tabId del id="nav-xxx"
+      const tabId = btn.id?.replace('nav-', '');
+      if (!tabId) return;
+      
+      // Si està bloquejat, cancel·lar l'event
+      if (_lockedTabs.has(tabId)) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        const cond = TAB_UNLOCK_CONDITIONS[tabId];
+        showToast('🔒 ' + (cond?.desc || 'Secció bloquejada'));
+        return false;
+      }
+      // Si no està bloquejat, deixar passar — l'onclick="showTab(...)" original funciona
+    }, true); // 'true' = fase de CAPTURA, s'executa ABANS que l'onclick inline
+    
+    console.log('🔒 Sidebar interceptor instal·lat');
+  }
+  tryInstall();
+})();
 
 
 // ════════════════════════════════════════════════════════════
@@ -1546,44 +1573,67 @@ function checkRetention(gd) {
 //  INTEGRACIÓ AMB EL JOC PRINCIPAL
 // ════════════════════════════════════════════════════════════
 
-// Hook a advanceWeek
-const originalAdvanceWeek = window.advanceWeek;
-window.advanceWeek = async function() {
-  // Comprovar si hi ha event interactiu pendent
-  if (window._currentInteractiveEvent) {
-    showToast('⚠️ Has de resoldre l\'esdeveniment primer!');
-    return;
-  }
-  
-  await originalAdvanceWeek.call(this);
-  
-  const gd = getG()?.gameData;
-  if (!gd) return;
-  
-  // Comprovar missions
-  checkMissions(gd);
-  
-  // Trigger events interactius
-  triggerInteractiveEvent(gd);
-  
-  // Trigger minijocs
-  triggerMinigame(gd);
-  
-  // Actualitzar locks de tabs
-  updateTabLocks();
-  
-  // Guardar
-  await saveGameData();
-};
+// Les funcions del joc (advanceWeek, renderDashboard) es defineixen
+// dins un <script type="module"> que pot carregar-se DESPRÉS d'aquest fitxer.
+// Per tant, fem polling fins que existeixin i llavors les hookem.
 
-// Hook a renderDashboard per injectar missions i leaderboard
-const originalRenderDashboard = window.renderDashboard;
-if (typeof originalRenderDashboard === 'function') {
+let _hooked = false;
+
+function hookGameFunctions() {
+  if (_hooked) return;
+  
+  // Esperar que window.advanceWeek existeixi
+  if (typeof window.advanceWeek !== 'function') return;
+  if (typeof window.renderDashboard !== 'function') return;
+  
+  _hooked = true;
+  console.log('🎮 Hooking advanceWeek i renderDashboard...');
+  
+  // Hook a advanceWeek
+  const originalAdvanceWeek = window.advanceWeek;
+  window.advanceWeek = async function() {
+    // Comprovar si hi ha event interactiu pendent
+    if (window._currentInteractiveEvent) {
+      showToast('⚠️ Has de resoldre l\'esdeveniment primer!');
+      return;
+    }
+    
+    await originalAdvanceWeek.call(this);
+    
+    const gd = getG()?.gameData;
+    if (!gd) return;
+    
+    // Comprovar missions
+    checkMissions(gd);
+    
+    // Trigger events interactius
+    triggerInteractiveEvent(gd);
+    
+    // Trigger minijocs
+    triggerMinigame(gd);
+    
+    // Actualitzar locks de tabs
+    updateTabLocks();
+    
+    // Guardar
+    await saveGameData();
+  };
+
+  // Hook a renderDashboard per injectar missions i leaderboard
+  const originalRenderDashboard = window.renderDashboard;
   window.renderDashboard = function() {
     originalRenderDashboard();
     injectDashboardExtras();
   };
+  
+  console.log('🎮 Hooks instal·lats correctament!');
 }
+
+// Polling: intentar hookar cada 300ms fins que funcioni
+const hookInterval = setInterval(() => {
+  hookGameFunctions();
+  if (_hooked) clearInterval(hookInterval);
+}, 300);
 
 function injectDashboardExtras() {
   const gd = getG()?.gameData;
