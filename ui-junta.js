@@ -218,37 +218,259 @@ window.voteDecision = async function(id, option) {
 
   const approved = votesYes > 50;
 
-  // Efectes de la decisió
+  // ════════════ EFECTES REALS DE LES DECISIONS ════════════
+  let effectMsg = '';
+  let effectDetails = []; // Per mostrar al modal de resum
+  
   if (id === 'dividends' && option === 'Aprovada' && approved) {
-    const amount = Math.round((gd.finances?.passiu?.reserves||0) * 0.20);
-    gd.finances.cash -= amount;
-    gd.finances.passiu.reserves = (gd.finances.passiu.reserves||0) - amount;
-    shareholders.forEach(sh => { sh.satisfaction = Math.min(100, sh.satisfaction + 10); });
-    showToast(`💰 Dividends distribuïts: ${fmt(amount)}€`);
-  } else if (id === 'relleu' && option === 'Canviar CEO' && approved) {
+    // Distribuir el 20% de les reserves entre accionistes
+    const totalAmount = Math.round((gd.finances?.passiu?.reserves||0) * 0.20);
+    if (totalAmount <= 0) {
+      effectMsg = '❌ Sense reserves suficients per distribuir';
+    } else if ((gd.finances.cash||0) < totalAmount) {
+      effectMsg = '❌ Sense liquiditat per pagar dividends';
+    } else {
+      // Calcular dividend del CEO segons la seva participació
+      const myDividend = Math.round(totalAmount * myPct);
+      // El cash de l'empresa baixa pel total, però la part del CEO se la queda l'empresa
+      // (en realitat surt cap a comptes personals; aquí ho mantenim simplificat: el CEO és l'empresa)
+      gd.finances.cash -= (totalAmount - myDividend); // només surt allò que va als altres accionistes
+      gd.finances.passiu.reserves = (gd.finances.passiu.reserves||0) - totalAmount;
+      shareholders.forEach(sh => { sh.satisfaction = Math.min(100, sh.satisfaction + 10); });
+      effectMsg = `💰 Dividends distribuïts: ${fmt(totalAmount)}€ totals`;
+      effectDetails = [
+        `Total repartit: ${fmt(totalAmount)}€`,
+        `La teva part (${(myPct*100).toFixed(0)}%): ${fmt(myDividend)}€ (queda a l'empresa)`,
+        `Pagat a altres accionistes: ${fmt(totalAmount - myDividend)}€`,
+        `Reserves després: ${fmt(gd.finances.passiu.reserves)}€`,
+        `Satisfacció accionistes: +10 punts`,
+      ];
+    }
+  }
+  
+  // ★★★ AMPLIACIÓ DE CAPITAL — ARA AMB EFECTE REAL ★★★
+  else if (id === 'ampliacio' && option === 'Aprovada' && approved) {
+    // Calculem la mida de l'ampliació: 30% del capital actual o mínim 20.000€
+    const capitalActual = gd.finances?.passiu?.capital || 3000;
+    const amountAmpliacio = Math.max(20000, Math.round(capitalActual * 0.30));
+    
+    // Entrada de cash i augment de capital social
+    gd.finances.cash = (gd.finances.cash||0) + amountAmpliacio;
+    gd.finances.passiu.capital = capitalActual + amountAmpliacio;
+    
+    // Dilució dels accionistes existents: noves accions emeses pel mateix import,
+    // així el % del CEO i dels accionistes existents baixa proporcionalment
+    // Suposem que els nous inversors compren el 30% del capital total nou
+    const novesParticipacionsPct = amountAmpliacio / (capitalActual + amountAmpliacio);
+    
+    // Diluir accionistes actuals proporcionalment
+    let totalDiluted = 0;
+    shareholders.forEach(sh => {
+      const oldPct = sh.pct;
+      sh.pct = sh.pct * (1 - novesParticipacionsPct);
+      totalDiluted += (oldPct - sh.pct);
+      // Els accionistes existents s'enfaden una mica per la dilució
+      sh.satisfaction = Math.max(0, sh.satisfaction - 5);
+    });
+    
+    // Afegir un nou inversor que ha entrat amb l'ampliació
+    if (!gd.shareholders) gd.shareholders = [];
+    gd.shareholders.push({
+      name: 'Nous inversors (Ampliació S' + gd.week + ')',
+      icon: '🆕',
+      type: 'ampliacio',
+      pct: novesParticipacionsPct,
+      capital: amountAmpliacio,
+      patience: 5,
+      risk: 'mig',
+      style: 'equilibrat',
+      satisfaction: 75,
+    });
+    
+    effectMsg = `📈 Ampliació de capital: +${fmt(amountAmpliacio)}€`;
+    effectDetails = [
+      `💰 Cash entrat: +${fmt(amountAmpliacio)}€`,
+      `📊 Capital social nou: ${fmt(gd.finances.passiu.capital)}€`,
+      `🆕 Nous inversors han entrat amb ${(novesParticipacionsPct*100).toFixed(1)}% del capital`,
+      `⚖️ La teva participació passa del ${(myPct*100).toFixed(0)}% al ${(myPct*(1-novesParticipacionsPct)*100).toFixed(0)}%`,
+      `⚠️ Accionistes existents diluïts (-5 satisfacció)`,
+    ];
+    
+    gd.notifications.push({
+      id: Date.now()+Math.random(),
+      icon: '📈',
+      title: 'Ampliació de capital executada',
+      desc: `S'han emès noves accions per ${fmt(amountAmpliacio)}€. La teva participació s'ha diluït però l'empresa té més recursos.`,
+      time: `S${gd.week}`,
+      urgent: false,
+    });
+  }
+  
+  // ★★★ FUSIÓ — ARA AMB EFECTE REAL ★★★
+  else if (id === 'fusion' && option === 'Iniciar estudi' && approved) {
+    // L'estudi de fusió costa diners però genera prestigi i pot obrir oportunitats
+    const studyCost = 8000;
+    if ((gd.finances.cash||0) < studyCost) {
+      effectMsg = '❌ Sense fons per encarregar l\'estudi (' + fmt(studyCost) + '€)';
+    } else {
+      gd.finances.cash -= studyCost;
+      gd.prestigi = Math.min(100, (gd.prestigi||0) + 5);
+      
+      // Marcar que hi ha un estudi de fusió en curs (per a futurs events)
+      gd._fusionStudyActive = gd.week;
+      
+      // Probabilitat d'oferta de fusió real en setmanes futures
+      gd._pendingFusionOffer = gd.week + 4 + Math.floor(Math.random()*4);
+      
+      effectMsg = `🤝 Estudi de fusió encarregat (-${fmt(studyCost)}€)`;
+      effectDetails = [
+        `💸 Cost estudi: -${fmt(studyCost)}€ (consultoria)`,
+        `⭐ Prestigi: +5 punts`,
+        `📅 En 4-8 setmanes podràs rebre ofertes de fusió`,
+        `🔍 Els accionistes valoren l'ambició estratègica`,
+      ];
+      
+      shareholders.forEach(sh => { sh.satisfaction = Math.min(100, sh.satisfaction + 5); });
+    }
+  }
+  
+  else if (id === 'relleu' && option === 'Canviar CEO' && approved) {
     showEventToast('🚨','Acomiadament!','La junta ha votat relleu en la direcció. Has perdut el control executiu.', false);
     gd.notifications.push({id:Date.now(), icon:'🚨', title:'Acomiadament executiu', desc:'La junta ha votat en contra teu. Pots mantenir les accions però perds el control.', time:`S${gd.week}`, urgent:true});
-  } else if (id === 'bonus' && option === 'Aprovar' && approved) {
-    const bonus = (gd.employees||[]).length * 500;
-    gd.finances.cash -= bonus;
-    (gd.employees||[]).forEach(e => { e.morale = Math.min(100, (e.morale||60)+15); });
-    showToast(`🎁 Bonus aprovats: ${fmt(bonus)}€. Moral dels empleats puja!`);
+    effectMsg = '🚨 La junta t\'ha apartat de la direcció';
+    effectDetails = ['Mantens les accions però has perdut el control executiu'];
   }
+  
+  else if (id === 'bonus' && option === 'Aprovar' && approved) {
+    const bonus = (gd.employees||[]).length * 500;
+    if ((gd.finances.cash||0) < bonus) {
+      effectMsg = '❌ Sense fons per pagar bonus (' + fmt(bonus) + '€)';
+    } else {
+      gd.finances.cash -= bonus;
+      (gd.employees||[]).forEach(e => { e.morale = Math.min(100, (e.morale||60)+15); });
+      effectMsg = `🎁 Bonus aprovats: ${fmt(bonus)}€`;
+      effectDetails = [
+        `💸 Total bonus: -${fmt(bonus)}€ (500€/empleat)`,
+        `😊 Moral empleats: +15 punts`,
+        `👥 ${(gd.employees||[]).length} empleats beneficiats`,
+      ];
+    }
+  }
+  
+  // Si la votació ha sigut rebutjada, registrar igualment
+  if (!approved) {
+    effectMsg = '❌ La proposta ha estat rebutjada per la junta';
+    if (id === 'ampliacio') {
+      effectDetails = ['Els accionistes no veuen necessària l\'ampliació ara mateix'];
+    } else if (id === 'dividends') {
+      effectDetails = ['La junta prefereix retenir beneficis per reinversió'];
+    }
+  }
+  
+  // Si l'opció era "Rebutjar" o "Descartar" o "Ajornar" (decisió pròpia del CEO)
+  if (option === 'Rebutjada' || option === 'Descartar' || option === 'Ajornar' || option === 'Rebutjar' || option === 'Modificar') {
+    effectMsg = `↪️ Has decidit: ${option}`;
+    effectDetails = ['Cap canvi a l\'empresa. Podràs proposar-ho de nou més endavant.'];
+  }
+  
+  if (effectMsg) showToast(effectMsg);
 
   // Enregistrar decisió
   if (!gd.boardDecisions) gd.boardDecisions = [];
   gd.boardDecisions.push({
     week:gd.week, year:gd.year, type:id, option, approved,
     votesYes:votesYes.toFixed(0), votesNo:votesNo.toFixed(0),
-    agenda:[{title:`Votació: ${id}`, desc:`Opció escollida: ${option}. Resultat: ${approved?'APROVADA':'REBUTJADA'}.`, urgent:false}],
+    agenda:[{title:`Votació: ${id}`, desc:`Opció escollida: ${option}. Resultat: ${approved?'APROVADA':'REBUTJADA'}. ${effectMsg||''}`, urgent:false}],
     avgSat: (gd.shareholders||[]).length > 0
       ? (gd.shareholders.reduce((s,sh)=>s+sh.satisfaction,0)/gd.shareholders.length).toFixed(0) : '100',
   });
 
   await saveGameData();
-  showToast(`🗳️ Decisió: ${option} — ${approved?'✅ Aprovada':'❌ Rebutjada'} (${votesYes.toFixed(0)}% a favor)`);
+  
+  // ★ Modal visual de resum de la decisió ★
+  showVotingResultModal({
+    id, option, approved,
+    votesYes: votesYes.toFixed(0),
+    votesNo: votesNo.toFixed(0),
+    effectMsg,
+    effectDetails,
+  });
+  
   renderJunta();
 };
+
+// Modal visual elegant per mostrar el resultat d'una votació
+function showVotingResultModal({id, option, approved, votesYes, votesNo, effectMsg, effectDetails}) {
+  const existing = document.getElementById('voting-result-modal');
+  if (existing) existing.remove();
+  
+  const titles = {
+    dividends: 'Distribució de dividends',
+    ampliacio: 'Ampliació de capital',
+    relleu: 'Rellevament de la direcció',
+    fusion: 'Estudi de fusió',
+    bonus: 'Bonus a empleats',
+  };
+  const icons = {
+    dividends: '💰',
+    ampliacio: '📈',
+    relleu: '👔',
+    fusion: '🤝',
+    bonus: '🎁',
+  };
+  
+  const modal = document.createElement('div');
+  modal.id = 'voting-result-modal';
+  modal.className = 'modal-overlay';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);padding:16px;animation:fadeIn .3s ease';
+  
+  const statusColor = approved ? 'var(--green)' : 'var(--red)';
+  const statusIcon = approved ? '✅' : '❌';
+  const statusText = approved ? 'APROVADA' : 'REBUTJADA';
+  
+  modal.innerHTML = `
+    <div style="background:linear-gradient(180deg, rgba(14,20,45,.98), rgba(6,8,15,.98));border:2px solid ${statusColor};border-radius:20px;padding:28px;max-width:520px;width:100%;animation:slideUp .4s ease;box-shadow:0 20px 60px rgba(0,0,0,.6)">
+      <!-- Header -->
+      <div style="text-align:center;margin-bottom:18px">
+        <div style="font-size:56px;margin-bottom:6px;animation:float 2s ease-in-out infinite">${icons[id]||'🗳️'}</div>
+        <div style="font-size:11px;font-weight:800;color:${statusColor};letter-spacing:2px;margin-bottom:4px">${statusIcon} VOTACIÓ ${statusText}</div>
+        <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);line-height:1.3">${titles[id]||id}</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:4px">Opció votada: <strong>${option}</strong></div>
+      </div>
+      
+      <!-- Vot breakdown -->
+      <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px">
+        <div style="font-size:11px;color:var(--text2);font-weight:700;letter-spacing:1px;margin-bottom:8px">RESULTAT VOTACIÓ</div>
+        <div style="display:flex;height:24px;border-radius:6px;overflow:hidden;margin-bottom:8px">
+          <div style="background:var(--green);width:${votesYes}%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff">${votesYes}% SÍ</div>
+          <div style="background:var(--red);width:${votesNo}%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff">${votesNo>5?votesNo+'% NO':''}</div>
+        </div>
+        <div style="font-size:11px;color:var(--text3);text-align:center">Necessari: >50% per aprovar</div>
+      </div>
+      
+      <!-- Effect details -->
+      ${effectMsg ? `
+        <div style="background:rgba(79,127,255,.06);border:1px solid rgba(79,127,255,.2);border-radius:12px;padding:14px;margin-bottom:16px">
+          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px">📋 Què ha passat:</div>
+          <div style="font-size:13px;color:var(--text);font-weight:600;margin-bottom:10px">${effectMsg}</div>
+          ${effectDetails && effectDetails.length > 0 ? `
+            <div style="display:flex;flex-direction:column;gap:6px">
+              ${effectDetails.map(d => `
+                <div style="font-size:12px;color:var(--text2);padding:6px 10px;background:rgba(255,255,255,.03);border-radius:6px;line-height:1.5">${d}</div>
+              `).join('')}
+            </div>
+          ` : ''}
+        </div>
+      ` : ''}
+      
+      <button onclick="document.getElementById('voting-result-modal').remove()" style="width:100%;padding:12px;background:var(--accent);border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);transition:.2s">
+        Continuar →
+      </button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e => { if(e.target===modal) modal.remove(); });
+}
 
 window.openAddShareholder = async function() {
   const gd = getG().gameData;

@@ -2675,6 +2675,9 @@ function renderDashboard() {
   document.getElementById('kpi-result').textContent = result.toLocaleString('ca') + '€';
   document.getElementById('kpi-result').className = 'kpi-val ' + (result >= 0 ? 'positive' : 'negative');
 
+  // ★★★ NOU: Panel de desglossament d'ingressos amb avisos ★★★
+  renderRevenueBreakdownPanel(gd);
+
   // Chart
   const history = f.revenue_history || [];
   const bars = document.getElementById('chart-bars');
@@ -2729,6 +2732,142 @@ function renderDashboard() {
       <div class="dept-name">${d.name}</div>
       <div class="dept-status ${d.status}">${d.statusTxt}</div>
     </div>`).join('');
+}
+
+// ★★★ NOU: Panel de desglossament d'ingressos amb avisos ★★★
+function renderRevenueBreakdownPanel(gd) {
+  const breakdown = gd._lastRevenueBreakdown;
+  // Si encara no hi ha desglossament (primera setmana), no mostrem res
+  if (!breakdown) return;
+  
+  // Trobem o creem el contenidor
+  let panel = document.getElementById('revenue-breakdown-panel');
+  if (!panel) {
+    panel = document.createElement('div');
+    panel.id = 'revenue-breakdown-panel';
+    panel.className = 'section-card';
+    panel.style.marginTop = '10px';
+    // L'inserim després dels KPIs (.dash-top) i abans del .dash-mid
+    const dashWrap = document.querySelector('.dash-wrap');
+    const dashMid = dashWrap?.querySelector('.dash-mid');
+    if (dashWrap && dashMid) dashWrap.insertBefore(panel, dashMid);
+    else if (dashWrap) dashWrap.appendChild(panel);
+  }
+  
+  const fmtN = n => Math.round(n).toLocaleString('ca');
+  const tieneAvisos = breakdown.avisos && breakdown.avisos.length > 0;
+  const hayPenalizacion = breakdown.penalitzacio < 0.95 && breakdown.brut > 0;
+  
+  // Color del header según situación
+  const headerColor = breakdown.avisos.some(a => a.severity === 'critic') ? 'var(--red)'
+                    : tieneAvisos ? 'var(--gold)'
+                    : 'var(--green)';
+  
+  panel.innerHTML = `
+    <div class="section-title" style="display:flex;align-items:center;gap:8px;justify-content:space-between">
+      <span>💡 D'on venen els teus ingressos? <span style="font-size:10px;color:var(--text3);font-weight:400">(transparent)</span></span>
+      <span style="font-size:11px;color:${headerColor};font-weight:700">${
+        breakdown.avisos.some(a => a.severity === 'critic') ? '🚨 ALERTA' 
+        : tieneAvisos ? '⚠️ Atenció' 
+        : '✅ Tot OK'
+      }</span>
+    </div>
+    
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px">
+      <!-- Columna esquerra: desglossament -->
+      <div>
+        <div style="font-size:11px;color:var(--text3);font-weight:700;letter-spacing:1px;margin-bottom:6px">FONTS D'INGRÉS (mensual)</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          ${breakdown.serveis > 0 ? `
+            <div style="display:flex;justify-content:space-between;padding:6px 10px;background:rgba(16,185,129,.06);border-radius:6px;font-size:12px">
+              <span style="color:var(--text2)">📦 Vendes serveis/productes</span>
+              <span style="color:var(--green);font-weight:700;font-family:'JetBrains Mono',monospace">+${fmtN(breakdown.serveis)}€</span>
+            </div>` : `
+            <div style="display:flex;justify-content:space-between;padding:6px 10px;background:rgba(255,255,255,.02);border-radius:6px;font-size:12px;opacity:.5">
+              <span style="color:var(--text3)">📦 Sense productes/serveis definits</span>
+              <span style="color:var(--text3);font-family:'JetBrains Mono',monospace">0€</span>
+            </div>`}
+          ${breakdown.clients > 0 ? `
+            <div style="display:flex;justify-content:space-between;padding:6px 10px;background:rgba(16,185,129,.06);border-radius:6px;font-size:12px">
+              <span style="color:var(--text2)">🤝 Contractes clients fixos</span>
+              <span style="color:var(--green);font-weight:700;font-family:'JetBrains Mono',monospace">+${fmtN(breakdown.clients)}€</span>
+            </div>` : ''}
+          ${breakdown.exportacions > 0 ? `
+            <div style="display:flex;justify-content:space-between;padding:6px 10px;background:rgba(16,185,129,.06);border-radius:6px;font-size:12px">
+              <span style="color:var(--text2)">🌐 Exportacions internacionals</span>
+              <span style="color:var(--green);font-weight:700;font-family:'JetBrains Mono',monospace">+${fmtN(breakdown.exportacions)}€</span>
+            </div>` : ''}
+          ${breakdown.franquicies > 0 ? `
+            <div style="display:flex;justify-content:space-between;padding:6px 10px;background:rgba(16,185,129,.06);border-radius:6px;font-size:12px">
+              <span style="color:var(--text2)">🏪 Royalties franquícies</span>
+              <span style="color:var(--green);font-weight:700;font-family:'JetBrains Mono',monospace">+${fmtN(breakdown.franquicies)}€</span>
+            </div>` : ''}
+          
+          <!-- Subtotal brut -->
+          <div style="display:flex;justify-content:space-between;padding:8px 10px;border-top:1px dashed var(--border);margin-top:4px;font-size:12px">
+            <span style="color:var(--text2);font-weight:700">SUBTOTAL BRUT (potencial)</span>
+            <span style="color:var(--text);font-weight:800;font-family:'JetBrains Mono',monospace">${fmtN(breakdown.brut)}€</span>
+          </div>
+          
+          <!-- Penalització si n'hi ha -->
+          ${hayPenalizacion ? `
+            <div style="display:flex;justify-content:space-between;padding:6px 10px;background:rgba(239,68,68,.08);border-radius:6px;font-size:12px;border:1px solid rgba(239,68,68,.2)">
+              <span style="color:var(--red);font-weight:700">⚠️ Pèrdua per ineficiència</span>
+              <span style="color:var(--red);font-weight:800;font-family:'JetBrains Mono',monospace">-${fmtN(breakdown.perduts)}€</span>
+            </div>
+            <div style="font-size:10px;color:var(--text3);padding:0 10px;line-height:1.4">
+              S'està utilitzant només el ${(breakdown.penalitzacio*100).toFixed(0)}% del potencial. Mira els avisos →
+            </div>` : ''}
+          
+          <!-- Total final -->
+          <div style="display:flex;justify-content:space-between;padding:10px 10px;background:rgba(79,127,255,.08);border:1px solid rgba(79,127,255,.25);border-radius:8px;margin-top:6px;font-size:13px">
+            <span style="color:var(--text);font-weight:800">TOTAL INGRESSOS REAL/mes</span>
+            <span style="color:var(--accent);font-weight:800;font-family:'JetBrains Mono',monospace">${fmtN(breakdown.monthRev)}€</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Columna dreta: avisos i factors -->
+      <div>
+        <div style="font-size:11px;color:var(--text3);font-weight:700;letter-spacing:1px;margin-bottom:6px">FACTORS I AVISOS</div>
+        
+        <!-- Barres de factor -->
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">
+          ${renderFactorBar('👥 Personal', breakdown.factorLabor)}
+          ${renderFactorBar('🏭 Producció', breakdown.factorProd)}
+          ${renderFactorBar('📞 Vendes', breakdown.factorSales)}
+        </div>
+        
+        <!-- Llista d'avisos accionables -->
+        ${tieneAvisos ? `
+          <div style="display:flex;flex-direction:column;gap:5px">
+            ${breakdown.avisos.map(a => `
+              <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:${a.severity==='critic'?'rgba(239,68,68,.10)':'rgba(245,158,11,.08)'};border:1px solid ${a.severity==='critic'?'rgba(239,68,68,.25)':'rgba(245,158,11,.2)'};border-radius:6px;font-size:11px">
+                <span style="font-size:14px">${a.icon}</span>
+                <span style="color:${a.severity==='critic'?'var(--red)':'var(--gold)'};font-weight:600;line-height:1.4;flex:1">${a.text}</span>
+              </div>`).join('')}
+          </div>` : `
+          <div style="padding:10px;text-align:center;color:var(--green);font-size:11px;background:rgba(16,185,129,.06);border-radius:6px">
+            ✅ Tots els factors estan bé. Continua així!
+          </div>`}
+      </div>
+    </div>
+  `;
+}
+
+function renderFactorBar(label, value) {
+  const pct = Math.min(100, Math.max(0, value * 100));
+  const color = pct >= 70 ? 'var(--green)' : pct >= 40 ? 'var(--gold)' : 'var(--red)';
+  return `
+    <div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text2);margin-bottom:2px">
+        <span>${label}</span>
+        <span style="color:${color};font-weight:700">${pct.toFixed(0)}%</span>
+      </div>
+      <div style="height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden">
+        <div style="height:100%;background:${color};width:${pct}%;border-radius:3px;transition:width .4s"></div>
+      </div>
+    </div>`;
 }
 
 // ==================== FINANCES ====================
@@ -3361,8 +3500,47 @@ window.advanceWeek = async function() {
     revMensual = empsVendes * 800 + prestigi * 30; // molt poc, per permetre captació orgànica
   }
   
-  // Aplicar factors de força laboral
-  revMensual *= laborFactor * prodFactor * salesFactor;
+  // ★★★ ARREGLAT: Penalització SUMATIVA amb sòl mínim del 35% ★★★
+  // Abans: revMensual *= laborFactor * prodFactor * salesFactor; (multiplicava per 0!)
+  // Ara: mitjana ponderada amb mínim 35%, i guardem detalls per al dashboard
+  const revMensualBrut = revMensual;
+  
+  // Cada factor té un pes; si tot va bé, multiplicador = 1.0
+  // Si tot va molt malament, mínim = 0.35 (encara entren alguns ingressos, però amb avís)
+  const factorPenalitzacio = Math.max(0.35, (laborFactor * 0.35 + prodFactor * 0.35 + salesFactor * 0.30));
+  revMensual *= factorPenalitzacio;
+  
+  // Guardar detalls del càlcul per mostrar al dashboard (transparència total)
+  gd._lastRevenueBreakdown = {
+    week: gd.week,
+    serveis: serveis.reduce((s, sv) => s + sv.preu * sv.unitats_mes, 0),
+    clients: clients.reduce((s, cl) => s + (cl.monthly_value || 0), 0),
+    brut: revMensualBrut,
+    factorLabor: laborFactor,
+    factorProd: prodFactor,
+    factorSales: salesFactor,
+    penalitzacio: factorPenalitzacio,
+    perduts: Math.round(revMensualBrut - revMensual),
+    avisos: [],
+  };
+  
+  // Generar avisos per al dashboard quan els factors són baixos
+  if (laborFactor < 0.6) gd._lastRevenueBreakdown.avisos.push({
+    icon: '👥', text: 'Falta personal: contracta més empleats o perdràs ingressos',
+    severity: laborFactor < 0.3 ? 'critic' : 'avís',
+  });
+  if (prodFactor < 0.5 && machinesOperatives.length > 0) gd._lastRevenueBreakdown.avisos.push({
+    icon: '🏭', text: 'Producció infrautilitzada: necessites operaris a producció',
+    severity: prodFactor < 0.2 ? 'critic' : 'avís',
+  });
+  if (prodFactor < 0.5 && machinesOperatives.length === 0) gd._lastRevenueBreakdown.avisos.push({
+    icon: '⚙️', text: 'Sense maquinària: ves a Producció i compra equipament',
+    severity: 'avís',
+  });
+  if (salesFactor < 0.4) gd._lastRevenueBreakdown.avisos.push({
+    icon: '📞', text: 'Falten comercials: contracta gent al departament de Vendes',
+    severity: salesFactor < 0.2 ? 'critic' : 'avís',
+  });
   
   const weekVariation = 0.92 + Math.random() * 0.16 + prestigi * 0.001;
   let weekRev = (revMensual / 4.33) * weekVariation;
@@ -3378,8 +3556,16 @@ window.advanceWeek = async function() {
   weekRev = Math.max(0, weekRev * revMult);
 
   // Exportacions i franquícia
-  weekRev += (gd.trade?.exports || []).reduce((s, e) => s + (e.weeklyValue || 0), 0);
-  if (gd.franchise?.mode === 'franquiciador') weekRev += (gd.franchise.royaltyWeekly || 0);
+  const exportRev = (gd.trade?.exports || []).reduce((s, e) => s + (e.weeklyValue || 0), 0);
+  const franchRev = (gd.franchise?.mode === 'franquiciador') ? (gd.franchise.royaltyWeekly || 0) : 0;
+  weekRev += exportRev;
+  weekRev += franchRev;
+  
+  // Guardar també extres al desglossament
+  gd._lastRevenueBreakdown.exportacions = Math.round(exportRev * 4.33);
+  gd._lastRevenueBreakdown.franquicies = Math.round(franchRev * 4.33);
+  gd._lastRevenueBreakdown.weekRev = Math.round(weekRev);
+  gd._lastRevenueBreakdown.monthRev = Math.round(weekRev * 4.33);
 
   // ── Costos setmanals ──
   const salariesSetm = emps.filter(e => !e.en_vaga)

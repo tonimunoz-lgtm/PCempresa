@@ -417,6 +417,283 @@ CSS.textContent = `
   border-radius: 3px;
   transition: width .1s linear;
 }
+/* ══ TRANSICIÓ SETMANAL (carrega de "tornar la pàgina") ══ */
+.week-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at center, rgba(14,20,45,.96), rgba(0,0,0,.98));
+  backdrop-filter: blur(20px);
+  pointer-events: all;
+  animation: fadeIn .25s ease;
+}
+.week-transition-content {
+  text-align: center;
+  animation: scaleIn .4s ease;
+}
+@keyframes scaleIn {
+  from { transform: scale(0.7); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.week-transition-icon {
+  font-size: 80px;
+  margin-bottom: 12px;
+  animation: spin360 0.8s ease-in-out;
+  display: inline-block;
+}
+@keyframes spin360 {
+  from { transform: rotate(0deg) scale(0.5); }
+  to { transform: rotate(360deg) scale(1); }
+}
+.week-transition-text {
+  font-family: 'Syne', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+}
+.week-transition-sub {
+  font-size: 13px;
+  color: var(--text2);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ══ RECAP SETMANAL (el "sobre" que s'obre) ══ */
+.week-recap {
+  position: fixed;
+  inset: 0;
+  z-index: 350;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,.78);
+  backdrop-filter: blur(12px);
+  padding: 16px;
+  animation: fadeIn .3s ease;
+  cursor: pointer;
+}
+.week-recap-card {
+  background: linear-gradient(180deg, rgba(20,28,60,.99), rgba(8,12,24,.99));
+  border: 2px solid var(--border2);
+  border-radius: 20px;
+  padding: 26px 28px;
+  max-width: 460px;
+  width: 100%;
+  animation: recapSlide .5s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+}
+.week-recap-card.positive { border-color: rgba(16,185,129,.5); box-shadow: 0 0 60px rgba(16,185,129,.15); }
+.week-recap-card.negative { border-color: rgba(239,68,68,.5); box-shadow: 0 0 60px rgba(239,68,68,.15); }
+.week-recap-card.neutral  { border-color: rgba(79,127,255,.5); box-shadow: 0 0 60px rgba(79,127,255,.15); }
+@keyframes recapSlide {
+  from { transform: translateY(40px) scale(0.9); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+.week-recap-header {
+  text-align: center;
+  margin-bottom: 18px;
+  position: relative;
+}
+.week-recap-week {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+.week-recap-date {
+  font-family: 'Syne', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.week-recap-mood {
+  font-size: 36px;
+  margin-bottom: 4px;
+  display: inline-block;
+  animation: moodBounce 1s ease-in-out infinite;
+}
+@keyframes moodBounce {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.week-recap-result {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 32px;
+  font-weight: 800;
+  margin: 8px 0 4px;
+}
+.week-recap-result.up { color: var(--green); }
+.week-recap-result.down { color: var(--red); }
+.week-recap-result.flat { color: var(--gold); }
+.week-recap-subtitle {
+  font-size: 12px;
+  color: var(--text2);
+  margin-bottom: 16px;
+}
+.week-recap-events {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.week-recap-event {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(255,255,255,.04);
+  border-radius: 10px;
+  border-left: 3px solid var(--border2);
+  font-size: 12px;
+  animation: eventSlideIn .4s ease backwards;
+}
+.week-recap-event.good { border-left-color: var(--green); background: rgba(16,185,129,.06); }
+.week-recap-event.bad { border-left-color: var(--red); background: rgba(239,68,68,.06); }
+.week-recap-event.neutral { border-left-color: var(--accent); background: rgba(79,127,255,.04); }
+@keyframes eventSlideIn {
+  from { transform: translateX(-15px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.week-recap-event-icon { font-size: 22px; flex-shrink: 0; }
+.week-recap-event-text { flex: 1; color: var(--text); line-height: 1.4; }
+.week-recap-event-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 13px;
+}
+.week-recap-event-value.up { color: var(--green); }
+.week-recap-event-value.down { color: var(--red); }
+.week-recap-continue {
+  width: 100%;
+  padding: 12px;
+  background: var(--accent);
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: .2s;
+}
+.week-recap-continue:hover { background: #3d6dee; transform: translateY(-1px); }
+.week-recap-tip {
+  text-align: center;
+  font-size: 10px;
+  color: var(--text3);
+  margin-top: 8px;
+}
+
+/* ══ MISSIÓ PERSISTENT (sota topbar) ══ */
+.mission-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 20px;
+  background: linear-gradient(90deg, rgba(79,127,255,.12), rgba(124,58,237,.10), rgba(245,158,11,.10));
+  border-bottom: 1px solid rgba(79,127,255,.25);
+  border-top: 1px solid rgba(255,255,255,.04);
+  font-family: var(--font);
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+.mission-bar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(79,127,255,.06), transparent);
+  animation: missionShine 4s linear infinite;
+  pointer-events: none;
+}
+@keyframes missionShine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.mission-bar-icon {
+  font-size: 26px;
+  flex-shrink: 0;
+  animation: missionPulse 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px rgba(245,158,11,.4));
+}
+@keyframes missionPulse {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+}
+.mission-bar-label {
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--gold);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 1px;
+}
+.mission-bar-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.2;
+}
+.mission-bar-desc {
+  font-size: 11px;
+  color: var(--text2);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+.mission-bar-action {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: var(--font);
+  white-space: nowrap;
+  transition: .2s;
+  box-shadow: 0 4px 14px rgba(79,127,255,.35);
+  position: relative;
+  z-index: 2;
+}
+.mission-bar-action:hover {
+  background: #3d6dee;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(79,127,255,.5);
+}
+.mission-bar-reward {
+  font-size: 10px;
+  color: var(--gold);
+  font-weight: 700;
+  padding: 4px 8px;
+  background: rgba(245,158,11,.10);
+  border: 1px solid rgba(245,158,11,.25);
+  border-radius: 6px;
+  white-space: nowrap;
+}
+.mission-bar.completed {
+  background: linear-gradient(90deg, rgba(16,185,129,.12), rgba(16,185,129,.06));
+  border-bottom-color: rgba(16,185,129,.25);
+}
+.mission-bar-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--gold));
+  transition: width .5s ease;
+}
+
 .minigame-timer-text {
   font-family: 'JetBrains Mono', monospace;
   font-size: 14px;
@@ -631,6 +908,122 @@ const MISSIONS = [
   },
 ];
 
+// ★★★ Mapeo de cada missió a la pestanya on es completa ★★★
+const MISSION_TO_TAB = {
+  M01: 'setup',         // Crear empresa
+  M02: 'hr',            // Contractar empleat
+  M03: 'finances',      // Demanar préstec
+  M04: 'sales',         // Primer client
+  M05: 'production',    // Comprar màquina
+  M06: 'marketing',     // Inversió màrqueting
+  M07: 'hr',            // 5 empleats
+  M08: 'dashboard',     // Setmanes positives (només cal avançar)
+  M09: 'sales',         // Conquereix el Vallès
+  M10: 'finances',      // Caixa forta (gestió general)
+  M11: 'trade',         // Exportar
+  M12: 'borsa',         // Inversió a borsa
+  M13: 'dashboard',     // 52 setmanes (només avançar)
+  M14: 'dashboard',     // Magnata (objectiu global)
+};
+
+// ★★★ Barra de missió persistent sota el topbar ★★★
+function renderMissionBar() {
+  const gd = getG()?.gameData;
+  if (!gd || !gd.mode) {
+    const existing = document.getElementById('mission-bar');
+    if (existing) existing.remove();
+    return;
+  }
+  initMissions(gd);
+  
+  const ms = gd.missions;
+  const totalMissions = MISSIONS.length;
+  const completedCount = ms.completed.length;
+  const progressPct = (completedCount / totalMissions) * 100;
+  
+  // Trobar la missió activa actual
+  const activeMissionId = ms.active.find(mid => !ms.completed.includes(mid));
+  const mission = MISSIONS.find(m => m.id === activeMissionId);
+  
+  // Buscar o crear la barra
+  let bar = document.getElementById('mission-bar');
+  if (!bar) {
+    bar = document.createElement('div');
+    bar.id = 'mission-bar';
+    bar.className = 'mission-bar';
+    // Inserir-la JUST després del topbar
+    const topbar = document.querySelector('.topbar');
+    if (topbar && topbar.parentNode) {
+      topbar.parentNode.insertBefore(bar, topbar.nextSibling);
+    } else {
+      // Si no hi ha topbar, no podem inserir-la
+      return;
+    }
+  }
+  
+  // Si totes les missions estan completades
+  if (!mission) {
+    bar.className = 'mission-bar completed';
+    bar.innerHTML = `
+      <div class="mission-bar-icon">👑</div>
+      <div style="flex:1">
+        <div class="mission-bar-label" style="color:var(--green)">✅ TOTES LES MISSIONS COMPLETADES</div>
+        <div class="mission-bar-title">Ets un/a mestre/a empresarial!</div>
+        <div class="mission-bar-desc">Continua creixent i competint amb els companys de classe.</div>
+      </div>
+      <div class="mission-bar-reward">${completedCount}/${totalMissions} ✓</div>
+    `;
+    return;
+  }
+  
+  const tab = MISSION_TO_TAB[mission.id] || 'dashboard';
+  const rewardText = (mission.xp ? `+${mission.xp} XP` : '') 
+    + (mission.reward?.cash ? ` · +${fmt(mission.reward.cash)}€` : '')
+    + (mission.reward?.prestigi ? ` · +${mission.reward.prestigi}⭐` : '');
+  
+  bar.className = 'mission-bar';
+  bar.innerHTML = `
+    <div class="mission-bar-icon">${mission.icon}</div>
+    <div style="flex:1;min-width:0">
+      <div class="mission-bar-label">CAPÍTOL ${mission.chapter} · MISSIÓ ${completedCount+1}/${totalMissions}</div>
+      <div class="mission-bar-title">${mission.title}</div>
+      <div class="mission-bar-desc">${mission.desc}</div>
+    </div>
+    <div class="mission-bar-reward">🎁 ${rewardText}</div>
+    <button class="mission-bar-action" onclick="window._goToMissionTab('${tab}')">
+      ${tab === 'dashboard' ? '⏩ Avança setmanes' : '→ Anar-hi'}
+    </button>
+    <div class="mission-bar-progress" style="width:${progressPct}%"></div>
+  `;
+}
+
+// Funció global per navegar a la pestanya de la missió
+window._goToMissionTab = function(tab) {
+  if (tab === 'dashboard') {
+    // Si la missió només requereix avançar setmanes, fes scroll cap al botó d'avançar
+    const advBtn = document.querySelector('.week-advance-btn');
+    if (advBtn) {
+      advBtn.scrollIntoView({behavior:'smooth', block:'center'});
+      advBtn.style.animation = 'missionPulse 0.6s ease 3';
+      setTimeout(() => { advBtn.style.animation = ''; }, 2000);
+    }
+    return;
+  }
+  
+  // Comprovar si la pestanya està bloquejada
+  if (_lockedTabs && _lockedTabs.has(tab)) {
+    const cond = TAB_UNLOCK_CONDITIONS[tab];
+    showToast('🔒 Aquesta secció encara no està desbloquejada. ' + (cond?.desc || ''));
+    return;
+  }
+  
+  if (typeof window.showTab === 'function') {
+    window.showTab(tab);
+  }
+};
+
+window.renderMissionBar = renderMissionBar;
+
 function initMissions(gd) {
   if (!gd.missions) {
     gd.missions = {
@@ -684,6 +1077,11 @@ function checkMissions(gd) {
       }
     } catch(e) { /* ignore */ }
   });
+  
+  // ★ Si s'ha completat alguna missió, actualitzar la barra
+  if (newCompleted) {
+    setTimeout(() => renderMissionBar(), 100);
+  }
   
   return newCompleted;
 }
@@ -1656,6 +2054,299 @@ function checkRetention(gd) {
 // dins un <script type="module"> que pot carregar-se DESPRÉS d'aquest fitxer.
 // Per tant, fem polling fins que existeixin i llavors les hookem.
 
+// ════════════════════════════════════════════════════════════
+//  ★★★ MÒDUL J: AVANÇAR SETMANA AMB FEEDBACK EMOCIONAL ★★★
+//  Transició dramàtica + recap visual + so
+// ════════════════════════════════════════════════════════════
+
+// — Sons sintètics generats amb Web Audio API (sense cap fitxer extern) —
+let _audioCtx = null;
+function getAudio() {
+  if (!_audioCtx) {
+    try {
+      _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch(e) { return null; }
+  }
+  return _audioCtx;
+}
+function playSfx(type) {
+  if (localStorage.getItem('sfx-disabled') === '1') return;
+  const ctx = getAudio();
+  if (!ctx) return;
+  try {
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    
+    if (type === 'cling') {
+      // Cobrar: nota brillant
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, now);
+      osc.frequency.exponentialRampToValueAtTime(1760, now + 0.08);
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+      osc.start(now); osc.stop(now + 0.4);
+    } else if (type === 'whoosh') {
+      // Avançar setmana: swoosh greu
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(120, now);
+      osc.frequency.exponentialRampToValueAtTime(440, now + 0.3);
+      gain.gain.setValueAtTime(0.10, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+      osc.start(now); osc.stop(now + 0.3);
+    } else if (type === 'success') {
+      // Èxit: arpegio ascendent ràpid
+      [523, 659, 784, 1047].forEach((f, i) => {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = 'sine';
+        o.frequency.value = f;
+        g.gain.setValueAtTime(0, now + i*0.06);
+        g.gain.linearRampToValueAtTime(0.15, now + i*0.06 + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.001, now + i*0.06 + 0.15);
+        o.start(now + i*0.06); o.stop(now + i*0.06 + 0.15);
+      });
+      return;
+    } else if (type === 'fail') {
+      // Fallida: nota descendent greu
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(220, now);
+      osc.frequency.exponentialRampToValueAtTime(80, now + 0.5);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+      osc.start(now); osc.stop(now + 0.5);
+    } else if (type === 'click') {
+      osc.type = 'sine';
+      osc.frequency.value = 600;
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+      osc.start(now); osc.stop(now + 0.05);
+    } else if (type === 'alert') {
+      // Sirena d'alerta
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(440, now);
+      osc.frequency.linearRampToValueAtTime(660, now + 0.15);
+      osc.frequency.linearRampToValueAtTime(440, now + 0.30);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+      osc.start(now); osc.stop(now + 0.4);
+    }
+  } catch(e) { /* silenci en cas d'error */ }
+}
+window.playSfx = playSfx;
+
+// — Transició: pantalla "carregant setmana" —
+function showWeekTransition(newWeek) {
+  playSfx('whoosh');
+  const existing = document.getElementById('week-transition');
+  if (existing) existing.remove();
+  
+  const div = document.createElement('div');
+  div.id = 'week-transition';
+  div.className = 'week-transition';
+  div.innerHTML = `
+    <div class="week-transition-content">
+      <div class="week-transition-icon">⏳</div>
+      <div class="week-transition-text">Setmana ${newWeek}</div>
+      <div class="week-transition-sub">Processant esdeveniments...</div>
+    </div>
+  `;
+  document.body.appendChild(div);
+}
+function hideWeekTransition() {
+  const el = document.getElementById('week-transition');
+  if (el) {
+    el.style.animation = 'fadeIn .3s ease reverse';
+    setTimeout(() => el.remove(), 280);
+  }
+}
+
+// — Recap: el "sobre" amb el resum de la setmana —
+function showWeekRecap(before, after, diff, gd) {
+  const existing = document.getElementById('week-recap');
+  if (existing) existing.remove();
+  
+  // Calcular result setmanal aproximat
+  const weekResult = Math.round(diff.cash);
+  
+  // Determinar mood emoji segons el resultat
+  let mood, moodClass, moodLabel, sfx;
+  if (weekResult >= 5000) { mood = '🚀'; moodClass = 'positive'; moodLabel = 'SETMANA INCREÏBLE'; sfx = 'success'; }
+  else if (weekResult >= 1000) { mood = '😄'; moodClass = 'positive'; moodLabel = 'SETMANA BONA'; sfx = 'cling'; }
+  else if (weekResult >= -500) { mood = '😐'; moodClass = 'neutral'; moodLabel = 'SETMANA NORMAL'; sfx = 'click'; }
+  else if (weekResult >= -3000) { mood = '😟'; moodClass = 'negative'; moodLabel = 'SETMANA FLUIXA'; sfx = 'click'; }
+  else { mood = '😱'; moodClass = 'negative'; moodLabel = 'SETMANA TERRIBLE'; sfx = 'fail'; }
+  
+  // Reproduir so
+  setTimeout(() => playSfx(sfx), 200);
+  
+  // Construir llista d'esdeveniments d'aquesta setmana
+  const events = [];
+  
+  // Ingressos / costos
+  const rev = Math.round(after.monthly_revenue / 4.33);
+  const costs = Math.round(after.monthly_costs / 4.33);
+  if (rev > 0) {
+    events.push({
+      icon: '💰', text: `Ingressos cobrats`,
+      value: `+${rev.toLocaleString('ca')}€`, type: 'good', cls: 'up',
+    });
+  }
+  if (costs > 0) {
+    events.push({
+      icon: '💸', text: `Despeses pagades`,
+      value: `-${costs.toLocaleString('ca')}€`, type: 'bad', cls: 'down',
+    });
+  }
+  
+  // Canvis de prestigi
+  if (diff.prestigi > 0) {
+    events.push({
+      icon: '⭐', text: `Prestigi guanyat`,
+      value: `+${diff.prestigi.toFixed(1)}`, type: 'good', cls: 'up',
+    });
+  } else if (diff.prestigi < -0.5) {
+    events.push({
+      icon: '⭐', text: `Prestigi perdut`,
+      value: `${diff.prestigi.toFixed(1)}`, type: 'bad', cls: 'down',
+    });
+  }
+  
+  // Empleats nous
+  if (diff.employees > 0) {
+    events.push({
+      icon: '👥', text: `Nous empleats incorporats`,
+      value: `+${diff.employees}`, type: 'good', cls: 'up',
+    });
+  }
+  
+  // Notificacions noves importants (mostra fins a 2)
+  const newNotifs = (gd.notifications||[]).slice(-diff.newNotifications);
+  newNotifs.slice(0, 2).forEach(n => {
+    events.push({
+      icon: n.icon || '📋', text: n.title,
+      value: '', type: n.urgent ? 'bad' : 'neutral', cls: '',
+    });
+  });
+  
+  // Avisos de penalització
+  const breakdown = gd._lastRevenueBreakdown;
+  if (breakdown && breakdown.avisos && breakdown.avisos.length > 0) {
+    const critical = breakdown.avisos.find(a => a.severity === 'critic');
+    if (critical) {
+      events.push({
+        icon: '🚨', text: critical.text,
+        value: '', type: 'bad', cls: '',
+      });
+    }
+  }
+  
+  // Si no hi ha cap event, missatge per defecte
+  if (events.length === 0) {
+    events.push({
+      icon: '💤', text: 'Setmana sense esdeveniments destacats',
+      value: '', type: 'neutral', cls: '',
+    });
+  }
+  
+  const recapDate = (() => {
+    try {
+      const d = new Date(gd.startDate || new Date());
+      d.setDate(d.getDate() + (after.week - 1) * 7);
+      return d.toLocaleDateString('ca-ES', {day:'numeric', month:'short', year:'numeric'});
+    } catch(e) { return 'Setmana ' + after.week; }
+  })();
+  
+  const div = document.createElement('div');
+  div.id = 'week-recap';
+  div.className = 'week-recap';
+  div.innerHTML = `
+    <div class="week-recap-card ${moodClass}">
+      <div class="week-recap-header">
+        <div class="week-recap-week">SETMANA ${after.week} · ANY ${gd.year}</div>
+        <div class="week-recap-date">${recapDate}</div>
+        <div class="week-recap-mood">${mood}</div>
+        <div class="week-recap-result ${weekResult>=0?'up':'down'}">${weekResult>=0?'+':''}${weekResult.toLocaleString('ca')}€</div>
+        <div class="week-recap-subtitle">${moodLabel}</div>
+      </div>
+      <div class="week-recap-events">
+        ${events.map((e, i) => `
+          <div class="week-recap-event ${e.type}" style="animation-delay:${i*0.08}s">
+            <div class="week-recap-event-icon">${e.icon}</div>
+            <div class="week-recap-event-text">${e.text}</div>
+            ${e.value ? `<div class="week-recap-event-value ${e.cls}">${e.value}</div>` : ''}
+          </div>
+        `).join('')}
+      </div>
+      <button class="week-recap-continue" onclick="window._closeWeekRecap()">
+        Continuar →
+      </button>
+      <div class="week-recap-tip">💡 Pots prémer Espai per avançar la setmana més ràpid</div>
+    </div>
+  `;
+  document.body.appendChild(div);
+  
+  // Tancar amb clic al fons
+  div.addEventListener('click', e => {
+    if (e.target === div) window._closeWeekRecap();
+  });
+  
+  // Tancar amb tecla Enter o Espai
+  const closeOnKey = (e) => {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') {
+      e.preventDefault();
+      window._closeWeekRecap();
+    }
+  };
+  document.addEventListener('keydown', closeOnKey, { once: true });
+  window._weekRecapKeyHandler = closeOnKey;
+}
+
+window._closeWeekRecap = function() {
+  const el = document.getElementById('week-recap');
+  if (el) {
+    el.style.animation = 'fadeIn .25s ease reverse';
+    setTimeout(() => el.remove(), 240);
+  }
+  if (window._weekRecapKeyHandler) {
+    document.removeEventListener('keydown', window._weekRecapKeyHandler);
+    window._weekRecapKeyHandler = null;
+  }
+  playSfx('click');
+};
+
+// Botó per silenciar so (s'inserirà a la topbar)
+window._toggleSfx = function() {
+  const disabled = localStorage.getItem('sfx-disabled') === '1';
+  localStorage.setItem('sfx-disabled', disabled ? '0' : '1');
+  const btn = document.getElementById('sfx-toggle');
+  if (btn) btn.textContent = disabled ? '🔊' : '🔇';
+  if (disabled) playSfx('click');
+};
+
+// Inserir botó de so a la topbar (al costat del botó de perfil)
+function injectSfxToggle() {
+  if (document.getElementById('sfx-toggle')) return;
+  const profileBtn = document.querySelector('.profile-btn');
+  if (!profileBtn) return;
+  const btn = document.createElement('button');
+  btn.id = 'sfx-toggle';
+  btn.className = 'profile-btn';
+  btn.style.cssText = 'padding:6px 10px;min-width:auto';
+  btn.title = 'Activar/desactivar sons';
+  btn.textContent = localStorage.getItem('sfx-disabled') === '1' ? '🔇' : '🔊';
+  btn.onclick = window._toggleSfx;
+  profileBtn.parentNode.insertBefore(btn, profileBtn);
+}
+
+
+// ════════════════════════════════════════════════════════════
+//  HOOKS AL JOC PRINCIPAL
+// ════════════════════════════════════════════════════════════
+
 let _hooked = false;
 
 function hookGameFunctions() {
@@ -1668,7 +2359,7 @@ function hookGameFunctions() {
   _hooked = true;
   console.log('🎮 Hooking advanceWeek i renderDashboard...');
   
-  // Hook a advanceWeek
+  // Hook a advanceWeek — ★ AMB RECAP DRAMÀTIC ★
   const originalAdvanceWeek = window.advanceWeek;
   window.advanceWeek = async function() {
     // Comprovar si hi ha event interactiu pendent
@@ -1677,10 +2368,54 @@ function hookGameFunctions() {
       return;
     }
     
-    await originalAdvanceWeek.call(this);
-    
     const gd = getG()?.gameData;
     if (!gd) return;
+    
+    // ★ Capturar estat ABANS d'avançar ★
+    const before = {
+      week: gd.week,
+      cash: gd.finances?.cash || 0,
+      monthly_revenue: gd.finances?.monthly_revenue || 0,
+      monthly_costs: gd.finances?.monthly_costs || 0,
+      prestigi: gd.prestigi || 0,
+      employees: (gd.employees||[]).length,
+      clients: (gd.clients||[]).length,
+      notifications: (gd.notifications||[]).length,
+    };
+    
+    // Mostrar pantalla de "carregant setmana" (suspense breu)
+    showWeekTransition(before.week + 1);
+    
+    // Esperar 700ms perquè es vegi l'animació de transició
+    await new Promise(r => setTimeout(r, 700));
+    
+    await originalAdvanceWeek.call(this);
+    
+    if (!gd) return;
+    
+    // ★ Capturar estat DESPRÉS i calcular diferències ★
+    const after = {
+      week: gd.week,
+      cash: gd.finances?.cash || 0,
+      monthly_revenue: gd.finances?.monthly_revenue || 0,
+      monthly_costs: gd.finances?.monthly_costs || 0,
+      prestigi: gd.prestigi || 0,
+      employees: (gd.employees||[]).length,
+      clients: (gd.clients||[]).length,
+      notifications: (gd.notifications||[]).length,
+    };
+    
+    const diff = {
+      cash: after.cash - before.cash,
+      prestigi: after.prestigi - before.prestigi,
+      employees: after.employees - before.employees,
+      clients: after.clients - before.clients,
+      newNotifications: Math.max(0, after.notifications - before.notifications),
+    };
+    
+    // Treure la pantalla de transició i mostrar el RECAP
+    hideWeekTransition();
+    showWeekRecap(before, after, diff, gd);
     
     // Comprovar missions
     checkMissions(gd);
@@ -1694,6 +2429,9 @@ function hookGameFunctions() {
     // Actualitzar locks de tabs
     updateTabLocks();
     
+    // Refrescar barra de missió
+    renderMissionBar();
+    
     // Guardar
     await saveGameData();
   };
@@ -1703,6 +2441,7 @@ function hookGameFunctions() {
   window.renderDashboard = function() {
     originalRenderDashboard();
     injectDashboardExtras();
+    renderMissionBar(); // ★ Actualitzar barra de missió
   };
   
   console.log('🎮 Hooks instal·lats correctament!');
@@ -1812,6 +2551,8 @@ const checkReady = setInterval(() => {
     
     // Injectar al dashboard si ja està renderitzat
     setTimeout(() => injectDashboardExtras(), 1000);
+    setTimeout(() => renderMissionBar(), 1100); // ★ Crear barra missió
+    setTimeout(() => injectSfxToggle(), 1200);  // ★ Botó de so
     
     console.log('🎮 ui-gameplay.js — Millores inicialitzades!');
   }
