@@ -28,7 +28,28 @@ window.renderProfessor = function renderProfessor() {
     return;
   }
 
-  const students = getG().allStudents.filter(s => !s.isProf);
+  // ★★★ FIX: Filtrar només alumnes de la classe del professor ★★★
+  // El professor només veu alumnes que tinguin el SEU mateix classCode.
+  // Si el professor no té classCode definit, mostrar avís.
+  const profGd = getG().gameData;
+  const profClassCode = (profGd?.classCode || '').toUpperCase().trim();
+  
+  if (!profClassCode) {
+    document.getElementById('tab-professor').innerHTML = `
+      <div style="padding:40px;text-align:center;color:var(--text2);max-width:500px;margin:0 auto">
+        <div style="font-size:48px;margin-bottom:12px">🏫</div>
+        <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px">Sense classe activa</div>
+        <div style="font-size:13px;line-height:1.6;margin-bottom:20px">Has de crear o seleccionar una classe per veure els alumnes. Cada professor/a té el seu propi codi de classe i només pot veure els seus alumnes.</div>
+        <button onclick="openProfile()" class="btn-primary" style="padding:12px 24px;background:var(--accent);border:none;border-radius:10px;color:#fff;font-weight:700;cursor:pointer">🏫 Gestionar classes</button>
+      </div>`;
+    return;
+  }
+
+  const allStudents = getG().allStudents || [];
+  const students = allStudents.filter(s => 
+    !s.isProf && 
+    (s.classCode||'').toUpperCase().trim() === profClassCode
+  );
   const active   = students.filter(s => !!s.company);
   const inactive = students.filter(s => !s.company);
 

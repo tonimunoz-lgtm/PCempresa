@@ -952,24 +952,25 @@ CSS.textContent = `
 .news-tag.you    { background: rgba(79,127,255,.20); color: var(--accent); }
 
 /* ══ MISSIÓ PERSISTENT (sota topbar) ══ */
-.mission-bar {
+.topmission-bar {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 10px 20px;
-  background: linear-gradient(90deg, rgba(79,127,255,.12), rgba(124,58,237,.10), rgba(245,158,11,.10));
-  border-bottom: 1px solid rgba(79,127,255,.25);
+  gap: 10px;
+  padding: 6px 16px;
+  background: linear-gradient(90deg, rgba(79,127,255,.10), rgba(124,58,237,.08), rgba(245,158,11,.06));
+  border-bottom: 1px solid rgba(79,127,255,.20);
   border-top: 1px solid rgba(255,255,255,.04);
   font-family: var(--font);
   cursor: default;
   position: relative;
   overflow: hidden;
+  min-height: 38px;
 }
-.mission-bar::before {
+.topmission-bar::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(79,127,255,.06), transparent);
+  background: linear-gradient(90deg, transparent, rgba(79,127,255,.05), transparent);
   animation: missionShine 4s linear infinite;
   pointer-events: none;
 }
@@ -977,73 +978,77 @@ CSS.textContent = `
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
 }
-.mission-bar-icon {
-  font-size: 26px;
+.topmission-icon {
+  font-size: 18px;
   flex-shrink: 0;
-  animation: missionPulse 2s ease-in-out infinite;
-  filter: drop-shadow(0 0 8px rgba(245,158,11,.4));
+  filter: drop-shadow(0 0 4px rgba(245,158,11,.3));
 }
-@keyframes missionPulse {
-  0%,100% { transform: scale(1); }
-  50% { transform: scale(1.12); }
-}
-.mission-bar-label {
+.topmission-label {
   font-size: 9px;
   font-weight: 800;
   color: var(--gold);
-  letter-spacing: 1.5px;
+  letter-spacing: 1px;
   text-transform: uppercase;
-  margin-bottom: 1px;
+  display: inline-block;
+  background: rgba(245,158,11,.10);
+  padding: 1px 6px;
+  border-radius: 6px;
+  margin-right: 6px;
+  flex-shrink: 0;
 }
-.mission-bar-title {
-  font-family: 'Syne', sans-serif;
-  font-size: 14px;
-  font-weight: 800;
+.topmission-title {
+  font-size: 12px;
+  font-weight: 700;
   color: var(--text);
   line-height: 1.2;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.mission-bar-desc {
-  font-size: 11px;
-  color: var(--text2);
-  margin-top: 2px;
-  line-height: 1.4;
+.topmission-desc {
+  display: none; /* Ocult per defecte; només s'expandeix al hover */
 }
-.mission-bar-action {
+.topmission-bar:hover .topmission-title {
+  white-space: normal;
+}
+.topmission-action {
   background: var(--accent);
   color: #fff;
   border: none;
-  padding: 8px 18px;
-  border-radius: 10px;
-  font-size: 12px;
-  font-weight: 800;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
   cursor: pointer;
   font-family: var(--font);
   white-space: nowrap;
   transition: .2s;
-  box-shadow: 0 4px 14px rgba(79,127,255,.35);
   position: relative;
   z-index: 2;
+  flex-shrink: 0;
 }
-.mission-bar-action:hover {
+.topmission-action:hover {
   background: #3d6dee;
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(79,127,255,.5);
 }
-.mission-bar-reward {
+.topmission-reward {
   font-size: 10px;
   color: var(--gold);
   font-weight: 700;
-  padding: 4px 8px;
+  padding: 2px 7px;
   background: rgba(245,158,11,.10);
-  border: 1px solid rgba(245,158,11,.25);
-  border-radius: 6px;
+  border: 1px solid rgba(245,158,11,.20);
+  border-radius: 5px;
   white-space: nowrap;
+  flex-shrink: 0;
 }
-.mission-bar.completed {
-  background: linear-gradient(90deg, rgba(16,185,129,.12), rgba(16,185,129,.06));
-  border-bottom-color: rgba(16,185,129,.25);
+.topmission-bar.completed {
+  background: linear-gradient(90deg, rgba(16,185,129,.10), rgba(16,185,129,.05));
+  border-bottom-color: rgba(16,185,129,.20);
 }
-.mission-bar-progress {
+.topmission-progress {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -1308,7 +1313,7 @@ function renderMissionBar() {
   if (!bar) {
     bar = document.createElement('div');
     bar.id = 'mission-bar';
-    bar.className = 'mission-bar';
+    bar.className = 'topmission-bar';
     // Inserir-la JUST després del topbar
     const topbar = document.querySelector('.topbar');
     if (topbar && topbar.parentNode) {
@@ -1321,37 +1326,31 @@ function renderMissionBar() {
   
   // Si totes les missions estan completades
   if (!mission) {
-    bar.className = 'mission-bar completed';
+    bar.className = 'topmission-bar completed';
     bar.innerHTML = `
-      <div class="mission-bar-icon">👑</div>
-      <div style="flex:1">
-        <div class="mission-bar-label" style="color:var(--green)">✅ TOTES LES MISSIONS COMPLETADES</div>
-        <div class="mission-bar-title">Ets un/a mestre/a empresarial!</div>
-        <div class="mission-bar-desc">Continua creixent i competint amb els companys de classe.</div>
-      </div>
-      <div class="mission-bar-reward">${completedCount}/${totalMissions} ✓</div>
+      <span class="topmission-icon">👑</span>
+      <span class="topmission-label" style="background:rgba(16,185,129,.10);color:var(--green)">COMPLETAT</span>
+      <span class="topmission-title">Ets un/a mestre/a empresarial! ${completedCount}/${totalMissions} missions ✓</span>
     `;
     return;
   }
   
   const tab = MISSION_TO_TAB[mission.id] || 'dashboard';
-  const rewardText = (mission.xp ? `+${mission.xp} XP` : '') 
-    + (mission.reward?.cash ? ` · +${fmt(mission.reward.cash)}€` : '')
-    + (mission.reward?.prestigi ? ` · +${mission.reward.prestigi}⭐` : '');
+  const rewardText = (mission.xp ? `+${mission.xp}XP` : '') 
+    + (mission.reward?.cash ? ` +${fmt(mission.reward.cash)}€` : '')
+    + (mission.reward?.prestigi ? ` +${mission.reward.prestigi}⭐` : '');
   
-  bar.className = 'mission-bar';
+  bar.className = 'topmission-bar';
+  // Format compacte: tot en una sola línia
   bar.innerHTML = `
-    <div class="mission-bar-icon">${mission.icon}</div>
-    <div style="flex:1;min-width:0">
-      <div class="mission-bar-label">CAPÍTOL ${mission.chapter} · MISSIÓ ${completedCount+1}/${totalMissions}</div>
-      <div class="mission-bar-title">${mission.title}</div>
-      <div class="mission-bar-desc">${mission.desc}</div>
-    </div>
-    <div class="mission-bar-reward">🎁 ${rewardText}</div>
-    <button class="mission-bar-action" onclick="window._goToMissionTab('${tab}')">
-      ${tab === 'dashboard' ? '⏩ Avança setmanes' : '→ Anar-hi'}
+    <span class="topmission-icon">${mission.icon}</span>
+    <span class="topmission-label">M${completedCount+1}/${totalMissions}</span>
+    <span class="topmission-title" title="${mission.desc.replace(/"/g,'&quot;')}"><strong>${mission.title}</strong> · ${mission.desc}</span>
+    <span class="topmission-reward">🎁 ${rewardText}</span>
+    <button class="topmission-action" onclick="window._goToMissionTab('${tab}')">
+      ${tab === 'dashboard' ? '⏩ Avançar' : '→ Anar-hi'}
     </button>
-    <div class="mission-bar-progress" style="width:${progressPct}%"></div>
+    <div class="topmission-progress" style="width:${progressPct}%"></div>
   `;
 }
 
@@ -1388,11 +1387,69 @@ function initMissions(gd) {
       completed: [],
       active: ['M01'],
       seen: [],
+      // ★ Marca que indica si ja s'ha fet la "primera passada de calibració"
+      _calibrated: false,
     };
   }
-  // Assegurar que M01 sempre està disponible
-  if (!gd.missions.active.includes('M01') && !gd.missions.completed.includes('M01')) {
-    gd.missions.active.push('M01');
+  
+  // ★★★ FIX: PRIMERA PASSADA "DE CALIBRACIÓ" ★★★
+  // Per a empreses ja existents (mode 'hired' o creades amb wizard amb empleats),
+  // marquem TOTES les missions que ja es compleixen com a completades silenciosament,
+  // SENSE donar XP ni mostrar modals. Així no es completen totes de cop quan l'usuari
+  // entra per primera vegada.
+  if (!gd.missions._calibrated) {
+    // Recórrer missions en ordre i marcar com a "completades silenciosament" 
+    // les que ja es compleixen al moment de la calibració
+    const toCalibrate = ['M01']; // Comencem per M01
+    const visited = new Set();
+    
+    while (toCalibrate.length > 0) {
+      const mid = toCalibrate.shift();
+      if (visited.has(mid)) continue;
+      visited.add(mid);
+      
+      if (gd.missions.completed.includes(mid)) {
+        // Ja completada — afegir desbloquejos
+        const m = MISSIONS.find(x => x.id === mid);
+        if (m) (m.unlocks||[]).forEach(u => toCalibrate.push(u));
+        continue;
+      }
+      
+      const mission = MISSIONS.find(m => m.id === mid);
+      if (!mission) continue;
+      
+      try {
+        // Si la missió ja es compleix, marcar com a completada SENSE recompensa
+        if (mission.check(gd)) {
+          gd.missions.completed.push(mid);
+          // Treure de active si hi era
+          gd.missions.active = gd.missions.active.filter(a => a !== mid);
+          // Encadenar desbloquejos
+          (mission.unlocks||[]).forEach(u => {
+            toCalibrate.push(u);
+            // Activar la propera missió
+            if (!gd.missions.completed.includes(u) && !gd.missions.active.includes(u)) {
+              gd.missions.active.push(u);
+            }
+          });
+        } else {
+          // No es compleix — activar-la per que sigui la propera missió real
+          if (!gd.missions.active.includes(mid)) {
+            gd.missions.active.push(mid);
+          }
+          // No continuar amb desbloquejos d'aquesta cadena fins que es compleixi
+        }
+      } catch(e) { /* ignore */ }
+    }
+    
+    gd.missions._calibrated = true;
+    console.log('🎯 Missions calibrades. Completades silenciosament:', gd.missions.completed.length);
+  }
+  
+  // Assegurar que SEMPRE hi ha alguna missió activa (la primera no completada)
+  const firstUncompleted = MISSIONS.find(m => !gd.missions.completed.includes(m.id));
+  if (firstUncompleted && !gd.missions.active.includes(firstUncompleted.id)) {
+    gd.missions.active.push(firstUncompleted.id);
   }
 }
 

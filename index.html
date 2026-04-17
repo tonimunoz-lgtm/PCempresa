@@ -1328,10 +1328,16 @@ body::before {
             <button type="button" class="auth-role-btn" id="role-professor" onclick="selectRole(this)">👩‍🏫 Professor/a</button>
           </div>
         </div>
+        <!-- ★ Codi de CLASSE: obligatori per a alumnes ★ -->
+        <div id="class-code-group" class="form-group">
+          <label>Codi de classe <span style="color:var(--red)">*</span></label>
+          <input class="form-input" type="text" id="reg-class-code" placeholder="EX: AB7K" style="letter-spacing:3px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;font-weight:700" maxlength="10">
+          <div style="font-size:11px;color:var(--text3);margin-top:5px">ℹ️ Codi facilitat pel teu professor/a. <strong>Imprescindible</strong> per jugar amb els teus companys.</div>
+        </div>
         <div id="prof-code-group" style="display:none" class="form-group">
-          <label>Codi professor/a</label>
+          <label>Codi professor/a <span style="color:var(--red)">*</span></label>
           <input class="form-input" type="text" id="reg-prof-code" placeholder="Codi facilitat pel centre" style="letter-spacing:2px;text-transform:uppercase">
-          <div style="font-size:11px;color:var(--text3);margin-top:5px">ℹ️ Contacta amb l admin del sistema per obtenir el codi.</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:5px">ℹ️ Contacta amb l'admin del sistema per obtenir el codi.</div>
         </div>
         <button class="auth-btn" onclick="doRegister()">Crear compte →</button>
       </div>
@@ -2083,7 +2089,9 @@ window.selectRole = function(btn) {
   document.querySelectorAll('.auth-role-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   const isProf = btn.id === 'role-professor';
+  // ★ Mostrar codi prof o codi classe segons el rol
   document.getElementById('prof-code-group').style.display = isProf ? '' : 'none';
+  document.getElementById('class-code-group').style.display = isProf ? 'none' : '';
 };
 
 window.doRegister = async function() {
@@ -2093,10 +2101,24 @@ window.doRegister = async function() {
   const pass    = document.getElementById('reg-pass').value;
   const isProf  = document.getElementById('role-professor')?.classList.contains('active');
   const profCode = document.getElementById('reg-prof-code')?.value.trim().toUpperCase();
+  const classCode = document.getElementById('reg-class-code')?.value.trim().toUpperCase();
 
   if (!name || !surname || !email || !pass) { showAuthErr('Omple tots els camps.'); return; }
   if (pass.length < 6) { showAuthErr('La contrasenya ha de tenir minim 6 caracters.'); return; }
   if (isProf && profCode !== PROF_CODE) { showAuthErr('Codi de professor incorrecte.'); return; }
+  
+  // ★★★ Codi de classe OBLIGATORI per a alumnes ★★★
+  if (!isProf) {
+    if (!classCode || classCode.length < 3) {
+      showAuthErr('Has d\'introduir el codi de classe que t\'ha donat el professor/a (mínim 3 caràcters).');
+      return;
+    }
+    // Validació de format: només lletres i números
+    if (!/^[A-Z0-9]+$/.test(classCode)) {
+      showAuthErr('El codi de classe només pot contenir lletres majúscules i números.');
+      return;
+    }
+  }
 
   try {
     const btn = document.querySelector('#register-form .auth-btn');
@@ -2105,6 +2127,22 @@ window.doRegister = async function() {
     const gd = defaultGameData(cred.user.uid, name + ' ' + surname);
     gd.isProf = !!isProf;
     gd.mode   = null; // Assegurar que comença a l'elecció
+    
+    // ★ Assignar el codi de classe ★
+    if (!isProf) {
+      gd.classCode = classCode;
+    } else {
+      // Si és professor, generar un codi de classe propi automàticament
+      const genCode = () => {
+        const ch = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        let c = '';
+        for (let i = 0; i < 4; i++) c += ch[Math.floor(Math.random()*ch.length)];
+        return c;
+      };
+      gd.classCode = genCode();
+      gd.profClasses = [{ code: gd.classCode, name: 'Classe 1', created: Date.now() }];
+    }
+    
     await setDoc(doc(db, 'games', cred.user.uid), gd);
     console.log('Registre OK: isProf=', gd.isProf);
   } catch(e) {
@@ -2203,17 +2241,35 @@ function startRealtimeListeners() {
   // Intentar llegir altres jugadors per al mapa (pot fallar per permisos)
   // Si falla, simplement no mostrem altres jugadors
   try {
-    const q = query(collection(db, 'games'), limit(30));
+    const q = query(collection(db, 'games'), limit(100));
     onSnapshot(q, (snap) => {
+      // ★★★ FIX BUG 4: Filtrar SEMPRE per classCode propi ★★★
+      // Cada usuari només veu els jugadors que comparteixen la seva classCode.
+      // El propi usuari sempre s'inclou (per coherència amb el rànquing).
+      const myClassCode = (G.gameData?.classCode || '').toUpperCase().trim();
+      
       G.otherPlayers = [];
       G.allStudents  = [];
+      
       snap.forEach(d => {
         const dat = d.data();
-        G.allStudents.push(dat);
-        if (d.id !== G.uid && dat.company) {
-          G.otherPlayers.push(dat);
+        const theirClassCode = (dat.classCode || '').toUpperCase().trim();
+        
+        // Sempre incloure'm a mi mateix
+        if (d.id === G.uid) {
+          G.allStudents.push(dat);
+          return;
+        }
+        
+        // Per als altres: només si compartim classCode (i tots dos en tenim)
+        if (myClassCode && theirClassCode && myClassCode === theirClassCode) {
+          G.allStudents.push(dat);
+          if (dat.company) G.otherPlayers.push(dat);
         }
       });
+      
+      console.log('🏫 allStudents filtrats per classCode "' + myClassCode + '": ' + G.allStudents.length + ' alumnes');
+      
       if (G.currentTab === 'map') renderMap();
       renderRanking();
     }, (err) => {
@@ -2230,7 +2286,7 @@ function startRealtimeListeners() {
 // ==================== UI INIT ====================
 function initUI() {
   const gd = G.gameData;
-  console.log('initUI: mode=', gd.mode, 'isProf=', gd.isProf, 'company=', gd.company?.name);
+  console.log('initUI: mode=', gd.mode, 'isProf=', gd.isProf, 'company=', gd.company?.name, 'classCode=', gd.classCode);
 
   document.getElementById('profile-name').textContent = gd.displayName || 'Jugador';
   updateTopStats();
@@ -2241,6 +2297,14 @@ function initUI() {
   const profSep = document.getElementById('prof-sep');
   if (navProf) navProf.style.display = G.isProf ? '' : 'none';
   if (profSep) profSep.style.display = G.isProf ? '' : 'none';
+  
+  // ★★★ FIX BUG 4: Si l'usuari NO té classCode, mostrar pantalla bloquejant ★★★
+  // Això passa per a usuaris registrats abans del fix.
+  if (!gd.classCode || gd.classCode.trim() === '') {
+    showClassCodeRequired();
+    G.initialized = true;
+    return;
+  }
 
   if (!gd.mode) {
     // Sense empresa → pantalla d'elecció
@@ -2264,6 +2328,90 @@ function initUI() {
   }
   G.initialized = true;
 }
+
+// ★ Pantalla bloquejant per a usuaris sense classCode (migració)
+function showClassCodeRequired() {
+  const gd = G.gameData;
+  const isProf = !!gd.isProf;
+  
+  // Amagar tot el game-screen normal i mostrar overlay
+  const existing = document.getElementById('classcode-required-overlay');
+  if (existing) existing.remove();
+  
+  const overlay = document.createElement('div');
+  overlay.id = 'classcode-required-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at center, rgba(14,20,45,.98), rgba(0,0,0,.99));backdrop-filter:blur(20px);padding:16px';
+  
+  overlay.innerHTML = `
+    <div style="background:linear-gradient(180deg, rgba(20,28,60,.99), rgba(8,12,24,.99));border:2px solid var(--accent);border-radius:24px;padding:32px;max-width:520px;width:100%;text-align:center;box-shadow:0 30px 100px rgba(0,0,0,.7)">
+      <div style="font-size:64px;margin-bottom:14px">🏫</div>
+      <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--text);margin-bottom:8px">${isProf ? 'Crea la teva classe' : 'Codi de classe necessari'}</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:24px">
+        ${isProf 
+          ? 'Per gestionar alumnes necessites un codi de classe. Pots inventar-ne un i compartir-lo amb els teus alumnes (ex: <strong style="color:var(--gold)">3RES1</strong> per a 3r ESO grup 1).'
+          : 'Per jugar amb els teus companys, has d\'introduir el <strong>codi de classe</strong> que t\'ha donat el teu professor/a. Sense codi no podràs veure els altres alumnes ni participar al rànquing.'}
+      </div>
+      <div style="margin-bottom:14px">
+        <input type="text" id="migrate-class-code" 
+          placeholder="Ex: AB7K" 
+          maxlength="10"
+          style="width:100%;background:rgba(255,255,255,.06);border:2px solid var(--border);border-radius:12px;padding:14px 18px;color:var(--text);font-size:18px;font-family:'JetBrains Mono',monospace;font-weight:700;letter-spacing:4px;text-transform:uppercase;text-align:center;outline:none">
+      </div>
+      <button onclick="window._saveClassCode()" 
+        style="width:100%;padding:14px;background:var(--accent);border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:800;cursor:pointer;font-family:var(--font);transition:.2s">
+        ✅ Confirmar codi de classe
+      </button>
+      <div id="migrate-class-err" style="color:var(--red);font-size:12px;margin-top:10px;display:none"></div>
+      ${isProf ? '<button onclick="window._generateClassCode()" style="margin-top:10px;background:rgba(245,158,11,.10);border:1px solid rgba(245,158,11,.25);color:var(--gold);padding:10px 20px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)">🎲 Generar-me un codi automàtic</button>' : ''}
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  
+  // Focus a l'input
+  setTimeout(() => document.getElementById('migrate-class-code')?.focus(), 100);
+}
+
+window._saveClassCode = async function() {
+  const inp = document.getElementById('migrate-class-code');
+  const err = document.getElementById('migrate-class-err');
+  if (!inp) return;
+  
+  const code = inp.value.trim().toUpperCase();
+  
+  if (!code || code.length < 3) {
+    err.textContent = '❌ El codi ha de tenir mínim 3 caràcters';
+    err.style.display = 'block';
+    return;
+  }
+  if (!/^[A-Z0-9]+$/.test(code)) {
+    err.textContent = '❌ Només lletres i números';
+    err.style.display = 'block';
+    return;
+  }
+  
+  G.gameData.classCode = code;
+  // Si és professor, també desar la classe a profClasses
+  if (G.gameData.isProf) {
+    G.gameData.profClasses = G.gameData.profClasses || [];
+    if (!G.gameData.profClasses.find(c => c.code === code)) {
+      G.gameData.profClasses.push({ code, name: 'Classe principal', created: Date.now() });
+    }
+  }
+  await saveGameData();
+  
+  document.getElementById('classcode-required-overlay')?.remove();
+  showToast('✅ Classe assignada: ' + code);
+  
+  // Re-inicialitzar UI
+  initUI();
+};
+
+window._generateClassCode = function() {
+  const ch = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let c = '';
+  for (let i = 0; i < 4; i++) c += ch[Math.floor(Math.random()*ch.length)];
+  document.getElementById('migrate-class-code').value = c;
+};
 
 function showSetupInit() {
   document.getElementById('setup-init').style.display = '';
@@ -2674,6 +2822,11 @@ async function createCompanyFromQuickStart() {
   
   // Guardar i mostrar el joc
   await saveGameData();
+  
+  // ★ FIX: Amagar la pantalla "Creant..." abans de mostrar el joc actiu
+  document.getElementById('quickstart-area').style.display = 'none';
+  document.getElementById('quickstart-area').innerHTML = ''; // Netejar contingut
+  
   showActiveGame();
   showTab('dashboard');
   renderDashboard();
