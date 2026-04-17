@@ -593,6 +593,364 @@ CSS.textContent = `
   margin-top: 8px;
 }
 
+/* ══ NOTÍCIES DEL VALLÈS — Feed estil X amb moviments dels companys ══ */
+.news-feed {
+  background: linear-gradient(180deg, rgba(20,28,60,.6), rgba(8,12,24,.6));
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  padding: 16px;
+  max-height: 380px;
+  overflow-y: auto;
+}
+.news-feed-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.news-feed-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.news-feed-live {
+  font-size: 9px;
+  font-weight: 800;
+  color: #fff;
+  background: var(--red);
+  padding: 2px 7px;
+  border-radius: 10px;
+  letter-spacing: 1px;
+  animation: livePulse 1.5s ease-in-out infinite;
+}
+@keyframes livePulse {
+  0%,100% { opacity: 1; }
+  50% { opacity: .55; }
+}
+@keyframes newTabPop {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ══ APOSTES SETMANALS — Mini-event de risc ══ */
+.bet-card {
+  background: linear-gradient(135deg, rgba(124,58,237,.10), rgba(245,158,11,.08));
+  border: 1px solid rgba(124,58,237,.30);
+  border-radius: 16px;
+  padding: 18px;
+  margin-top: 10px;
+  position: relative;
+  overflow: hidden;
+}
+.bet-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 40%, rgba(124,58,237,.08), transparent 60%);
+  animation: quickGlow 4s linear infinite;
+  pointer-events: none;
+}
+.bet-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 2;
+}
+.bet-icon {
+  font-size: 28px;
+}
+.bet-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+  flex: 1;
+}
+.bet-tag {
+  font-size: 9px;
+  font-weight: 800;
+  background: rgba(245,158,11,.20);
+  color: var(--gold);
+  padding: 3px 8px;
+  border-radius: 10px;
+  letter-spacing: 1px;
+}
+.bet-question {
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: 14px;
+  line-height: 1.5;
+  position: relative;
+  z-index: 2;
+}
+.bet-question strong { color: var(--gold); }
+.bet-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  position: relative;
+  z-index: 2;
+}
+.bet-option {
+  padding: 12px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: .2s;
+  text-align: center;
+  font-family: var(--font);
+}
+.bet-option:hover {
+  background: rgba(124,58,237,.10);
+  border-color: rgba(124,58,237,.50);
+  transform: translateY(-2px);
+}
+.bet-option-icon { font-size: 22px; display: block; margin-bottom: 4px; }
+.bet-option-text { font-size: 12px; font-weight: 700; color: var(--text); }
+.bet-option-payout { font-size: 10px; color: var(--gold); margin-top: 2px; font-weight: 700; }
+.bet-result {
+  text-align: center;
+  padding: 14px;
+  border-radius: 10px;
+  margin-top: 8px;
+}
+.bet-result.win {
+  background: rgba(16,185,129,.10);
+  border: 1px solid rgba(16,185,129,.30);
+}
+.bet-result.lose {
+  background: rgba(239,68,68,.10);
+  border: 1px solid rgba(239,68,68,.30);
+}
+
+/* ══ SPLASH INICIAL — Ranking quan obres la sessió ══ */
+.session-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at center, rgba(14,20,45,.98), rgba(0,0,0,.99));
+  backdrop-filter: blur(20px);
+  cursor: pointer;
+  animation: fadeIn .4s ease;
+}
+.session-splash-card {
+  background: linear-gradient(180deg, rgba(20,28,60,.99), rgba(8,12,24,.99));
+  border: 2px solid var(--accent);
+  border-radius: 24px;
+  padding: 32px 36px;
+  max-width: 540px;
+  width: calc(100vw - 32px);
+  text-align: center;
+  animation: splashIn .5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 30px 80px rgba(0,0,0,.7), 0 0 80px rgba(79,127,255,.25);
+  cursor: default;
+}
+@keyframes splashIn {
+  from { transform: scale(0.7) translateY(40px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+.splash-greeting {
+  font-size: 13px;
+  color: var(--text2);
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
+}
+.splash-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 18px;
+  letter-spacing: -0.5px;
+}
+.splash-position {
+  font-size: 80px;
+  font-weight: 900;
+  font-family: 'JetBrains Mono', monospace;
+  background: linear-gradient(135deg, var(--gold), #ffae00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1;
+  margin-bottom: 4px;
+  animation: rocketLaunch 1.5s ease-in-out infinite;
+}
+.splash-position-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text3);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 22px;
+}
+.splash-podium {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 22px;
+  height: 130px;
+}
+.splash-podium-spot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  max-width: 110px;
+}
+.splash-podium-bar {
+  width: 100%;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 800;
+  font-size: 22px;
+  color: #fff;
+}
+.splash-podium-spot.gold .splash-podium-bar {
+  height: 110px;
+  background: linear-gradient(180deg, #ffd700, #b8860b);
+  box-shadow: 0 -4px 30px rgba(255,215,0,.4);
+}
+.splash-podium-spot.silver .splash-podium-bar {
+  height: 80px;
+  background: linear-gradient(180deg, #c0c0c0, #808080);
+}
+.splash-podium-spot.bronze .splash-podium-bar {
+  height: 55px;
+  background: linear-gradient(180deg, #cd7f32, #8b4513);
+}
+.splash-podium-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text);
+  text-align: center;
+  line-height: 1.2;
+}
+.splash-podium-cash {
+  font-size: 10px;
+  color: var(--text2);
+  font-family: 'JetBrains Mono', monospace;
+}
+.splash-rival-msg {
+  background: rgba(245,158,11,.08);
+  border: 1px solid rgba(245,158,11,.25);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 18px;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.5;
+}
+.splash-rival-msg strong { color: var(--gold); }
+.splash-cta {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+.splash-cta button {
+  flex: 1;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: .2s;
+}
+.splash-cta-primary {
+  background: var(--accent);
+  color: #fff;
+}
+.splash-cta-primary:hover { background: #3d6dee; transform: translateY(-1px); }
+.splash-cta-secondary {
+  background: rgba(255,255,255,.06);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.splash-cta-secondary:hover { background: rgba(255,255,255,.1); }
+.news-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  animation: newsSlide .4s ease backwards;
+}
+.news-item:last-child { border-bottom: none; }
+@keyframes newsSlide {
+  from { transform: translateX(-12px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.news-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  border: 2px solid var(--border2);
+}
+.news-content {
+  flex: 1;
+  min-width: 0;
+}
+.news-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 3px;
+}
+.news-name {
+  font-weight: 800;
+  font-size: 12px;
+  color: var(--text);
+}
+.news-time {
+  font-size: 10px;
+  color: var(--text3);
+}
+.news-text {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.45;
+}
+.news-text strong { color: var(--text); }
+.news-tag {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 8px;
+  margin-right: 4px;
+  letter-spacing: .3px;
+  text-transform: uppercase;
+}
+.news-tag.win    { background: rgba(16,185,129,.15); color: var(--green); }
+.news-tag.fail   { background: rgba(239,68,68,.15); color: var(--red); }
+.news-tag.market { background: rgba(245,158,11,.15); color: var(--gold); }
+.news-tag.event  { background: rgba(124,58,237,.15); color: #a78bfa; }
+.news-tag.you    { background: rgba(79,127,255,.20); color: var(--accent); }
+
 /* ══ MISSIÓ PERSISTENT (sota topbar) ══ */
 .mission-bar {
   display: flex;
@@ -1603,15 +1961,16 @@ const TAB_UNLOCK_CONDITIONS = {
   production: { always: true },
   marketing: { always: true },
   
-  // Unlock conditions
-  sales:       { week: 3, label: 'Setmana 3', desc: 'Avança fins a la setmana 3 per desbloquejar Vendes' },
-  borsa:       { week: 8, prestigi: 10, label: 'S8 + Prestigi 10', desc: 'Arriba a la setmana 8 amb prestigi 10 per desbloquejar la Borsa' },
-  junta:       { week: 6, employees: 3, label: 'S6 + 3 empleats', desc: 'Setmana 6 amb 3 empleats per desbloquejar la Junta' },
-  trade:       { week: 12, prestigi: 20, label: 'S12 + Prestigi 20', desc: 'Setmana 12 amb prestigi 20 per al Comerç Exterior' },
-  franquicies: { week: 16, cash: 50000, label: 'S16 + 50k€', desc: 'Setmana 16 amb 50.000€ per desbloquejar Franquícies' },
-  proveidors:  { week: 4, label: 'Setmana 4', desc: 'Avança fins a la setmana 4 per desbloquejar Proveïdors' },
-  laborals:    { week: 10, employees: 5, label: 'S10 + 5 empleats', desc: 'Setmana 10 amb 5 empleats per a Relacions Laborals' },
-  rdi:         { week: 14, prestigi: 15, label: 'S14 + Prestigi 15', desc: 'Setmana 14 amb prestigi 15 per desbloquejar R+D+I' },
+  // ★★★ Unlock conditions REVISADES — més permissives ★★★
+  // Filosofia: enganxar primer, complicar després
+  sales:       { week: 2, label: 'Setmana 2', desc: 'Avança fins a la setmana 2 per desbloquejar Vendes' },
+  borsa:       { week: 2, label: 'Setmana 2', desc: 'Avança fins a la setmana 2 — el que els alumnes voleu! 📈₿' },
+  junta:       { week: 4, employees: 2, label: 'S4 + 2 empleats', desc: 'Setmana 4 amb 2 empleats per desbloquejar la Junta' },
+  trade:       { week: 8, prestigi: 10, label: 'S8 + Prestigi 10', desc: 'Setmana 8 amb prestigi 10 per al Comerç Exterior' },
+  franquicies: { week: 12, cash: 25000, label: 'S12 + 25k€', desc: 'Setmana 12 amb 25.000€ per desbloquejar Franquícies' },
+  proveidors:  { week: 3, label: 'Setmana 3', desc: 'Avança fins a la setmana 3 per desbloquejar Proveïdors' },
+  laborals:    { week: 6, employees: 3, label: 'S6 + 3 empleats', desc: 'Setmana 6 amb 3 empleats per a Relacions Laborals' },
+  rdi:         { week: 10, prestigi: 10, label: 'S10 + Prestigi 10', desc: 'Setmana 10 amb prestigi 10 per desbloquejar R+D+I' },
   map:         { always: true },
 };
 
@@ -1647,29 +2006,58 @@ function updateTabLocks() {
     
     if (isUnlocked) {
       nav.classList.remove('locked');
+      // ★ Mostrar el tab si abans estava ocult
+      nav.style.display = '';
       _lockedTabs.delete(tabId);
       if (wasLocked) {
         justUnlocked.push(tabId);
       }
     } else {
       nav.classList.add('locked');
+      // ★ MODE PRINCIPIANT: amagar completament els tabs bloquejats
+      // així el menú lateral és menys aclaparador per a alumnes nous
+      nav.style.display = 'none';
       _lockedTabs.add(tabId);
     }
+  });
+  
+  // ★ Amagar separadors si tots els tabs del seu grup estan amagats ★
+  // Si un nav-sep no té cap tab visible al seu costat, no cal mostrar-lo
+  document.querySelectorAll('.nav-sep').forEach(sep => {
+    let next = sep.nextElementSibling;
+    let hasVisibleNext = false;
+    while (next && !next.classList?.contains('nav-sep')) {
+      if (next.classList?.contains('nav-btn') && next.style.display !== 'none') {
+        hasVisibleNext = true; break;
+      }
+      next = next.nextElementSibling;
+    }
+    sep.style.display = hasVisibleNext ? '' : 'none';
   });
   
   // Animació de desbloquejat
   justUnlocked.forEach(tabId => {
     const nav = document.getElementById('nav-' + tabId);
     if (nav) {
-      nav.style.animation = 'none';
-      requestAnimationFrame(() => {
-        nav.style.animation = 'missionGlow 1s ease-in-out 3';
-        nav.style.borderColor = 'var(--green)';
-        setTimeout(() => { nav.style.borderColor = ''; nav.style.animation = ''; }, 3000);
-      });
+      // ★ Animació "POOF" d'aparició + glow
+      nav.style.animation = 'newTabPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+      nav.style.borderColor = 'var(--green)';
+      
+      // Badge "NOU!" temporal
+      const badge = document.createElement('div');
+      badge.textContent = 'NOU';
+      badge.style.cssText = 'position:absolute;top:-4px;right:-4px;background:linear-gradient(135deg,var(--green),#10dca3);color:#fff;font-size:8px;font-weight:800;padding:2px 5px;border-radius:8px;letter-spacing:0.5px;animation:moodBounce 1s ease-in-out infinite;z-index:5';
+      nav.style.position = 'relative';
+      nav.appendChild(badge);
+      
+      setTimeout(() => { 
+        nav.style.borderColor = ''; 
+        nav.style.animation = '';
+        if (badge.parentNode) badge.remove();
+      }, 8000);
     }
-    showEventToast('🔓', 'Nova secció!', `Has desbloquejat: ${tabId.toUpperCase()}`, true);
-    showToast('🔓 Nova secció desbloquejada: ' + tabId);
+    showEventToast('🔓', 'Nova secció desbloquejada!', `Ara pots accedir a: ${tabId.toUpperCase()}`, true);
+    if (window.playSfx) window.playSfx('success');
   });
 }
 
@@ -2344,6 +2732,801 @@ function injectSfxToggle() {
 
 
 // ════════════════════════════════════════════════════════════
+//  ★★★ MÒDUL K: NOTÍCIES DEL VALLÈS — Feed competitiu ★★★
+//  Crea FOMO i visibilitat dels moviments dels companys
+// ════════════════════════════════════════════════════════════
+
+// Generar notícies basant-se en allStudents i el meu propi estat
+function generateNewsItems() {
+  const items = [];
+  const G = getG();
+  if (!G) return items;
+  
+  const gd = G.gameData;
+  const myUid = G.uid;
+  const allStudents = G.allStudents || [];
+  const otherStudents = allStudents.filter(s => s && s.uid !== myUid && s.company);
+  
+  // ─── Notícies sobre companys ───
+  otherStudents.forEach(s => {
+    const cash = s.finances?.cash || 0;
+    const rev = s.finances?.monthly_revenue || 0;
+    const costs = s.finances?.monthly_costs || 0;
+    const result = rev - costs;
+    const week = s.week || 1;
+    const empCount = (s.employees||[]).length;
+    
+    // Empresa molt rica
+    if (cash >= 100000) {
+      items.push({
+        avatar: s.company?.sectorData?.icon || '🏢',
+        name: s.displayName,
+        company: s.company?.name,
+        time: `S${week}`,
+        type: 'win',
+        tag: 'BOOM',
+        text: `<strong>${s.company?.name||'?'}</strong> supera els <strong>100.000€</strong> de tresoreria. Imperi en construcció!`,
+        priority: 4,
+      });
+    } else if (cash >= 50000) {
+      items.push({
+        avatar: s.company?.sectorData?.icon || '🏢',
+        name: s.displayName,
+        company: s.company?.name,
+        time: `S${week}`,
+        type: 'win',
+        tag: 'TOP',
+        text: `<strong>${s.company?.name||'?'}</strong> arriba a <strong>${(cash/1000).toFixed(0)}k€</strong> de tresoreria. Vigila la competència!`,
+        priority: 3,
+      });
+    }
+    
+    // Empresa en crisi
+    if (cash < 0) {
+      items.push({
+        avatar: '🚨',
+        name: s.displayName,
+        company: s.company?.name,
+        time: `S${week}`,
+        type: 'fail',
+        tag: 'CRISI',
+        text: `<strong>${s.company?.name||'?'}</strong> té tresoreria negativa (${cash.toLocaleString('ca')}€). Risc de fallida!`,
+        priority: 4,
+      });
+    } else if (result < -2000) {
+      items.push({
+        avatar: '📉',
+        name: s.displayName,
+        company: s.company?.name,
+        time: `S${week}`,
+        type: 'fail',
+        tag: 'PÈRDUES',
+        text: `<strong>${s.company?.name||'?'}</strong> perd <strong>${Math.abs(result).toLocaleString('ca')}€/mes</strong>. Què està passant?`,
+        priority: 2,
+      });
+    }
+    
+    // Equip gran
+    if (empCount >= 8) {
+      items.push({
+        avatar: '👥',
+        name: s.displayName,
+        company: s.company?.name,
+        time: `S${week}`,
+        type: 'win',
+        tag: 'EQUIP',
+        text: `<strong>${s.company?.name||'?'}</strong> ja té <strong>${empCount} empleats</strong>. Negoci en expansió.`,
+        priority: 2,
+      });
+    }
+    
+    // Prestigi alt
+    if ((s.prestigi||0) >= 30) {
+      items.push({
+        avatar: '⭐',
+        name: s.displayName,
+        company: s.company?.name,
+        time: `S${week}`,
+        type: 'win',
+        tag: 'PRESTIGI',
+        text: `<strong>${s.company?.name||'?'}</strong> arriba a <strong>${(s.prestigi||0).toFixed(0)} de prestigi</strong>. Reputació top.`,
+        priority: 1,
+      });
+    }
+    
+    // Té cartera d'inversions
+    const stocks = Object.keys(s.portfolio?.stocks||{});
+    const cryptos = Object.keys(s.portfolio?.crypto||{});
+    if (stocks.length >= 3 || cryptos.length >= 2) {
+      items.push({
+        avatar: stocks.length > cryptos.length ? '📈' : '₿',
+        name: s.displayName,
+        company: s.company?.name,
+        time: `S${week}`,
+        type: 'market',
+        tag: cryptos.length > 0 ? 'CRIPTO' : 'BORSA',
+        text: `<strong>${s.displayName}</strong> està invertint a <strong>${stocks.length+cryptos.length} actius</strong>. Diversificant!`,
+        priority: 1,
+      });
+    }
+  });
+  
+  // ─── Notícies pròpies (autoreferencials per crear context) ───
+  if (gd.company) {
+    const myCash = gd.finances?.cash || 0;
+    const lb = gd._lastRevenueBreakdown;
+    
+    // Avisos de penalització
+    if (lb && lb.avisos && lb.avisos.some(a => a.severity === 'critic')) {
+      const crit = lb.avisos.find(a => a.severity === 'critic');
+      items.push({
+        avatar: '⚠️',
+        name: 'Tu',
+        company: gd.company?.name,
+        time: `Ara`,
+        type: 'fail',
+        tag: 'TU · ATENCIÓ',
+        text: `<strong>${crit.text}</strong>. Estàs perdent ingressos!`,
+        priority: 5,
+        isMe: true,
+      });
+    }
+    
+    // Comparativa amb la mitjana
+    const myCashRank = otherStudents.filter(s => (s.finances?.cash||0) > myCash).length + 1;
+    if (otherStudents.length >= 2) {
+      if (myCashRank === 1) {
+        items.push({
+          avatar: '👑',
+          name: 'Tu',
+          company: gd.company?.name,
+          time: `Ara`,
+          type: 'win',
+          tag: 'TU · LÍDER',
+          text: `Ets el <strong>#1 en tresoreria</strong> de la classe! Mantén el ritme.`,
+          priority: 3,
+          isMe: true,
+        });
+      } else if (myCashRank <= 3) {
+        items.push({
+          avatar: '🥉',
+          name: 'Tu',
+          company: gd.company?.name,
+          time: `Ara`,
+          type: 'win',
+          tag: 'TU · TOP 3',
+          text: `Ets <strong>#${myCashRank}</strong> en tresoreria de la classe. Falta poc per al podi!`,
+          priority: 2,
+          isMe: true,
+        });
+      } else if (myCashRank > otherStudents.length / 2) {
+        // Quart competidor per davant
+        const sorted = [...otherStudents].sort((a,b) => (b.finances?.cash||0) - (a.finances?.cash||0));
+        const next = sorted[Math.max(0, myCashRank - 2)];
+        if (next && next.finances?.cash > myCash) {
+          const diff = next.finances.cash - myCash;
+          items.push({
+            avatar: '🎯',
+            name: 'Tu',
+            company: gd.company?.name,
+            time: `Ara`,
+            type: 'event',
+            tag: 'TU · OBJECTIU',
+            text: `<strong>${next.displayName}</strong> et porta <strong>${diff.toLocaleString('ca')}€</strong> d'avantatge. Pots remuntar!`,
+            priority: 3,
+            isMe: true,
+          });
+        }
+      }
+    }
+  }
+  
+  // ─── Notícies de mercat (context global) ───
+  const week = gd?.week || 1;
+  const marketNews = [
+    { tag: 'BORSA', text: 'L\'IBEX35 obre amb pujades del <strong>+0.8%</strong>. Bon dia per invertir.', avatar: '📈' },
+    { tag: 'CRIPTO', text: 'Bitcoin marca màxims setmanals. Volatilitat alta!', avatar: '₿' },
+    { tag: 'ECONOMIA', text: 'L\'Euríbor baixa al <strong>2.65%</strong>. Préstecs més barats.', avatar: '🏦' },
+    { tag: 'VALLÈS', text: 'Granollers anuncia subvencions per a empreses joves del Vallès.', avatar: '🏛️' },
+    { tag: 'MERCAT', text: 'Augment de la demanda en el sector tecnològic aquest trimestre.', avatar: '📊' },
+  ];
+  if (week % 3 === 0 && marketNews.length > 0) {
+    const mn = marketNews[week % marketNews.length];
+    items.push({
+      avatar: mn.avatar,
+      name: 'El Periòdic del Vallès',
+      company: '',
+      time: `S${week}`,
+      type: 'market',
+      tag: mn.tag,
+      text: mn.text,
+      priority: 1,
+    });
+  }
+  
+  // Ordenar per prioritat (descendent) i limitar
+  items.sort((a, b) => (b.priority||0) - (a.priority||0));
+  return items.slice(0, 12);
+}
+
+function renderNewsFeed() {
+  const items = generateNewsItems();
+  
+  if (items.length === 0) {
+    return `
+      <div class="news-feed">
+        <div class="news-feed-header">
+          <div class="news-feed-title">📰 Notícies del Vallès</div>
+          <div class="news-feed-live">LIVE</div>
+        </div>
+        <div style="text-align:center;padding:30px;color:var(--text3);font-size:12px">
+          Encara no hi ha notícies. Quan els companys juguin apareixeran aquí!
+        </div>
+      </div>`;
+  }
+  
+  return `
+    <div class="news-feed">
+      <div class="news-feed-header">
+        <div class="news-feed-title">📰 Notícies del Vallès <span style="font-size:10px;color:var(--text3);font-weight:400">${items.length} actualitzacions</span></div>
+        <div class="news-feed-live">LIVE</div>
+      </div>
+      ${items.map((it, i) => `
+        <div class="news-item" style="animation-delay:${i*0.05}s;${it.isMe?'background:rgba(79,127,255,.04);border-radius:10px;padding:12px;border-bottom:none;margin-bottom:6px':''}">
+          <div class="news-avatar" style="${it.isMe?'background:linear-gradient(135deg,var(--accent),var(--gold))':''}">${it.avatar}</div>
+          <div class="news-content">
+            <div class="news-meta">
+              <span class="news-name">${it.name}</span>
+              ${it.company ? `<span style="font-size:10px;color:var(--text3)">· ${it.company}</span>` : ''}
+              <span class="news-time" style="margin-left:auto">${it.time}</span>
+            </div>
+            <div class="news-text">
+              <span class="news-tag ${it.type}">${it.tag}</span>
+              ${it.text}
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    </div>`;
+}
+
+// Inyectar el feed en el dashboard
+function injectNewsFeed() {
+  const dashWrap = document.querySelector('.dash-wrap');
+  if (!dashWrap) return;
+  const gd = getG()?.gameData;
+  if (!gd || !gd.mode) return;
+  
+  let panel = document.getElementById('news-feed-inject');
+  if (!panel) {
+    panel = document.createElement('div');
+    panel.id = 'news-feed-inject';
+    panel.style.marginTop = '10px';
+    // Inserir-lo al final, abans del P2P (que és l'últim element)
+    const p2p = document.getElementById('p2p-inject');
+    if (p2p) dashWrap.insertBefore(panel, p2p);
+    else dashWrap.appendChild(panel);
+  }
+  panel.innerHTML = renderNewsFeed();
+}
+
+window.renderNewsFeed = renderNewsFeed;
+window.injectNewsFeed = injectNewsFeed;
+
+
+// ════════════════════════════════════════════════════════════
+//  ★★★ MÒDUL L: SISTEMA DE RATXES (STREAKS) ★★★
+//  Setmanes positives consecutives — efecte 🔥 visible
+// ════════════════════════════════════════════════════════════
+
+function updateProfitStreak(gd, weekResult) {
+  if (!gd._profitStreak) gd._profitStreak = { current: 0, best: 0 };
+  
+  if (weekResult >= 0) {
+    gd._profitStreak.current = (gd._profitStreak.current || 0) + 1;
+    if (gd._profitStreak.current > (gd._profitStreak.best || 0)) {
+      gd._profitStreak.best = gd._profitStreak.current;
+    }
+    
+    // Notificacions especials de ratxa
+    const c = gd._profitStreak.current;
+    if (c === 3) {
+      showEventToast('🔥', 'Ratxa de 3 setmanes!', 'Tres setmanes positives seguides. Continua!', true);
+      playSfx('cling');
+    } else if (c === 5) {
+      showEventToast('🔥🔥', 'Ratxa de 5!', 'Cinc setmanes en positiu. La maquinària funciona!', true);
+      playSfx('success');
+      gd.prestigi = (gd.prestigi||0) + 2;
+    } else if (c === 10) {
+      showEventToast('🔥🔥🔥', 'Ratxa LLEGENDÀRIA!', '10 setmanes en positiu. Ets una llegenda!', true);
+      playSfx('success');
+      gd.prestigi = (gd.prestigi||0) + 5;
+    } else if (c % 5 === 0 && c > 10) {
+      showEventToast('🔥', `Ratxa de ${c} setmanes!`, 'Increïble. Continues imparable.', true);
+    }
+  } else {
+    // Trencament de ratxa
+    if ((gd._profitStreak.current||0) >= 3) {
+      showEventToast('💔', 'Ratxa trencada!', `Has perdut una ratxa de ${gd._profitStreak.current} setmanes. Recupera-la!`, false);
+      playSfx('fail');
+    }
+    gd._profitStreak.current = 0;
+  }
+}
+
+// Renderitzar badge de ratxa al topbar
+function injectStreakBadge() {
+  const gd = getG()?.gameData;
+  if (!gd) return;
+  
+  const streak = gd._profitStreak?.current || 0;
+  let badge = document.getElementById('streak-badge-inject');
+  
+  // Si no hi ha ratxa significativa, no mostrar
+  if (streak < 2) {
+    if (badge) badge.remove();
+    return;
+  }
+  
+  // Crear si no existeix
+  if (!badge) {
+    const weekDisplay = document.getElementById('week-display');
+    if (!weekDisplay) return;
+    badge = document.createElement('div');
+    badge.id = 'streak-badge-inject';
+    badge.style.cssText = 'display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,rgba(245,158,11,.20),rgba(239,68,68,.18));border:1px solid rgba(245,158,11,.40);padding:5px 10px;border-radius:20px;font-size:11px;font-weight:800;color:var(--gold);font-family:var(--font);margin-right:8px;animation:moodBounce 1.5s ease-in-out infinite;cursor:default';
+    badge.title = 'Setmanes consecutives en positiu';
+    weekDisplay.parentNode.insertBefore(badge, weekDisplay);
+  }
+  
+  // Determinar emoji segons mida
+  let fireIcon = '🔥';
+  if (streak >= 10) fireIcon = '🔥🔥🔥';
+  else if (streak >= 5) fireIcon = '🔥🔥';
+  
+  badge.innerHTML = `${fireIcon} <span style="font-family:'JetBrains Mono',monospace">${streak}</span>`;
+}
+
+window.injectStreakBadge = injectStreakBadge;
+
+
+// ════════════════════════════════════════════════════════════
+//  ★★★ MÒDUL M: SPLASH INICIAL — Rànquing en obrir sessió ★★★
+//  El primer que veuen els alumnes = la seva posició
+// ════════════════════════════════════════════════════════════
+
+function showSessionSplash() {
+  const G = getG();
+  if (!G) return;
+  const gd = G.gameData;
+  if (!gd || !gd.mode || !gd.company) return;
+  
+  // Només mostrar un cop per sessió (no cada vegada que es renderitza)
+  if (window._splashShown) return;
+  window._splashShown = true;
+  
+  // Calcular el meu rànquing
+  const allStudents = (G.allStudents || []).filter(s => s && s.company);
+  
+  // Si jo no apareixo a la llista (encara no s'ha sincronitzat), afegir-me
+  if (!allStudents.find(s => s.uid === G.uid)) {
+    allStudents.push(gd);
+  }
+  
+  // Ordenar per cash (tresoreria) descendent
+  const ranked = [...allStudents].sort((a, b) => 
+    ((b.finances?.cash||0) - (a.finances?.cash||0))
+  );
+  
+  // La meva posició
+  const myPosition = ranked.findIndex(s => s.uid === G.uid) + 1;
+  const myCash = gd.finances?.cash || 0;
+  
+  // Si sóc l'únic, no mostrar splash competitiu
+  if (ranked.length < 2) {
+    showSinglePlayerSplash();
+    return;
+  }
+  
+  // Trobar rival a perseguir (un per damunt) o defendre's de (un per sota)
+  let rivalMsg = '';
+  if (myPosition === 1) {
+    const second = ranked[1];
+    const lead = myCash - (second.finances?.cash||0);
+    rivalMsg = `👑 Estàs al <strong>#1</strong>! <strong>${second.displayName}</strong> et persegueix amb una diferència de <strong>${lead.toLocaleString('ca')}€</strong>. Mantén el ritme!`;
+  } else {
+    const above = ranked[myPosition - 2]; // posició - 1 - 1 (índex base 0)
+    const gap = (above.finances?.cash||0) - myCash;
+    rivalMsg = `🎯 <strong>${above.displayName}</strong> (${above.company?.name||'?'}) et porta <strong>${gap.toLocaleString('ca')}€</strong> d'avantatge. Pots remuntar avui!`;
+  }
+  
+  // Top 3 per al podi
+  const top3 = ranked.slice(0, 3);
+  while (top3.length < 3) top3.push(null);
+  
+  const podium = [
+    { rank: 2, cls: 'silver', medal: '🥈', data: top3[1] },
+    { rank: 1, cls: 'gold',   medal: '🥇', data: top3[0] },
+    { rank: 3, cls: 'bronze', medal: '🥉', data: top3[2] },
+  ];
+  
+  const positionEmoji = myPosition === 1 ? '🥇' : myPosition === 2 ? '🥈' : myPosition === 3 ? '🥉' : '#' + myPosition;
+  const positionMood = myPosition === 1 ? '👑 LÍDER ABSOLUT' 
+                     : myPosition <= 3 ? '🏆 AL PODI' 
+                     : myPosition <= ranked.length / 2 ? '💪 EN LA LLUITA' 
+                     : '🚀 A REMUNTAR';
+  
+  const splash = document.createElement('div');
+  splash.id = 'session-splash';
+  splash.className = 'session-splash';
+  splash.innerHTML = `
+    <div class="session-splash-card" onclick="event.stopPropagation()">
+      <div class="splash-greeting">Benvingut/da de nou,</div>
+      <div class="splash-name">${gd.displayName} 👋</div>
+      
+      <div class="splash-position">${positionEmoji}</div>
+      <div class="splash-position-label">${positionMood} · ${ranked.length} EMPRESES</div>
+      
+      <div class="splash-podium">
+        ${podium.map(p => `
+          <div class="splash-podium-spot ${p.cls}">
+            <div style="font-size:24px;margin-bottom:4px">${p.medal}</div>
+            <div class="splash-podium-bar">${p.rank}</div>
+            <div class="splash-podium-name">${p.data ? (p.data.uid === G.uid ? '<strong style="color:var(--accent)">TU</strong>' : (p.data.displayName||'?').split(' ')[0]) : '—'}</div>
+            <div class="splash-podium-cash">${p.data ? Math.round((p.data.finances?.cash||0)/1000)+'k€' : '—'}</div>
+          </div>
+        `).join('')}
+      </div>
+      
+      <div class="splash-rival-msg">${rivalMsg}</div>
+      
+      <div class="splash-cta">
+        <button class="splash-cta-secondary" onclick="window._closeSplash()">Tancar</button>
+        <button class="splash-cta-primary" onclick="window._closeSplash();window.advanceWeek()">⏩ Avançar setmana</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(splash);
+  
+  // Reproduir so motivador
+  if (window.playSfx) {
+    setTimeout(() => playSfx(myPosition <= 3 ? 'success' : 'cling'), 300);
+  }
+  
+  splash.addEventListener('click', e => {
+    if (e.target === splash) window._closeSplash();
+  });
+}
+
+function showSinglePlayerSplash() {
+  const G = getG();
+  const gd = G?.gameData;
+  if (!gd) return;
+  
+  const cash = gd.finances?.cash || 0;
+  const week = gd.week || 1;
+  
+  const splash = document.createElement('div');
+  splash.id = 'session-splash';
+  splash.className = 'session-splash';
+  splash.innerHTML = `
+    <div class="session-splash-card" onclick="event.stopPropagation()">
+      <div class="splash-greeting">Benvingut/da,</div>
+      <div class="splash-name">${gd.displayName} 👋</div>
+      
+      <div style="font-size:60px;margin-bottom:8px">${gd.company?.sectorData?.icon||'🏢'}</div>
+      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px">${gd.company?.name||'La teva empresa'}</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:18px">Setmana ${week} · ${cash.toLocaleString('ca')}€ a tresoreria</div>
+      
+      <div class="splash-rival-msg" style="background:rgba(124,58,237,.08);border-color:rgba(124,58,237,.25)">
+        ⏳ Encara no hi ha altres empreses a la classe. <strong>Quan els companys juguin, podràs competir-hi!</strong> Mentrestant, fes créixer la teva empresa.
+      </div>
+      
+      <div class="splash-cta">
+        <button class="splash-cta-secondary" onclick="window._closeSplash()">Tancar</button>
+        <button class="splash-cta-primary" onclick="window._closeSplash();window.advanceWeek()">⏩ Avançar setmana</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(splash);
+  
+  if (window.playSfx) setTimeout(() => playSfx('cling'), 300);
+  
+  splash.addEventListener('click', e => {
+    if (e.target === splash) window._closeSplash();
+  });
+}
+
+window._closeSplash = function() {
+  const el = document.getElementById('session-splash');
+  if (el) {
+    el.style.animation = 'fadeIn .3s ease reverse';
+    setTimeout(() => el.remove(), 280);
+  }
+  if (window.playSfx) playSfx('click');
+};
+
+window.showSessionSplash = showSessionSplash;
+
+
+// ════════════════════════════════════════════════════════════
+//  ★★★ MÒDUL N: APOSTES SETMANALS ★★★
+//  Activa el gust pel risc i la competició
+// ════════════════════════════════════════════════════════════
+
+const BET_AMOUNT = 500; // Quantitat fixa per apostar
+
+function generateWeeklyBet(gd) {
+  if (!gd._weeklyBet) gd._weeklyBet = null;
+  
+  // Si ja hi ha aposta activa o ja s'ha fet aquesta setmana, no generar nova
+  if (gd._weeklyBet && gd._weeklyBet.week === gd.week) return;
+  
+  const G = getG();
+  const otherStudents = (G?.allStudents || []).filter(s => s && s.uid !== G.uid && s.company);
+  
+  // Necessitem almenys 1 altre alumne per generar apostes interessants
+  if (otherStudents.length === 0) {
+    gd._weeklyBet = null;
+    return;
+  }
+  
+  // Triar tipus d'aposta aleatori
+  const types = ['ranking', 'bestWeek', 'classGrowth'];
+  const type = types[Math.floor(Math.random() * types.length)];
+  
+  let bet = null;
+  
+  if (type === 'ranking') {
+    // Triar un company aleatori
+    const rival = otherStudents[Math.floor(Math.random() * otherStudents.length)];
+    const myCash = gd.finances?.cash || 0;
+    const rivalCash = rival.finances?.cash || 0;
+    bet = {
+      week: gd.week,
+      type: 'ranking',
+      icon: '⚔️',
+      tag: 'DUEL',
+      title: `Duel contra ${rival.displayName}`,
+      question: `Qui tindrà més tresoreria al final de la setmana, tu o <strong>${rival.displayName}</strong> (${rival.company?.name||'?'})?`,
+      rivalUid: rival.uid,
+      rivalName: rival.displayName,
+      rivalCash: rivalCash,
+      myCash: myCash,
+      options: [
+        { id: 'me', icon: '😎', text: 'Jo guanyaré', payout: 'x2' },
+        { id: 'them', icon: '🥋', text: rival.displayName.split(' ')[0]+' guanyarà', payout: 'x2' },
+      ],
+    };
+  } else if (type === 'bestWeek') {
+    bet = {
+      week: gd.week,
+      type: 'bestWeek',
+      icon: '🏆',
+      tag: 'PREDICCIÓ',
+      title: 'Millor setmana de la classe',
+      question: `Aquesta setmana, <strong>seré jo el qui guanyi més diners</strong> (resultat setmanal positiu) de tota la classe?`,
+      options: [
+        { id: 'yes', icon: '🚀', text: 'Sí, seré jo!', payout: 'x' + (otherStudents.length+1) },
+        { id: 'no', icon: '🤷', text: 'No ho crec', payout: 'x1.3' },
+      ],
+    };
+  } else if (type === 'classGrowth') {
+    bet = {
+      week: gd.week,
+      type: 'classGrowth',
+      icon: '📊',
+      tag: 'TENDÈNCIA',
+      title: 'Tendència de la classe',
+      question: `Aquesta setmana, <strong>més de la meitat de la classe</strong> tindrà resultat positiu?`,
+      options: [
+        { id: 'yes', icon: '📈', text: 'Sí, anirem bé', payout: 'x1.8' },
+        { id: 'no', icon: '📉', text: 'No, mala setmana', payout: 'x1.8' },
+      ],
+    };
+  }
+  
+  gd._weeklyBet = bet;
+}
+
+function renderWeeklyBet() {
+  const gd = getG()?.gameData;
+  if (!gd || !gd._weeklyBet) return '';
+  
+  const bet = gd._weeklyBet;
+  
+  // Si ja s'ha resolt, mostrar el resultat
+  if (bet.resolved) {
+    const isWin = bet.won;
+    return `
+      <div class="bet-result ${isWin ? 'win' : 'lose'}">
+        <div style="font-size:32px;margin-bottom:6px">${isWin ? '🎉' : '😔'}</div>
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:${isWin?'var(--green)':'var(--red)'};margin-bottom:4px">
+          ${isWin ? '✅ HAS GUANYAT L\'APOSTA' : '❌ Has perdut l\'aposta'}
+        </div>
+        <div style="font-size:12px;color:var(--text2)">${bet.title} · ${isWin ? '+' : '-'}${bet.payoutAmount.toLocaleString('ca')}€</div>
+      </div>`;
+  }
+  
+  // Si ja ha apostat però encara no s'ha resolt
+  if (bet.choice) {
+    const chosen = bet.options.find(o => o.id === bet.choice);
+    return `
+      <div class="bet-card" style="opacity:.85">
+        <div class="bet-header">
+          <span class="bet-icon">${bet.icon}</span>
+          <div class="bet-title">${bet.title}</div>
+          <span class="bet-tag" style="background:rgba(79,127,255,.20);color:var(--accent)">APOSTAT</span>
+        </div>
+        <div class="bet-question">
+          ✅ Has apostat <strong>${BET_AMOUNT}€</strong> per: <strong style="color:var(--accent)">${chosen.icon} ${chosen.text}</strong>
+        </div>
+        <div style="font-size:11px;color:var(--text3);text-align:center">El resultat es resoldrà en avançar la setmana.</div>
+      </div>`;
+  }
+  
+  const cash = gd.finances?.cash || 0;
+  const canBet = cash >= BET_AMOUNT;
+  
+  return `
+    <div class="bet-card">
+      <div class="bet-header">
+        <span class="bet-icon">${bet.icon}</span>
+        <div class="bet-title">${bet.title}</div>
+        <span class="bet-tag">🎰 APOSTA · ${BET_AMOUNT}€</span>
+      </div>
+      <div class="bet-question">${bet.question}</div>
+      ${canBet ? `
+        <div class="bet-options">
+          ${bet.options.map(o => `
+            <div class="bet-option" onclick="window._placeBet('${o.id}')">
+              <div class="bet-option-icon">${o.icon}</div>
+              <div class="bet-option-text">${o.text}</div>
+              <div class="bet-option-payout">Si guanyes: ${o.payout}</div>
+            </div>
+          `).join('')}
+        </div>
+        <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:10px">⚠️ Aposta opcional · Risc: pots perdre els ${BET_AMOUNT}€</div>
+      ` : `
+        <div style="text-align:center;padding:14px;color:var(--text3);font-size:12px">
+          Necessites almenys <strong style="color:var(--gold)">${BET_AMOUNT}€</strong> de tresoreria per apostar
+        </div>
+      `}
+    </div>`;
+}
+
+window._placeBet = function(choiceId) {
+  const gd = getG()?.gameData;
+  if (!gd?._weeklyBet) return;
+  if ((gd.finances?.cash||0) < BET_AMOUNT) {
+    showToast('❌ Sense fons per apostar');
+    return;
+  }
+  
+  gd._weeklyBet.choice = choiceId;
+  gd.finances.cash -= BET_AMOUNT; // Es paga al apostar
+  
+  showToast(`🎰 Has apostat ${BET_AMOUNT}€. Sort!`);
+  if (window.playSfx) window.playSfx('cling');
+  
+  saveGameData();
+  // Re-renderitzar el panel d'apostes
+  if (typeof window.injectBetWidget === 'function') window.injectBetWidget();
+};
+
+function resolveWeeklyBet(gd) {
+  if (!gd?._weeklyBet || !gd._weeklyBet.choice || gd._weeklyBet.resolved) return;
+  
+  const bet = gd._weeklyBet;
+  const G = getG();
+  const otherStudents = (G?.allStudents || []).filter(s => s && s.uid !== G.uid && s.company);
+  let won = false;
+  let payoutMult = 2;
+  
+  if (bet.type === 'ranking') {
+    // Comprovar si tinc més cash que el rival
+    const rival = otherStudents.find(s => s.uid === bet.rivalUid);
+    if (!rival) {
+      // Rival ha desaparegut, devolver l'aposta
+      gd.finances.cash += BET_AMOUNT;
+      bet.resolved = true; bet.won = false; bet.payoutAmount = 0;
+      showEventToast('🎰', 'Aposta cancel·lada', 'El rival ha desaparegut. Diners retornats.', false);
+      return;
+    }
+    const myWon = (gd.finances?.cash||0) > (rival.finances?.cash||0);
+    won = (bet.choice === 'me' && myWon) || (bet.choice === 'them' && !myWon);
+    payoutMult = 2;
+  } else if (bet.type === 'bestWeek') {
+    // Comprovar si he tingut el millor resultat
+    const myResult = (gd.finances?.monthly_revenue||0) - (gd.finances?.monthly_costs||0);
+    const allResults = otherStudents.map(s => (s.finances?.monthly_revenue||0) - (s.finances?.monthly_costs||0));
+    const maxOther = Math.max(0, ...allResults);
+    const iAmBest = myResult > maxOther;
+    won = (bet.choice === 'yes' && iAmBest) || (bet.choice === 'no' && !iAmBest);
+    payoutMult = bet.choice === 'yes' ? (otherStudents.length + 1) : 1.3;
+  } else if (bet.type === 'classGrowth') {
+    // Comprovar si > 50% han tingut resultat positiu
+    const total = otherStudents.length + 1;
+    const positives = otherStudents.filter(s => (s.finances?.monthly_revenue||0) > (s.finances?.monthly_costs||0)).length 
+                    + (((gd.finances?.monthly_revenue||0) > (gd.finances?.monthly_costs||0)) ? 1 : 0);
+    const majorityPositive = positives > total / 2;
+    won = (bet.choice === 'yes' && majorityPositive) || (bet.choice === 'no' && !majorityPositive);
+    payoutMult = 1.8;
+  }
+  
+  bet.resolved = true;
+  bet.won = won;
+  
+  if (won) {
+    bet.payoutAmount = Math.round(BET_AMOUNT * payoutMult);
+    gd.finances.cash += bet.payoutAmount;
+    showEventToast('🎉', 'Aposta guanyada!', `+${bet.payoutAmount.toLocaleString('ca')}€ a tresoreria`, true);
+    if (window.playSfx) playSfx('success');
+    
+    gd.notifications.push({
+      id: Date.now()+Math.random(),
+      icon: '🎰',
+      title: 'Aposta guanyada!',
+      desc: `${bet.title}: +${bet.payoutAmount.toLocaleString('ca')}€`,
+      time: `S${gd.week}`,
+      urgent: false,
+    });
+  } else {
+    bet.payoutAmount = BET_AMOUNT; // El que has perdut
+    showEventToast('💸', 'Aposta perduda', `Has perdut els ${BET_AMOUNT}€ apostats`, false);
+    if (window.playSfx) playSfx('fail');
+    
+    gd.notifications.push({
+      id: Date.now()+Math.random(),
+      icon: '🎰',
+      title: 'Aposta perduda',
+      desc: `${bet.title}: -${BET_AMOUNT}€`,
+      time: `S${gd.week}`,
+      urgent: false,
+    });
+  }
+}
+
+// Injectar widget d'apostes al dashboard (sota el news feed)
+function injectBetWidget() {
+  const gd = getG()?.gameData;
+  if (!gd || !gd.mode) return;
+  
+  // Generar aposta si no hi ha cap per aquesta setmana
+  generateWeeklyBet(gd);
+  
+  // Si segueix sense haver-hi (cap company), no mostrar res
+  if (!gd._weeklyBet) {
+    const ex = document.getElementById('bet-widget-inject');
+    if (ex) ex.remove();
+    return;
+  }
+  
+  const dashWrap = document.querySelector('.dash-wrap');
+  if (!dashWrap) return;
+  
+  let widget = document.getElementById('bet-widget-inject');
+  if (!widget) {
+    widget = document.createElement('div');
+    widget.id = 'bet-widget-inject';
+    // Insertar després del news feed (o al final)
+    const newsInject = document.getElementById('news-feed-inject');
+    if (newsInject && newsInject.nextSibling) {
+      dashWrap.insertBefore(widget, newsInject.nextSibling);
+    } else if (newsInject) {
+      newsInject.parentNode.insertBefore(widget, newsInject.nextSibling);
+    } else {
+      dashWrap.appendChild(widget);
+    }
+  }
+  widget.innerHTML = renderWeeklyBet();
+}
+
+window.injectBetWidget = injectBetWidget;
+window.resolveWeeklyBet = resolveWeeklyBet;
+
+
+// ════════════════════════════════════════════════════════════
 //  HOOKS AL JOC PRINCIPAL
 // ════════════════════════════════════════════════════════════
 
@@ -2413,6 +3596,12 @@ function hookGameFunctions() {
       newNotifications: Math.max(0, after.notifications - before.notifications),
     };
     
+    // ★ Actualitzar ratxa de setmanes positives ★
+    updateProfitStreak(gd, diff.cash);
+    
+    // ★ Resoldre aposta si n'hi havia ★
+    resolveWeeklyBet(gd);
+    
     // Treure la pantalla de transició i mostrar el RECAP
     hideWeekTransition();
     showWeekRecap(before, after, diff, gd);
@@ -2429,8 +3618,12 @@ function hookGameFunctions() {
     // Actualitzar locks de tabs
     updateTabLocks();
     
-    // Refrescar barra de missió
+    // Refrescar barra de missió i streak badge
     renderMissionBar();
+    injectStreakBadge();
+    
+    // ★ Refrescar widget d'aposta (es generarà nova per la propera setmana) ★
+    injectBetWidget();
     
     // Guardar
     await saveGameData();
@@ -2442,6 +3635,7 @@ function hookGameFunctions() {
     originalRenderDashboard();
     injectDashboardExtras();
     renderMissionBar(); // ★ Actualitzar barra de missió
+    injectStreakBadge(); // ★ Mostrar badge ratxa al topbar
   };
   
   console.log('🎮 Hooks instal·lats correctament!');
@@ -2480,6 +3674,12 @@ function injectDashboardExtras() {
   const dashMid = dashWrap.querySelector('.dash-mid');
   if (dashMid) dashWrap.insertBefore(lbDiv, dashMid);
   else dashWrap.appendChild(lbDiv);
+  
+  // ★ Injectar feed de notícies del Vallès ★
+  injectNewsFeed();
+  
+  // ★ Injectar widget d'apostes setmanals ★
+  injectBetWidget();
   
   // Injectar P2P section
   const existingP2P = document.getElementById('p2p-inject');
@@ -2553,6 +3753,13 @@ const checkReady = setInterval(() => {
     setTimeout(() => injectDashboardExtras(), 1000);
     setTimeout(() => renderMissionBar(), 1100); // ★ Crear barra missió
     setTimeout(() => injectSfxToggle(), 1200);  // ★ Botó de so
+    setTimeout(() => injectStreakBadge(), 1300); // ★ Badge ratxa
+    
+    // ★ Splash de benvinguda — només si l'empresa ja existia abans (no Quick Start nou) ★
+    // Detectem que és una empresa "ja madura" si té més d'una setmana o té dades acumulades
+    if (gd.week > 1 || (gd.finances?.revenue_history||[]).length > 0) {
+      setTimeout(() => showSessionSplash(), 1500);
+    }
     
     console.log('🎮 ui-gameplay.js — Millores inicialitzades!');
   }

@@ -761,6 +761,259 @@ body::before {
 .choice-desc { font-size:12px;color:var(--text2);line-height:1.6; }
 .choice-badge { position:absolute;top:12px;right:12px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;letter-spacing:.5px; }
 
+/* ★★★ QUICK START — opció destacada ★★★ */
+.quick-start-card {
+  background: linear-gradient(135deg, rgba(79,127,255,.18), rgba(124,58,237,.14), rgba(245,158,11,.10));
+  border: 2px solid rgba(79,127,255,.4);
+  border-radius: 22px;
+  padding: 26px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: .3s;
+  box-shadow: 0 12px 50px rgba(79,127,255,.18);
+}
+.quick-start-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+  box-shadow: 0 20px 60px rgba(79,127,255,.35);
+}
+.quick-start-glow {
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(120deg, transparent 30%, rgba(79,127,255,.25), transparent 70%);
+  animation: quickGlow 3s linear infinite;
+  pointer-events: none;
+}
+@keyframes quickGlow {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.quick-start-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: linear-gradient(135deg, var(--gold), #ff9a3c);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 5px 12px;
+  border-radius: 20px;
+  letter-spacing: 1px;
+  z-index: 3;
+  box-shadow: 0 4px 12px rgba(245,158,11,.4);
+}
+.quick-start-icon {
+  font-size: 64px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 6px 20px rgba(79,127,255,.5));
+  animation: rocketLaunch 2s ease-in-out infinite;
+}
+@keyframes rocketLaunch {
+  0%,100% { transform: translateY(0) rotate(-5deg); }
+  50% { transform: translateY(-6px) rotate(5deg); }
+}
+.quick-start-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 6px;
+  letter-spacing: -0.5px;
+}
+.quick-start-desc {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+.quick-start-features {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.quick-start-features span {
+  font-size: 11px;
+  color: var(--text);
+  background: rgba(255,255,255,.06);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+.quick-start-arrow {
+  font-size: 36px;
+  color: var(--accent);
+  font-weight: 800;
+  transition: transform .3s;
+}
+.quick-start-card:hover .quick-start-arrow { transform: translateX(8px); }
+
+/* Quick Start Wizard - 3 preguntes BuzzFeed-style */
+.qs-wizard {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: 22px;
+  padding: 32px;
+  position: relative;
+  overflow: hidden;
+}
+.qs-progress {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 26px;
+}
+.qs-progress-dot {
+  flex: 1;
+  height: 5px;
+  background: rgba(255,255,255,.08);
+  border-radius: 3px;
+  transition: .4s;
+}
+.qs-progress-dot.done { background: var(--green); }
+.qs-progress-dot.active {
+  background: linear-gradient(90deg, var(--accent), var(--gold));
+}
+.qs-question {
+  font-family: 'Syne', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+  animation: slideUp .4s ease;
+}
+.qs-subtitle {
+  font-size: 13px;
+  color: var(--text2);
+  text-align: center;
+  margin-bottom: 24px;
+  animation: slideUp .4s ease;
+}
+.qs-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.qs-option {
+  background: rgba(255,255,255,.04);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  padding: 18px 14px;
+  cursor: pointer;
+  text-align: center;
+  transition: .25s;
+  font-family: var(--font);
+  animation: slideUp .4s ease backwards;
+}
+.qs-option:hover {
+  background: rgba(79,127,255,.08);
+  border-color: var(--accent);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(79,127,255,.18);
+}
+.qs-option.selected {
+  background: rgba(79,127,255,.12);
+  border-color: var(--accent);
+  box-shadow: 0 0 20px rgba(79,127,255,.25);
+}
+.qs-option-icon {
+  font-size: 38px;
+  margin-bottom: 8px;
+  display: block;
+}
+.qs-option-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.qs-option-desc {
+  font-size: 10px;
+  color: var(--text2);
+  line-height: 1.4;
+}
+.qs-input-name {
+  width: 100%;
+  background: rgba(255,255,255,.06);
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 20px;
+  color: var(--text);
+  font-size: 18px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  text-align: center;
+  outline: none;
+  transition: .2s;
+  margin-bottom: 14px;
+}
+.qs-input-name:focus { border-color: var(--accent); background: rgba(79,127,255,.06); }
+.qs-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.qs-suggestion {
+  background: rgba(124,58,237,.08);
+  border: 1px solid rgba(124,58,237,.25);
+  color: var(--text2);
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: .2s;
+  font-family: var(--font);
+}
+.qs-suggestion:hover {
+  background: rgba(124,58,237,.18);
+  color: var(--text);
+  transform: translateY(-1px);
+}
+.qs-nav {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+.qs-btn-back {
+  padding: 12px 18px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text2);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: .2s;
+}
+.qs-btn-next {
+  flex: 1;
+  padding: 12px;
+  background: var(--accent);
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: .2s;
+}
+.qs-btn-next:disabled {
+  background: rgba(255,255,255,.08);
+  color: var(--text3);
+  cursor: not-allowed;
+}
+.qs-btn-next:not(:disabled):hover {
+  background: #3d6dee;
+  transform: translateY(-1px);
+}
+
 /* Wizard */
 .wizard-steps { display:flex;gap:0;margin-bottom:28px;position:relative; }
 .wizard-steps::before { content:'';position:absolute;top:18px;left:18px;right:18px;height:2px;background:var(--border);z-index:0; }
@@ -1263,28 +1516,57 @@ body::before {
 
       <!-- SETUP / COMPANY CREATION -->
       <div class="tab-panel" id="tab-setup">
-        <div id="setup-init" style="padding:24px;max-width:700px;margin:0 auto">
-          <h2 class="setup-title">Benvingut al Simulador Empresarial</h2>
-          <p class="setup-subtitle">Escull com vols iniciar la teva carrera empresarial. Cada camí té els seus reptes i oportunitats.</p>
-          <div class="setup-choice">
-            <div class="choice-card" onclick="startMode('create')">
-              <div class="choice-badge">MÉS COMPLEX</div>
-              <span class="choice-icon">🚀</span>
-              <div class="choice-title">Crear la meva empresa</div>
-              <div class="choice-desc">Crea una empresa des de zero. Escull la forma jurídica, busca finançament, troba locals, contracta personal i construeix el teu negoci pas a pas.</div>
-            </div>
-            <div class="choice-card" onclick="startMode('hired')">
-              <div class="choice-icon">💼</div>
-              <div class="choice-title">Ser contractat/da</div>
-              <div class="choice-desc">Rep ofertes de feina d'empreses reals del Vallès. Gestiona una empresa existent. El teu prestigi determinarà quines ofertes rebràs.</div>
+        <div id="setup-init" style="padding:24px;max-width:760px;margin:0 auto">
+          <h2 class="setup-title">🎮 Comença la teva aventura empresarial</h2>
+          <p class="setup-subtitle">Tria com vols començar. La majoria d'alumnes recomanen el mode ràpid!</p>
+          
+          <!-- ★★★ OPCIÓ DESTACADA: QUICK START ★★★ -->
+          <div class="quick-start-card" onclick="startQuickStart()">
+            <div class="quick-start-glow"></div>
+            <div class="quick-start-badge">⚡ RECOMANAT · 60 SEGONS</div>
+            <div style="display:flex;align-items:center;gap:20px;position:relative;z-index:2">
+              <div class="quick-start-icon">🚀</div>
+              <div style="flex:1">
+                <div class="quick-start-title">Començar a jugar JA!</div>
+                <div class="quick-start-desc">3 preguntes ràpides i comences a competir amb els companys. Podràs canviar tot després si vols.</div>
+                <div class="quick-start-features">
+                  <span>✨ 60 segons</span>
+                  <span>🎯 Comences a la S1</span>
+                  <span>💼 Empresa equilibrada</span>
+                  <span>📊 Apte per principiants</span>
+                </div>
+              </div>
+              <div class="quick-start-arrow">→</div>
             </div>
           </div>
-          <div style="text-align:center;margin-top:-16px;margin-bottom:16px">
+          
+          <!-- Opcions avançades -->
+          <div style="margin-top:30px">
+            <div style="font-size:11px;color:var(--text3);font-weight:700;letter-spacing:2px;text-align:center;margin-bottom:14px">─────  O TRIA UNA OPCIÓ AVANÇADA  ─────</div>
+            <div class="setup-choice">
+              <div class="choice-card" onclick="startMode('create')">
+                <div class="choice-badge">MODE EXPERT</div>
+                <span class="choice-icon">🏗️</span>
+                <div class="choice-title">Crear empresa des de zero</div>
+                <div class="choice-desc">Wizard complet: forma jurídica, finançament, instal·lacions, personal. Per a alumnes que volen aprofundir.</div>
+              </div>
+              <div class="choice-card" onclick="startMode('hired')">
+                <div class="choice-icon">💼</div>
+                <div class="choice-title">Dirigir empresa existent</div>
+                <div class="choice-desc">Rep ofertes d'empreses reals del Vallès segons el teu prestigi. Gestió d'una empresa ja en marxa.</div>
+              </div>
+            </div>
+          </div>
+          
+          <div style="text-align:center;margin-top:20px;margin-bottom:16px">
             <button onclick="activateProfMode()" style="background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:10px 20px;color:var(--gold);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:.2s" onmouseover="this.style.background='rgba(245,158,11,.2)'" onmouseout="this.style.background='rgba(245,158,11,.12)'">
               👩‍🏫 Accedir com a Professor/a
             </button>
           </div>
         </div>
+        
+        <!-- ★★★ QUICK START WIZARD ★★★ -->
+        <div id="quickstart-area" style="display:none;padding:24px;max-width:600px;margin:0 auto"></div>
 
         <!-- COMPANY CREATION WIZARD -->
         <div id="wizard-area" style="display:none;padding:24px;max-width:700px;margin:0 auto">
@@ -2006,6 +2288,407 @@ window.startMode = function(mode) {
     showHiredMode();
   }
 };
+
+// ════════════════════════════════════════════════════════════
+//  ★★★ QUICK START — Crear empresa en 60 segons ★★★
+//  3 preguntes BuzzFeed-style i ja estàs jugant
+// ════════════════════════════════════════════════════════════
+
+const QS_PASSIONS = [
+  { id: 'gaming',   icon: '🎮', name: 'Gaming/Tech',   sector: 'tecnologia',  desc: 'eSports, apps, software',     namePool: ['Pixel', 'NeoGames', 'CodeLab', 'TechVall', 'BitBoost'] },
+  { id: 'moda',     icon: '👕', name: 'Moda/Estètica', sector: 'moda',        desc: 'Roba, complements, beauty',    namePool: ['Valles Style', 'Modaria', 'Trend Co', 'Urban Lab', 'Studio M'] },
+  { id: 'food',     icon: '🍔', name: 'Menjar/Beguda', sector: 'alimentacio', desc: 'Restaurants, productes locals', namePool: ['SaborVallès', 'BocataLab', 'GreenFork', 'Cuina22', 'Mercat&Co'] },
+  { id: 'sport',    icon: '⚽', name: 'Esport/Fitness',sector: 'salut',       desc: 'Gimnasos, equipament, salut',  namePool: ['FitVall', 'PowerHub', 'Ironside', 'Atletic', 'Move&Co'] },
+  { id: 'music',    icon: '🎵', name: 'Música/Art',     sector: 'educacio',    desc: 'Estudis, escoles, esdev.',     namePool: ['Sonora', 'BeatLab', 'StudioVall', 'Ritmus', 'Crescendo'] },
+  { id: 'eco',      icon: '🌱', name: 'Eco/Sostenible', sector: 'quimica',     desc: 'Energies, reciclatge, bio',    namePool: ['EcoVallès', 'GreenLab', 'BioRoot', 'TerraNova', 'Sostenia'] },
+];
+
+const QS_STYLES = [
+  {
+    id: 'safe',
+    icon: '🛡️',
+    name: 'Segur i estable',
+    desc: 'Empresa petita, créixer a poc a poc, sense riscos',
+    legalForm: 'autonomia',
+    initCash: 8000,
+    initLoan: 0,
+    initEmployees: { vendes: 0, produccio: 1, admin: 0 },
+    color: 'var(--green)',
+  },
+  {
+    id: 'balanced',
+    icon: '⚖️',
+    name: 'Equilibrat',
+    desc: 'SL amb un préstec petit. La majoria d\'alumnes',
+    legalForm: 'sl',
+    initCash: 18000,
+    initLoan: 12000,
+    initEmployees: { vendes: 1, produccio: 2, admin: 1 },
+    color: 'var(--accent)',
+  },
+  {
+    id: 'risky',
+    icon: '🚀',
+    name: 'Arriscat i ràpid',
+    desc: 'SA gran amb crèdit fort. Alts ingressos, alts costos',
+    legalForm: 'sa',
+    initCash: 45000,
+    initLoan: 35000,
+    initEmployees: { vendes: 2, produccio: 3, admin: 1 },
+    color: 'var(--red)',
+  },
+];
+
+let qsData = { passion: null, style: null, name: '' };
+let qsStep = 0;
+
+window.startQuickStart = function() {
+  qsData = { passion: null, style: null, name: '' };
+  qsStep = 0;
+  document.getElementById('setup-init').style.display = 'none';
+  document.getElementById('wizard-area').style.display = 'none';
+  document.getElementById('hired-area').style.display = 'none';
+  const qsArea = document.getElementById('quickstart-area');
+  qsArea.style.display = '';
+  renderQuickStartStep();
+};
+
+function renderQuickStartStep() {
+  const qsArea = document.getElementById('quickstart-area');
+  
+  const dots = [0,1,2].map(i => `<div class="qs-progress-dot ${i < qsStep ? 'done' : i === qsStep ? 'active' : ''}"></div>`).join('');
+  
+  let content = '';
+  if (qsStep === 0) content = renderQS_Passion();
+  else if (qsStep === 1) content = renderQS_Style();
+  else if (qsStep === 2) content = renderQS_Name();
+  
+  qsArea.innerHTML = `
+    <div class="qs-wizard">
+      <div class="qs-progress">${dots}</div>
+      ${content}
+      <div class="qs-nav">
+        ${qsStep > 0 ? '<button class="qs-btn-back" onclick="qsBack()">← Enrere</button>' : '<button class="qs-btn-back" onclick="qsCancel()">✕ Cancel·lar</button>'}
+        <button class="qs-btn-next" id="qs-next-btn" onclick="qsNext()" disabled>
+          ${qsStep < 2 ? 'Següent →' : '🚀 Començar a jugar!'}
+        </button>
+      </div>
+    </div>
+  `;
+  
+  // Activar el botó Next si l'opció ja s'havia seleccionat (en cas de tornar enrere)
+  updateQSNextButton();
+}
+
+function renderQS_Passion() {
+  return `
+    <div class="qs-question">Què t'apassiona més? 🤔</div>
+    <div class="qs-subtitle">El sector de la teva empresa. No t'amoïnis, podràs canviar productes després.</div>
+    <div class="qs-options">
+      ${QS_PASSIONS.map((p, i) => `
+        <div class="qs-option ${qsData.passion?.id === p.id ? 'selected' : ''}" 
+             onclick="qsSelectPassion('${p.id}')"
+             style="animation-delay:${i*0.06}s">
+          <div class="qs-option-icon">${p.icon}</div>
+          <div class="qs-option-title">${p.name}</div>
+          <div class="qs-option-desc">${p.desc}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderQS_Style() {
+  return `
+    <div class="qs-question">Com vols jugar? 🎯</div>
+    <div class="qs-subtitle">Això determina el teu capital inicial, forma jurídica i empleats. Tot és modificable després!</div>
+    <div class="qs-options" style="grid-template-columns:1fr">
+      ${QS_STYLES.map((s, i) => `
+        <div class="qs-option ${qsData.style?.id === s.id ? 'selected' : ''}" 
+             onclick="qsSelectStyle('${s.id}')"
+             style="animation-delay:${i*0.08}s;display:flex;align-items:center;gap:14px;text-align:left">
+          <div style="font-size:42px;flex-shrink:0">${s.icon}</div>
+          <div style="flex:1">
+            <div class="qs-option-title" style="margin-bottom:4px">${s.name}</div>
+            <div class="qs-option-desc" style="margin-bottom:6px">${s.desc}</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;font-size:10px">
+              <span style="background:rgba(16,185,129,.10);color:var(--green);padding:2px 7px;border-radius:6px;font-weight:700">💰 ${s.initCash.toLocaleString('ca')}€</span>
+              <span style="background:rgba(245,158,11,.10);color:var(--gold);padding:2px 7px;border-radius:6px;font-weight:700">🏦 ${s.initLoan>0 ? '+'+s.initLoan.toLocaleString('ca')+'€ préstec' : 'Sense préstec'}</span>
+              <span style="background:rgba(79,127,255,.10);color:var(--accent);padding:2px 7px;border-radius:6px;font-weight:700">👥 ${Object.values(s.initEmployees).reduce((a,b)=>a+b,0)} empleats</span>
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderQS_Name() {
+  const passion = qsData.passion;
+  const suggestions = passion?.namePool || ['Empresa Vallès', 'NovaCo', 'StartUp 22'];
+  
+  return `
+    <div class="qs-question">Com es dirà la teva empresa? ✏️</div>
+    <div class="qs-subtitle">Tria un nom curt que t'agradi. També pots utilitzar un dels suggeriments.</div>
+    <input type="text" class="qs-input-name" id="qs-name-input" 
+           placeholder="Ex: ${suggestions[0]}" 
+           value="${qsData.name||''}"
+           oninput="qsUpdateName(this.value)"
+           maxlength="32">
+    <div class="qs-suggestions">
+      ${suggestions.map(s => `<div class="qs-suggestion" onclick="qsSelectName('${s.replace(/'/g, '&apos;')}')">${s}</div>`).join('')}
+    </div>
+    <div style="background:rgba(79,127,255,.06);border:1px solid rgba(79,127,255,.15);border-radius:10px;padding:12px;font-size:11px;color:var(--text2);line-height:1.5">
+      💡 <strong>Resum:</strong> Crearàs <strong style="color:var(--text)">${qsData.name||'(escriu un nom)'}</strong>, una empresa de <strong style="color:var(--text)">${passion?.name||'?'}</strong> amb perfil <strong style="color:${qsData.style?.color||'var(--text)'}">${qsData.style?.name||'?'}</strong>. Començaràs amb <strong style="color:var(--green)">${(qsData.style?.initCash||0).toLocaleString('ca')}€</strong> a la tresoreria.
+    </div>
+  `;
+}
+
+window.qsSelectPassion = function(id) {
+  qsData.passion = QS_PASSIONS.find(p => p.id === id);
+  renderQuickStartStep();
+};
+
+window.qsSelectStyle = function(id) {
+  qsData.style = QS_STYLES.find(s => s.id === id);
+  renderQuickStartStep();
+};
+
+window.qsUpdateName = function(val) {
+  qsData.name = val.trim();
+  updateQSNextButton();
+};
+
+window.qsSelectName = function(name) {
+  qsData.name = name;
+  document.getElementById('qs-name-input').value = name;
+  updateQSNextButton();
+  // Feedback visual breu
+  document.getElementById('qs-name-input').style.borderColor = 'var(--green)';
+  setTimeout(() => { 
+    const el = document.getElementById('qs-name-input');
+    if (el) el.style.borderColor = '';
+  }, 600);
+};
+
+function updateQSNextButton() {
+  const btn = document.getElementById('qs-next-btn');
+  if (!btn) return;
+  let canContinue = false;
+  if (qsStep === 0) canContinue = !!qsData.passion;
+  else if (qsStep === 1) canContinue = !!qsData.style;
+  else if (qsStep === 2) canContinue = qsData.name && qsData.name.length >= 2;
+  btn.disabled = !canContinue;
+}
+
+window.qsBack = function() {
+  if (qsStep > 0) {
+    qsStep--;
+    renderQuickStartStep();
+  }
+};
+
+window.qsCancel = function() {
+  document.getElementById('quickstart-area').style.display = 'none';
+  document.getElementById('setup-init').style.display = '';
+};
+
+window.qsNext = async function() {
+  if (qsStep < 2) {
+    qsStep++;
+    renderQuickStartStep();
+    return;
+  }
+  // Final: crear l'empresa amb les dades del Quick Start
+  await createCompanyFromQuickStart();
+};
+
+async function createCompanyFromQuickStart() {
+  const passion = qsData.passion;
+  const style = qsData.style;
+  const name = qsData.name.trim();
+  
+  if (!passion || !style || !name) {
+    showToast('❌ Falten dades');
+    return;
+  }
+  
+  // Mostrar pantalla de "creant empresa"
+  const qsArea = document.getElementById('quickstart-area');
+  qsArea.innerHTML = `
+    <div class="qs-wizard" style="text-align:center;padding:50px 32px">
+      <div style="font-size:80px;margin-bottom:14px;animation:rocketLaunch 1s ease-in-out infinite">🚀</div>
+      <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--text);margin-bottom:8px">Creant ${name}...</div>
+      <div style="font-size:13px;color:var(--text2)">Configurant balanç inicial, contractant equip, registrant al Registre Mercantil...</div>
+      <div style="margin-top:24px;height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden">
+        <div style="height:100%;background:linear-gradient(90deg,var(--accent),var(--gold));width:0%;animation:qsProgress 2s ease-in-out forwards"></div>
+      </div>
+    </div>
+    <style>@keyframes qsProgress { to { width: 100%; } }</style>
+  `;
+  
+  // Esperar 1.8s per la sensació de "està passant alguna cosa"
+  await new Promise(r => setTimeout(r, 1800));
+  
+  // Construir l'estructura completa de l'empresa
+  const sectorData = (typeof getSectorData === 'function') ? getSectorData(passion.sector) : { icon: passion.icon, name: passion.name };
+  const legalFormName = style.legalForm === 'autonomia' ? 'Autònom/a' : style.legalForm === 'sl' ? 'Societat Limitada' : 'Societat Anònima';
+  
+  const gd = G.gameData;
+  gd.mode = 'create';
+  gd.week = 1;
+  gd.year = new Date().getFullYear();
+  gd.month = new Date().getMonth() + 1;
+  gd.startDate = new Date().toISOString();
+  gd.prestigi = 5;
+  
+  // Empresa
+  gd.company = {
+    name: name,
+    sector: passion.sector,
+    sectorData: sectorData,
+    legalForm: style.legalForm,
+    legalFormName: legalFormName,
+    founded: gd.year,
+    municipality: 'Granollers',
+    muni: [41.6083, 2.2877],
+    monthlyRent: 600,
+    surface: 100,
+    size: 'small',
+  };
+  
+  // Finances inicials
+  const capitalSocial = style.legalForm === 'autonomia' ? 0 : style.legalForm === 'sl' ? 3000 : 60000;
+  gd.finances = {
+    cash: style.initCash,
+    monthly_revenue: 0,
+    monthly_costs: 0,
+    annual_revenue: 0,
+    annual_costs: 0,
+    loans: style.initLoan > 0 ? [{
+      amount: style.initLoan,
+      interest: 5.5,
+      monthlyPayment: Math.round(style.initLoan / 60 * 1.05),
+      remaining: style.initLoan,
+      monthsLeft: 60,
+      entitat: 'CaixaBank',
+    }] : [],
+    revenue_history: [],
+    actiu: {
+      immobilitzat: 5000,
+      existencies: 1500,
+      tresoreria: style.initCash,
+      clients: 0,
+    },
+    passiu: {
+      capital: capitalSocial,
+      reserves: 0,
+      deutes_llarg: style.initLoan,
+      deutes_curt: 0,
+      proveidors: 0,
+    },
+  };
+  
+  // Empleats inicials
+  const empNames = ['Anna García','Jordi Puig','Maria López','Joan Fernández','Laura Martí','Pere Sánchez','Núria Ros','Marc Vidal'];
+  gd.employees = [];
+  let ei = 0;
+  Object.entries(style.initEmployees).forEach(([dept, count]) => {
+    for (let i = 0; i < count; i++) {
+      const role = dept === 'vendes' ? 'Comercial' : dept === 'produccio' ? 'Operari/a' : 'Administratiu/va';
+      const salary = dept === 'vendes' ? 1800 : dept === 'produccio' ? 1500 : 1700;
+      gd.employees.push({
+        id: 'emp_' + Date.now() + '_' + ei,
+        name: empNames[ei % empNames.length],
+        dept: dept,
+        role: role,
+        salary: salary,
+        morale: 75,
+        seniority: 0,
+        avatar: '👤',
+        nivel: 'base',
+      });
+      ei++;
+    }
+  });
+  
+  // Maquinària bàsica
+  gd.machines = [{
+    id: 'mach_init',
+    name: 'Equipament inicial',
+    valor: 5000,
+    capacity: 200,
+    maintenance: 50,
+    health: 100,
+    amortitzacio: 0.10,
+  }];
+  
+  // Servei inicial bàsic per generar ingressos
+  gd.serveis = [{
+    id: 'serv_1',
+    name: passion.name === 'Menjar/Beguda' ? 'Menú diari' : 
+          passion.name === 'Gaming/Tech' ? 'Servei subscripció' :
+          passion.name === 'Moda/Estètica' ? 'Producte estrella' :
+          passion.name === 'Esport/Fitness' ? 'Quota mensual' :
+          passion.name === 'Música/Art' ? 'Classes/Sessions' :
+          'Producte ecològic',
+    preu: 30,
+    unitats_mes: 100,
+  }];
+  
+  // Clients inicials (1 client petit per arrencar)
+  gd.clients = [{
+    id: 'cl_init',
+    icon: '🤝',
+    name: 'Primer client',
+    type: 'B2C',
+    monthly_value: 800,
+    satisfaction: 75,
+  }];
+  
+  // Notificacions inicials motivadores
+  gd.notifications = [{
+    id: Date.now(),
+    icon: '🎉',
+    title: 'Empresa creada amb èxit!',
+    desc: `${name} (${legalFormName}) ja està operativa. Has començat amb ${style.initCash.toLocaleString('ca')}€. Sort!`,
+    time: 'Ara',
+    urgent: false,
+    read: false,
+  }, {
+    id: Date.now() + 1,
+    icon: '💡',
+    title: 'Primer pas: avança una setmana',
+    desc: 'Prem el botó "⏩ Avançar setmana" a dalt per veure com va el negoci la primera setmana.',
+    time: 'Ara',
+    urgent: false,
+    read: false,
+  }];
+  
+  gd.shareholders = [];
+  gd.events = [];
+  gd.boardDecisions = [];
+  gd.portfolio = { stocks: {}, crypto: {} };
+  gd.marketing = { channels: {}, sponsors: [] };
+  gd.proveidors = [];
+  
+  // Guardar i mostrar el joc
+  await saveGameData();
+  showActiveGame();
+  showTab('dashboard');
+  renderDashboard();
+  if (typeof renderFinances === 'function') renderFinances();
+  if (typeof renderHR === 'function') renderHR();
+  if (typeof renderProduction === 'function') renderProduction();
+  if (typeof renderMarketing === 'function') renderMarketing();
+  
+  // Crear barra de missió
+  if (typeof window.renderMissionBar === 'function') window.renderMissionBar();
+  
+  // Toast i so de celebració
+  if (window.playSfx) window.playSfx('success');
+  showEventToast('🎉', name + ' creada!', 'Tens ' + style.initCash.toLocaleString('ca') + '€ a tresoreria. A jugar!', true);
+}
 
 // ==================== WIZARD ====================
 let wizardData = {};
