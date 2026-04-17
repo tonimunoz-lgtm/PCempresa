@@ -3337,9 +3337,16 @@ function renderDashboard() {
   // Banner
   if (c) {
     document.getElementById('company-banner').style.display = '';
-    document.getElementById('banner-icon').textContent = c.sectorData?.icon || '🏢';
+    // Si l'usuari ha personalitzat el seu avatar, usar-lo; sinó, l'icona del sector
+    const avatarEmoji = gd._avatar?.emoji || c.sectorData?.icon || '🏢';
+    const avatarColor = gd._avatar?.color || '';
+    document.getElementById('banner-icon').textContent = avatarEmoji;
+    if (avatarColor) {
+      document.getElementById('banner-icon').style.filter = `drop-shadow(0 4px 12px ${avatarColor}aa)`;
+    }
     document.getElementById('banner-title').textContent = c.name;
-    document.getElementById('banner-desc').textContent = c.legalFormName + ' · ' + c.municipality + ' · Setmana ' + gd.week + ' · Any ' + gd.year;
+    const sloganPart = gd._avatar?.slogan ? ` · "${gd._avatar.slogan}"` : '';
+    document.getElementById('banner-desc').textContent = c.legalFormName + ' · ' + c.municipality + ' · Setmana ' + gd.week + ' · Any ' + gd.year + sloganPart;
   } else {
     document.getElementById('company-banner').style.display = 'none';
   }
@@ -4889,7 +4896,6 @@ window.JOBS_BY_PRESTIGI  = JOBS_BY_PRESTIGI;
 <script defer src="icons-gamification.js"></script>
 <script defer src="ui-gameplay.js"></script>
 <script defer src="ui-fixes.js"></script>
-<script defer src="ui-gameplay.js"></script>
-</body>
+<script defer src="ui-season.js"></script>
 </body>
 </html>

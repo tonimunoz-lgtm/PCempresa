@@ -2759,6 +2759,8 @@ function generateNewsItems() {
     // Empresa molt rica
     if (cash >= 100000) {
       items.push({
+        targetUid: s.uid,
+        eventKey: 'rich100k_w' + week,
         avatar: s.company?.sectorData?.icon || '🏢',
         name: s.displayName,
         company: s.company?.name,
@@ -2770,6 +2772,8 @@ function generateNewsItems() {
       });
     } else if (cash >= 50000) {
       items.push({
+        targetUid: s.uid,
+        eventKey: 'rich50k_w' + week,
         avatar: s.company?.sectorData?.icon || '🏢',
         name: s.displayName,
         company: s.company?.name,
@@ -2784,6 +2788,8 @@ function generateNewsItems() {
     // Empresa en crisi
     if (cash < 0) {
       items.push({
+        targetUid: s.uid,
+        eventKey: 'crisis_w' + week,
         avatar: '🚨',
         name: s.displayName,
         company: s.company?.name,
@@ -2795,6 +2801,8 @@ function generateNewsItems() {
       });
     } else if (result < -2000) {
       items.push({
+        targetUid: s.uid,
+        eventKey: 'losses_w' + week,
         avatar: '📉',
         name: s.displayName,
         company: s.company?.name,
@@ -2809,6 +2817,8 @@ function generateNewsItems() {
     // Equip gran
     if (empCount >= 8) {
       items.push({
+        targetUid: s.uid,
+        eventKey: 'team8_w' + week,
         avatar: '👥',
         name: s.displayName,
         company: s.company?.name,
@@ -2823,6 +2833,8 @@ function generateNewsItems() {
     // Prestigi alt
     if ((s.prestigi||0) >= 30) {
       items.push({
+        targetUid: s.uid,
+        eventKey: 'prestige30_w' + week,
         avatar: '⭐',
         name: s.displayName,
         company: s.company?.name,
@@ -2839,6 +2851,8 @@ function generateNewsItems() {
     const cryptos = Object.keys(s.portfolio?.crypto||{});
     if (stocks.length >= 3 || cryptos.length >= 2) {
       items.push({
+        targetUid: s.uid,
+        eventKey: 'investor_w' + week,
         avatar: stocks.length > cryptos.length ? '📈' : '₿',
         name: s.displayName,
         company: s.company?.name,
@@ -2984,6 +2998,9 @@ function renderNewsFeed() {
               <span class="news-tag ${it.type}">${it.tag}</span>
               ${it.text}
             </div>
+            ${(!it.isMe && it.targetUid && it.eventKey && typeof window.renderReactionsBar === 'function') 
+              ? window.renderReactionsBar(it.targetUid, it.eventKey) 
+              : ''}
           </div>
         </div>
       `).join('')}
