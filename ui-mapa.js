@@ -130,6 +130,232 @@ let selectedCompanyUid = null;
 let companies = []; // Empreses renderitzades al mapa
 let hoveredBuilding = null;
 
+// ★★★ SESSIÓ 2: Sprites animats ★★★
+let pedestrians = [];  // Persones caminant per voreres
+let cars = [];          // Cotxes pels carrers
+let visualEvents = [];  // Flames, sirenes, etc. que apareixen quan passa quelcom
+
+const PEDESTRIAN_EMOJIS = ['🚶', '🚶‍♀️', '🧑', '👩', '👨', '🧍', '🧍‍♀️', '👔', '🧑‍💼', '👩‍💼', '👨‍💼', '🧑‍🎓', '🛍️'];
+const CAR_EMOJIS = ['🚗', '🚙', '🚕', '🚐', '🛵'];
+const BIG_VEHICLE_EMOJIS = ['🚚', '🚌', '🚓'];
+
+function isTileOfType(col, row, types) {
+  const t = CITY_LAYOUT[row]?.[col];
+  return types.includes(t);
+}
+
+function findWalkableNeighbor(col, row) {
+  const dirs = [[0,1],[1,0],[0,-1],[-1,0]];
+  const options = [];
+  dirs.forEach(([dc, dr]) => {
+    const nc = col + dc, nr = row + dr;
+    if (nc < 0 || nc >= MAP_CONFIG.cols || nr < 0 || nr >= MAP_CONFIG.rows) return;
+    if (isTileOfType(nc, nr, [3, 4, 6, 9])) {
+      options.push({ col: nc, row: nr });
+    }
+  });
+  return options;
+}
+
+function findRoadNeighbor(col, row, currentDir) {
+  const dirs = {
+    right: [1, 0], left: [-1, 0], down: [0, 1], up: [0, -1]
+  };
+  const options = [];
+  const opposite = { right:'left', left:'right', up:'down', down:'up' };
+  
+  if (currentDir && dirs[currentDir]) {
+    const [dc, dr] = dirs[currentDir];
+    const nc = col + dc, nr = row + dr;
+    if (nc >= 0 && nc < MAP_CONFIG.cols && nr >= 0 && nr < MAP_CONFIG.rows &&
+        isTileOfType(nc, nr, [1, 2, 8, 9])) {
+      options.push({ col: nc, row: nr, dir: currentDir });
+    }
+  }
+  
+  const otherDirs = Object.keys(dirs).filter(d => d !== currentDir).sort(() => Math.random() - 0.5);
+  for (const dir of otherDirs) {
+    if (currentDir && dir === opposite[currentDir]) continue;
+    const [dc, dr] = dirs[dir];
+    const nc = col + dc, nr = row + dr;
+    if (nc < 0 || nc >= MAP_CONFIG.cols || nr < 0 || nr >= MAP_CONFIG.rows) continue;
+    if (isTileOfType(nc, nr, [1, 2, 8, 9])) {
+      options.push({ col: nc, row: nr, dir });
+    }
+  }
+  return options;
+}
+
+function spawnPedestrian() {
+  const walkableTiles = [];
+  for (let r = 0; r < MAP_CONFIG.rows; r++) {
+    for (let c = 0; c < MAP_CONFIG.cols; c++) {
+      if (isTileOfType(c, r, [3])) walkableTiles.push({ col: c, row: r });
+    }
+  }
+  if (walkableTiles.length === 0) return;
+  
+  const spawn = walkableTiles[Math.floor(Math.random() * walkableTiles.length)];
+  const emoji = PEDESTRIAN_EMOJIS[Math.floor(Math.random() * PEDESTRIAN_EMOJIS.length)];
+  
+  pedestrians.push({
+    id: Date.now() + Math.random(),
+    emoji,
+    px: spawn.col * MAP_CONFIG.tileSize + MAP_CONFIG.tileSize/2,
+    py: spawn.row * MAP_CONFIG.tileSize + MAP_CONFIG.tileSize/2,
+    col: spawn.col,
+    row: spawn.row,
+    targetCol: spawn.col,
+    targetRow: spawn.row,
+    speed: 15 + Math.random() * 10,
+    life: 60 + Math.random() * 60,
+    age: 0,
+    bobPhase: Math.random() * Math.PI * 2,
+  });
+}
+
+function spawnCar() {
+  const roadEdges = [];
+  for (let r = 0; r < MAP_CONFIG.rows; r++) {
+    for (let c = 0; c < MAP_CONFIG.cols; c++) {
+      if (!isTileOfType(c, r, [1, 2, 8])) continue;
+      if (c === 0 || c === MAP_CONFIG.cols - 1 || r === 0 || r === MAP_CONFIG.rows - 1) {
+        roadEdges.push({ col: c, row: r });
+      }
+    }
+  }
+  if (roadEdges.length === 0) return;
+  
+  const spawn = roadEdges[Math.floor(Math.random() * roadEdges.length)];
+  const isSpecial = Math.random() < 0.08;
+  const emoji = isSpecial 
+    ? BIG_VEHICLE_EMOJIS[Math.floor(Math.random() * BIG_VEHICLE_EMOJIS.length)]
+    : CAR_EMOJIS[Math.floor(Math.random() * CAR_EMOJIS.length)];
+  
+  let dir = 'right';
+  if (spawn.col === MAP_CONFIG.cols - 1) dir = 'left';
+  else if (spawn.row === MAP_CONFIG.rows - 1) dir = 'up';
+  else if (spawn.row === 0) dir = 'down';
+  
+  cars.push({
+    id: Date.now() + Math.random(),
+    emoji,
+    px: spawn.col * MAP_CONFIG.tileSize + MAP_CONFIG.tileSize/2,
+    py: spawn.row * MAP_CONFIG.tileSize + MAP_CONFIG.tileSize/2,
+    col: spawn.col,
+    row: spawn.row,
+    targetCol: spawn.col,
+    targetRow: spawn.row,
+    dir,
+    speed: isSpecial ? 40 : 50 + Math.random() * 30,
+    life: 40,
+    age: 0,
+    isSpecial,
+  });
+}
+
+function updateSprites(delta) {
+  const hour = (gameTime / 3600) % 24;
+  const isNight = hour >= 22 || hour < 6;
+  const isRushHour = (hour >= 8 && hour < 10) || (hour >= 18 && hour < 20);
+  
+  const pedestrianTarget = isNight ? 4 : isRushHour ? 22 : 10;
+  const carTarget = isNight ? 2 : isRushHour ? 9 : 4;
+  
+  if (pedestrians.length < pedestrianTarget && Math.random() < 0.15) spawnPedestrian();
+  if (cars.length < carTarget && Math.random() < 0.08) spawnCar();
+  
+  pedestrians = pedestrians.filter(p => {
+    p.age += delta;
+    if (p.age > p.life) return false;
+    
+    const targetPx = p.targetCol * MAP_CONFIG.tileSize + MAP_CONFIG.tileSize/2;
+    const targetPy = p.targetRow * MAP_CONFIG.tileSize + MAP_CONFIG.tileSize/2;
+    const dx = targetPx - p.px;
+    const dy = targetPy - p.py;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    
+    if (dist < 3) {
+      p.col = p.targetCol;
+      p.row = p.targetRow;
+      const neighbors = findWalkableNeighbor(p.col, p.row);
+      if (neighbors.length === 0) return false;
+      const next = neighbors[Math.floor(Math.random() * neighbors.length)];
+      p.targetCol = next.col;
+      p.targetRow = next.row;
+    } else {
+      const moveDist = p.speed * delta;
+      p.px += (dx/dist) * moveDist;
+      p.py += (dy/dist) * moveDist;
+    }
+    return true;
+  });
+  
+  cars = cars.filter(c => {
+    c.age += delta;
+    if (c.age > c.life) return false;
+    
+    const targetPx = c.targetCol * MAP_CONFIG.tileSize + MAP_CONFIG.tileSize/2;
+    const targetPy = c.targetRow * MAP_CONFIG.tileSize + MAP_CONFIG.tileSize/2;
+    const dx = targetPx - c.px;
+    const dy = targetPy - c.py;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    
+    if (dist < 5) {
+      c.col = c.targetCol;
+      c.row = c.targetRow;
+      const neighbors = findRoadNeighbor(c.col, c.row, c.dir);
+      if (neighbors.length === 0) return false;
+      const next = Math.random() < 0.7 ? neighbors[0] : neighbors[Math.floor(Math.random() * neighbors.length)];
+      c.targetCol = next.col;
+      c.targetRow = next.row;
+      c.dir = next.dir;
+    } else {
+      const moveDist = c.speed * delta;
+      c.px += (dx/dist) * moveDist;
+      c.py += (dy/dist) * moveDist;
+    }
+    
+    if (c.px < -40 || c.px > MAP_CONFIG.width + 40 || c.py < -40 || c.py > MAP_CONFIG.height + 40) return false;
+    return true;
+  });
+  
+  visualEvents = visualEvents.filter(e => {
+    e.age = (e.age || 0) + delta;
+    return e.age < e.duration;
+  });
+}
+
+
+// ════════════════════════════════════════════════════════════
+//  EVENTS VISUALS SOBRE EL MAPA
+// ════════════════════════════════════════════════════════════
+
+function addVisualEvent(targetUid, type, duration = 10) {
+  const target = companies.find(c => c.uid === targetUid);
+  if (!target) return;
+  
+  visualEvents.push({
+    id: Date.now() + Math.random(),
+    type,
+    targetUid,
+    col: target.col,
+    row: target.row,
+    w: target.w,
+    h: target.h,
+    duration,
+    age: 0,
+  });
+  
+  if (window.playSfx) {
+    if (type === 'fire' || type === 'police') playSfx('alert');
+    else if (type === 'success') playSfx('cling');
+    else playSfx('click');
+  }
+}
+
+window.addMapVisualEvent = addVisualEvent;
+
 // ════════════════════════════════════════════════════════════
 //  CSS
 // ════════════════════════════════════════════════════════════
@@ -763,6 +989,203 @@ function drawNightOverlay(ctx, pal) {
   }
 }
 
+// ─── SPRITES: dibuixar vianants i cotxes ───
+function drawSprites(ctx) {
+  const hour = (gameTime / 3600) % 24;
+  const isNight = hour >= 22 || hour < 6;
+  const isDusk = hour >= 18 && hour < 22;
+  const opacityNight = isNight ? 0.55 : isDusk ? 0.80 : 1;
+  
+  // Vianants
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = '18px serif';
+  pedestrians.forEach(p => {
+    ctx.globalAlpha = opacityNight;
+    // Petit bob vertical per simular caminar
+    const bob = Math.sin(gameTime * 4 + p.bobPhase) * 1.5;
+    // Ombra
+    ctx.fillStyle = 'rgba(0,0,0,.3)';
+    ctx.beginPath();
+    ctx.ellipse(p.px, p.py + 8, 6, 2, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Emoji
+    ctx.fillStyle = '#fff';
+    ctx.globalAlpha = opacityNight;
+    ctx.fillText(p.emoji, p.px, p.py + bob);
+  });
+  
+  // Cotxes
+  ctx.font = '22px serif';
+  cars.forEach(c => {
+    ctx.globalAlpha = opacityNight;
+    // Ombra
+    ctx.fillStyle = 'rgba(0,0,0,.35)';
+    ctx.beginPath();
+    ctx.ellipse(c.px, c.py + 10, 12, 3, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Halo si és especial (policia)
+    if (c.isSpecial && c.emoji === '🚓') {
+      const flash = Math.sin(gameTime * 15) > 0;
+      ctx.fillStyle = flash ? 'rgba(79,127,255,.5)' : 'rgba(239,68,68,.5)';
+      ctx.beginPath();
+      ctx.arc(c.px, c.py, 16, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    // Emoji
+    ctx.fillStyle = '#fff';
+    ctx.globalAlpha = opacityNight;
+    ctx.fillText(c.emoji, c.px, c.py);
+  });
+  
+  ctx.globalAlpha = 1;
+}
+
+// ─── EVENTS VISUALS: flames, sirenes, pluja de fletxes, etc. ───
+function drawVisualEvents(ctx) {
+  visualEvents.forEach(e => {
+    const x = e.col * MAP_CONFIG.tileSize;
+    const y = e.row * MAP_CONFIG.tileSize;
+    const w = e.w * MAP_CONFIG.tileSize;
+    const h = e.h * MAP_CONFIG.tileSize;
+    const t = e.age;
+    const remaining = e.duration - e.age;
+    
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    if (e.type === 'fire') {
+      // Flames al damunt de l'edifici — emojis oscil·lant
+      const flames = ['🔥', '🔥', '🔥'];
+      ctx.font = '32px serif';
+      flames.forEach((f, i) => {
+        const wave = Math.sin(t * 8 + i * 1.5) * 3;
+        const fx = x + w * (0.3 + i * 0.2) + wave;
+        const fy = y + h * 0.3 + Math.sin(t * 6 + i) * 5;
+        ctx.fillText(f, fx, fy);
+      });
+      // Fum
+      ctx.font = '28px serif';
+      for (let i = 0; i < 4; i++) {
+        const smokeY = y - 15 - i * 20 - (t * 30) % 40;
+        ctx.globalAlpha = Math.max(0, 0.6 - i * 0.15 - (t * 30 % 40) / 100);
+        ctx.fillText('💨', x + w/2 + Math.sin(t * 3 + i) * 10, smokeY);
+      }
+      ctx.globalAlpha = 1;
+      // Glow vermell al voltant
+      const pulse = 0.5 + Math.sin(t * 8) * 0.3;
+      ctx.shadowColor = 'rgba(239,68,68,.8)';
+      ctx.shadowBlur = 25 * pulse;
+      ctx.strokeStyle = 'rgba(239,68,68,.6)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x - 2, y - 2, w + 4, h + 4);
+      ctx.shadowBlur = 0;
+    }
+    
+    else if (e.type === 'police') {
+      // Sirenes blau-vermell parpellejant al damunt
+      const flash = Math.sin(t * 10) > 0;
+      ctx.font = '28px serif';
+      ctx.fillText(flash ? '🚨' : '🚔', x + w/2, y - 15);
+      // Aura parpellejant
+      ctx.shadowColor = flash ? 'rgba(79,127,255,.8)' : 'rgba(239,68,68,.8)';
+      ctx.shadowBlur = 20;
+      ctx.strokeStyle = flash ? 'rgba(79,127,255,.7)' : 'rgba(239,68,68,.7)';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(x - 2, y - 2, w + 4, h + 4);
+      ctx.shadowBlur = 0;
+    }
+    
+    else if (e.type === 'inspection') {
+      // Inspector acostant-se amb portafoli
+      ctx.font = '28px serif';
+      const walkX = x - 30 + t * 15; // camina cap a l'edifici
+      if (walkX < x + w/2) {
+        ctx.fillText('🕴️', walkX, y + h/2);
+        ctx.fillText('📋', walkX + 15, y + h/2 - 10);
+      } else {
+        // Ja ha arribat — icones a la façana
+        ctx.fillText('🕴️📋', x + w/2, y + h/2);
+      }
+    }
+    
+    else if (e.type === 'migration') {
+      // Un empleat migrant — apareix una fletxa cap a una altra empresa
+      if (e.targetUid2) {
+        const target2 = companies.find(c => c.uid === e.targetUid2);
+        if (target2) {
+          const x2 = target2.col * MAP_CONFIG.tileSize + target2.w * MAP_CONFIG.tileSize / 2;
+          const y2 = target2.row * MAP_CONFIG.tileSize + target2.h * MAP_CONFIG.tileSize / 2;
+          const x1 = x + w/2;
+          const y1 = y + h/2;
+          // Progrés del moviment
+          const progress = Math.min(1, t / (e.duration * 0.8));
+          const empX = x1 + (x2 - x1) * progress;
+          const empY = y1 + (y2 - y1) * progress - Math.sin(progress * Math.PI) * 20; // arc
+          ctx.font = '24px serif';
+          ctx.fillText('🧑‍💼', empX, empY);
+          // Línia de trajectòria
+          ctx.strokeStyle = 'rgba(245,158,11,.4)';
+          ctx.lineWidth = 2;
+          ctx.setLineDash([4, 4]);
+          ctx.beginPath();
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+      }
+    }
+    
+    else if (e.type === 'news-bad') {
+      // Diari amb titular vermell
+      ctx.font = '32px serif';
+      const bounce = Math.sin(t * 4) * 3;
+      ctx.fillText('📰', x + w/2, y - 20 + bounce);
+      // Text "SCANDAL!" parpellejant
+      ctx.font = 'bold 10px system-ui';
+      ctx.fillStyle = Math.sin(t * 8) > 0 ? '#ef4444' : '#fff';
+      ctx.fillText('ESCÀNDOL!', x + w/2, y - 5);
+    }
+    
+    else if (e.type === 'success') {
+      // Confeti simple
+      const confettiCount = 8;
+      for (let i = 0; i < confettiCount; i++) {
+        const angle = (i / confettiCount) * Math.PI * 2;
+        const dist = t * 80;
+        const cx = x + w/2 + Math.cos(angle) * dist;
+        const cy = y + h/2 + Math.sin(angle) * dist - t * 50;
+        ctx.fillStyle = ['#f5d547','#ef4444','#4f7fff','#10b981','#a78bfa'][i % 5];
+        ctx.fillRect(cx, cy, 6, 10);
+      }
+      // Emoji estrella
+      ctx.font = '32px serif';
+      ctx.fillStyle = '#f5d547';
+      ctx.fillText('⭐', x + w/2, y + h/2);
+    }
+    
+    else if (e.type === 'review') {
+      // Gotes d'estrelles caient
+      ctx.font = '22px serif';
+      for (let i = 0; i < 5; i++) {
+        const phase = (t * 1.5 + i * 0.4) % 1;
+        const sx = x + (i / 5) * w + 10;
+        const sy = y - 10 + phase * (h + 30);
+        ctx.globalAlpha = 1 - phase * 0.5;
+        ctx.fillText('⭐', sx, sy);
+      }
+      ctx.globalAlpha = 1;
+    }
+    
+    // Fade out al final
+    if (remaining < 1) {
+      ctx.fillStyle = `rgba(0,0,0,${1 - remaining})`;
+      // Opcional: un lleuger oscuriment
+    }
+  });
+}
+
 function render() {
   if (!canvas || !ctx) return;
   
@@ -772,22 +1195,30 @@ function render() {
   ctx.fillStyle = pal.sky;
   ctx.fillRect(0, 0, MAP_CONFIG.width, MAP_CONFIG.height);
   
-  // Capes: base, POI, empreses, overlay nocturn
+  // Capes: base → POI → cotxes (sota edificis) → empreses → vianants (damunt) → events → overlay nocturn
   drawCityBase(ctx, pal);
   drawPOI(ctx, pal);
+  // Els cotxes van SOTA els edificis (perquè visualment sembli que estan als carrers)
+  // Dibuixem vehicles primer, després edificis, després vianants
+  drawSprites(ctx);
   drawCompanies(ctx, pal);
+  // Tornem a dibuixar els vianants que caminen per davant dels edificis (efecte de profunditat simple)
+  // — per simplicitat els deixem tots dibuixats al mateix moment
+  drawVisualEvents(ctx);
   drawNightOverlay(ctx, pal);
 }
 
 function animationLoop(timestamp) {
   if (!lastFrameTime) lastFrameTime = timestamp;
-  const delta = (timestamp - lastFrameTime) / 1000; // segons reals
+  const delta = Math.min(0.1, (timestamp - lastFrameTime) / 1000); // màxim 100ms per evitar salts grans
   lastFrameTime = timestamp;
   
   // Avançar temps del joc
-  // 1 dia virtual = DAY_LENGTH_SECONDS reals → 24h / DAY_LENGTH_SECONDS = X segons virtuals per segon real
   gameTime += delta * (86400 / DAY_LENGTH_SECONDS);
   if (gameTime >= 86400) gameTime -= 86400;
+  
+  // ★ Actualitzar sprites i events visuals ★
+  updateSprites(delta);
   
   render();
   updateClock();
@@ -1034,8 +1465,50 @@ function renderSidebar() {
         • 🛡️ Protegeix la teva empresa amb seguretat
       </div>
     </div>
+    
+    <div class="sidebar-section" style="border-color:rgba(124,58,237,.3)">
+      <h3>🎬 Demo d'efectes</h3>
+      <div style="font-size:10px;color:var(--text3);margin-bottom:8px">Prova com es veuran els events al mapa. Fes clic en una empresa del mapa, després en un botó aquí.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+        <button class="vallnova-ctrl-btn" style="background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);padding:6px;font-size:10px" onclick="window._demoEvent('fire')">🔥 Incendi</button>
+        <button class="vallnova-ctrl-btn" style="background:rgba(79,127,255,.15);border-color:rgba(79,127,255,.3);padding:6px;font-size:10px" onclick="window._demoEvent('police')">🚔 Policia</button>
+        <button class="vallnova-ctrl-btn" style="background:rgba(245,158,11,.15);border-color:rgba(245,158,11,.3);padding:6px;font-size:10px" onclick="window._demoEvent('inspection')">🕴️ Inspecció</button>
+        <button class="vallnova-ctrl-btn" style="background:rgba(239,68,68,.10);border-color:rgba(239,68,68,.3);padding:6px;font-size:10px" onclick="window._demoEvent('news-bad')">📰 Escàndol</button>
+        <button class="vallnova-ctrl-btn" style="background:rgba(16,185,129,.15);border-color:rgba(16,185,129,.3);padding:6px;font-size:10px" onclick="window._demoEvent('success')">⭐ Èxit</button>
+        <button class="vallnova-ctrl-btn" style="background:rgba(245,158,11,.10);border-color:rgba(245,158,11,.3);padding:6px;font-size:10px" onclick="window._demoEvent('review')">✨ Reviews</button>
+        <button class="vallnova-ctrl-btn" style="background:rgba(124,58,237,.10);border-color:rgba(124,58,237,.3);padding:6px;font-size:10px;grid-column:1/-1" onclick="window._demoMigration()">🧑‍💼 Migració empleat (2 empreses necessàries)</button>
+      </div>
+    </div>
   `;
 }
+
+window._demoEvent = function(type) {
+  if (!selectedCompanyUid) {
+    showToast('👆 Primer selecciona una empresa al mapa');
+    return;
+  }
+  addVisualEvent(selectedCompanyUid, type, 8);
+  showToast('🎬 Demo: ' + type + ' (8 segons)');
+};
+
+window._demoMigration = function() {
+  if (companies.length < 2) {
+    showToast('Necessites almenys 2 empreses al mapa');
+    return;
+  }
+  const src = companies[0];
+  const dst = companies[1];
+  visualEvents.push({
+    id: Date.now(),
+    type: 'migration',
+    targetUid: src.uid,
+    targetUid2: dst.uid,
+    col: src.col, row: src.row, w: src.w, h: src.h,
+    duration: 5, age: 0,
+  });
+  if (window.playSfx) window.playSfx('click');
+  showToast('🎬 Demo: empleat migrant de ' + src.name + ' a ' + dst.name);
+};
 
 window.renderMap = function() {
   const tab = document.getElementById('tab-map');
