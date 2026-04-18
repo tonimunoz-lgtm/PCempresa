@@ -3556,8 +3556,8 @@ function renderDashboard() {
     if (window.renderFacilityIllustration) window.renderFacilityIllustration('facility-illustration-dash');
   }
 
-  // Sol·licituds de departaments (IA caps)
-  if (window.generateDeptAIRequests) { window.generateDeptAIRequests(gd); window.renderDeptRequests(); }
+  // ★ FIX: Renderitzar sol·licituds de caps de departament directament ★
+  renderDeptRequestsPanel(gd);
 
   // Departments
   const depts = [
@@ -4662,6 +4662,144 @@ function generateDeptRequests(gd) {
   requests.forEach(r=>gd.notifications.push({id:Date.now()+Math.random(),icon:r.icon,title:"["+r.dept+"] "+r.emissor,desc:r.msg,time:"S"+gd.week,urgent:r.urgent,read:false}));
 }
 
+// ★★★ Panel de sol·licituds dels caps de departament — anàlisi en temps real ★★★
+function renderDeptRequestsPanel(gd) {
+  const panel = document.getElementById('dept-requests-panel');
+  if (!panel) return;
+  
+  const emps = gd.employees||[];
+  const machines = gd.machines||[];
+  const cash = gd.finances?.cash||0;
+  const rev = gd.finances?.monthly_revenue||0;
+  const costs = gd.finances?.monthly_costs||0;
+  const result = rev - costs;
+  
+  // Calcular sol·licituds en temps real (NO aleatori — basat en estat actual)
+  const requests = [];
+  
+  // Vendes
+  const comercials = emps.filter(e=>e.dept==='vendes').length;
+  if (comercials < 1 && rev > 0) {
+    requests.push({
+      icon:'📊', dept:'Vendes', emissor:'Cap Comercial',
+      msg:'No tenim cap comercial! Sense força de vendes, perdrem oportunitats clau. Proposo contractar mínim 1 comercial.',
+      urgent:true,
+      action: { tab:'hr', text:'Anar a RRHH' },
+    });
+  } else if (comercials < 2 && rev > 5000) {
+    requests.push({
+      icon:'📊', dept:'Vendes', emissor:'Cap Comercial',
+      msg:`Només tenim ${comercials} comercial(s) i les vendes creixen. La competència ens guanya terreny. Necessitem reforçar l'equip.`,
+      urgent:false,
+      action: { tab:'hr', text:'Contractar' },
+    });
+  }
+  
+  // Producció
+  const empsProd = emps.filter(e=>e.dept==='produccio').length;
+  const capacitatMax = machines.filter(m=>!m.installing).reduce((s,m)=>s+(m.capacity||0),0);
+  if (machines.length === 0) {
+    requests.push({
+      icon:'🏭', dept:'Producció', emissor:'Director Operacions',
+      msg:'No tenim cap maquinària instal·lada. Sense equipament, la producció és manual i lenta. Proposo invertir en equipament bàsic.',
+      urgent: rev > 0,
+      action: { tab:'production', text:'Comprar maquinària' },
+    });
+  } else if (empsProd === 0) {
+    requests.push({
+      icon:'🏭', dept:'Producció', emissor:'Director Operacions',
+      msg:'Tenim maquinària però NINGÚ a producció. Les màquines no produeixen soles. Proposo contractar operaris.',
+      urgent:true,
+      action: { tab:'hr', text:'Contractar operaris' },
+    });
+  } else if (capacitatMax > 0 && empsProd < Math.ceil(capacitatMax/200)) {
+    requests.push({
+      icon:'🏭', dept:'Producció', emissor:'Director Operacions',
+      msg:`Tenim capacitat per a ${capacitatMax} unitats però només ${empsProd} operari(s). Estem infrautilitzant la maquinària.`,
+      urgent:false,
+      action: { tab:'hr', text:'Reforçar plantilla' },
+    });
+  }
+  
+  // RRHH — moral
+  const avgMorale = emps.length>0 ? emps.reduce((s,e)=>s+(e.morale||60),0)/emps.length : 100;
+  if (emps.length >= 3 && avgMorale < 50) {
+    requests.push({
+      icon:'👥', dept:'RRHH', emissor:'Director RRHH',
+      msg:`La moral de l'equip és crítica (${Math.round(avgMorale)}%). Risc de baixes i caiguda de productivitat. Proposo bonus o millora de condicions.`,
+      urgent: avgMorale < 35,
+      action: { tab:'hr', text:'Revisar equip' },
+    });
+  }
+  
+  // Finances — liquiditat
+  if (cash < 0) {
+    requests.push({
+      icon:'💰', dept:'Finances', emissor:'Director Financer (CFO)',
+      msg:`Tresoreria NEGATIVA (${cash.toLocaleString('ca')}€)! Risc de fallida imminent. Cal acció urgent: préstec, ampliació de capital o reducció de costos.`,
+      urgent:true,
+      action: { tab:'finances', text:'Acció urgent' },
+    });
+  } else if (cash < (costs/4.33) * 2) {
+    // Menys de 2 setmanes de runway
+    requests.push({
+      icon:'💰', dept:'Finances', emissor:'Director Financer (CFO)',
+      msg:`Tresoreria ajustada: només ${(cash/(costs/4.33)).toFixed(1)} setmanes de runway. Recomano línia de crèdit preventiva.`,
+      urgent:false,
+      action: { tab:'finances', text:'Demanar crèdit' },
+    });
+  }
+  
+  // Resultats negatius
+  if (result < -3000) {
+    requests.push({
+      icon:'📉', dept:'Direcció', emissor:'Consultor extern',
+      msg:`Estem perdent ${Math.abs(result).toLocaleString('ca')}€/mes. Cal revisar costos o pujar preus. Mirar el desglossament d'ingressos al dashboard.`,
+      urgent:true,
+      action: { tab:'sales', text:'Revisar preus' },
+    });
+  }
+  
+  // Màrqueting
+  const mkt = Object.values(gd.marketing?.channels||{}).reduce((s,v)=>s+v,0);
+  if (rev > 5000 && mkt < rev * 0.02 && emps.filter(e=>e.dept==='marketing').length === 0) {
+    requests.push({
+      icon:'📣', dept:'Màrqueting', emissor:'Consultor de Marketing',
+      msg:`No invertim en màrqueting (<2% de les vendes). Estem perdent oportunitats de creixement. Proposo activar campanyes.`,
+      urgent:false,
+      action: { tab:'marketing', text:'Activar campanyes' },
+    });
+  }
+  
+  // Renderitzar
+  if (requests.length === 0) {
+    panel.innerHTML = `
+      <div style="text-align:center;padding:24px;color:var(--green);font-size:13px">
+        ✅ <strong>Tot sota control!</strong> Els caps de departament no tenen cap sol·licitud urgent.
+      </div>`;
+    return;
+  }
+  
+  // Ordenar: urgents primer
+  requests.sort((a, b) => (b.urgent?1:0) - (a.urgent?1:0));
+  
+  panel.innerHTML = requests.map(r => `
+    <div style="display:flex;gap:12px;padding:12px;background:${r.urgent?'rgba(239,68,68,.06)':'rgba(255,255,255,.03)'};border:1px solid ${r.urgent?'rgba(239,68,68,.20)':'var(--border)'};border-radius:10px;margin-bottom:8px;border-left:3px solid ${r.urgent?'var(--red)':'var(--accent)'}">
+      <div style="font-size:26px;flex-shrink:0">${r.icon}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap">
+          <span style="font-size:11px;font-weight:800;color:${r.urgent?'var(--red)':'var(--accent)'};letter-spacing:0.5px">${r.urgent?'🚨 URGENT · ':''}${r.dept}</span>
+          <span style="font-size:11px;color:var(--text3)">— ${r.emissor}</span>
+        </div>
+        <div style="font-size:12px;color:var(--text);line-height:1.5">${r.msg}</div>
+        ${r.action ? `
+          <button onclick="showTab('${r.action.tab}')" style="margin-top:8px;background:${r.urgent?'var(--red)':'var(--accent)'};color:#fff;border:none;padding:6px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font)">→ ${r.action.text}</button>
+        ` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
 
 function endOfYear() {
   const gd = G.gameData;
@@ -5016,7 +5154,8 @@ window.renderFinances    = renderFinances;
 window.renderHR          = renderHR;
 window.renderProduction  = renderProduction;
 window.renderMarketing   = renderMarketing;
-window.renderMap         = renderMap;
+// window.renderMap      = renderMap; // ★ Comentat: ara ui-mapa.js defineix el mapa nou de Vallnova
+window._renderMapLegacy  = renderMap; // Guardem el vell per si algú el necessita
 window.renderRanking     = renderRanking;
 window.finishWizard      = finishWizard;
 window.wizardData        = wizardData;
@@ -5050,5 +5189,6 @@ window.JOBS_BY_PRESTIGI  = JOBS_BY_PRESTIGI;
 <script defer src="ui-gameplay.js"></script>
 <script defer src="ui-fixes.js"></script>
 <script defer src="ui-season.js"></script>
+<script defer src="ui-mapa.js"></script>
 </body>
 </html>
