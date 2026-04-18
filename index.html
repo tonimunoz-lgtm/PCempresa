@@ -4271,9 +4271,11 @@ function renderMap() {
 }
 
 function renderRanking() {
+  const rankBody = document.getElementById('rank-body');
+  if (!rankBody) return; // ★ FIX: el nou mapa (Vallnova) no té rank-body
   const all = [...G.otherPlayers, G.gameData].filter(p => p && p.company);
   all.sort((a, b) => (b.finances?.cash || 0) - (a.finances?.cash || 0));
-  document.getElementById('rank-body').innerHTML = all.slice(0, 15).map((p, i) => `
+  rankBody.innerHTML = all.slice(0, 15).map((p, i) => `
     <div class="rank-row ${p.uid === G.uid ? 'me' : ''}" onclick="">
       <div class="rank-num">${i+1}</div>
       <div class="rank-name">${p.company?.sectorData?.icon || '🏢'} ${p.displayName || '—'}</div>
