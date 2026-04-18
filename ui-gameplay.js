@@ -2506,6 +2506,7 @@ function checkRetention(gd) {
 
 // — Sons sintètics generats amb Web Audio API (sense cap fitxer extern) —
 let _audioCtx = null;
+let _audioUnlocked = false;
 function getAudio() {
   if (!_audioCtx) {
     try {
@@ -2514,10 +2515,28 @@ function getAudio() {
   }
   return _audioCtx;
 }
+// Desbloquejar àudio al primer clic/toc de l'usuari (Chrome policy)
+function unlockAudio() {
+  if (_audioUnlocked) return;
+  const ctx = getAudio();
+  if (!ctx) return;
+  if (ctx.state === 'suspended') {
+    ctx.resume().then(() => { _audioUnlocked = true; }).catch(() => {});
+  } else {
+    _audioUnlocked = true;
+  }
+}
+// Escoltar primera interacció per desbloquejar
+['click', 'touchstart', 'keydown'].forEach(evt => {
+  document.addEventListener(evt, unlockAudio, { once: false, capture: true });
+});
+
 function playSfx(type) {
   if (localStorage.getItem('sfx-disabled') === '1') return;
   const ctx = getAudio();
   if (!ctx) return;
+  // Si encara no hi ha interacció de l'usuari, no intentem reproduir (evita spam a la consola)
+  if (ctx.state === 'suspended' && !_audioUnlocked) return;
   try {
     const now = ctx.currentTime;
     const osc = ctx.createOscillator();

@@ -2270,7 +2270,7 @@ function startRealtimeListeners() {
       
       console.log('🏫 allStudents filtrats per classCode "' + myClassCode + '": ' + G.allStudents.length + ' alumnes');
       
-      if (G.currentTab === 'map') renderMap();
+      if (G.currentTab === 'map' && typeof window.renderMap === 'function') window.renderMap();
       renderRanking();
     }, (err) => {
       // Permission denied és normal si les regles no permeten llegir tots
@@ -4632,7 +4632,7 @@ window.advanceWeek = async function() {
   else if (G.currentTab === "hr")         renderHR();
   else if (G.currentTab === "production") renderProduction();
   else if (G.currentTab === "marketing")  renderMarketing();
-  else if (G.currentTab === "map")        renderMap();
+  else if (G.currentTab === "map")        { if (typeof window.renderMap === 'function') window.renderMap(); }
   else {
     // Tabs externs: actualitzar suaument si estan visibles
     // sense posar spinner (el contingut ja hi és)
@@ -5018,7 +5018,11 @@ window.showTab = function(tab) {
   if (tab === 'hr')         { renderHR();        return; }
   if (tab === 'production') { renderProduction(); return; }
   if (tab === 'marketing')  { renderMarketing(); return; }
-  if (tab === 'map')        { setTimeout(() => { renderMap(); renderRanking(); }, 100); return; }
+  if (tab === 'map')        { setTimeout(() => { 
+    // Fem servir window.renderMap per cridar el mapa nou (ui-mapa.js) si existeix
+    if (typeof window.renderMap === 'function') window.renderMap();
+    if (typeof renderRanking === 'function') renderRanking();
+  }, 100); return; }
   if (tab === 'setup')      { return; }
 
   // Tabs externs: mostrar spinner NOMÉS si el panel està buit
